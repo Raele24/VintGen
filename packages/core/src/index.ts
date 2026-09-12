@@ -1,5 +1,5 @@
 /**
- * VintStack Core Package Exports
+ * VintGen Core Package Exports
  */
 
 export * from './types';

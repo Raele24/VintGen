@@ -1,4 +1,4 @@
-# VintStack
+# VintGen
 
 > **Open-Source AI Listing Generator for Vinted & Secondhand Fashion**  
 > Multimodal Vision &bull; Fair Market Pricing &bull; Pure BYOK Privacy &bull; Zero AI Slop
@@ -12,14 +12,14 @@
 
 ## Overview
 
-**VintStack** turns raw clothing and accessory photographs into high-converting, search-optimized listings for **Vinted** in seconds.
+**VintGen** turns raw clothing and accessory photographs into high-converting, search-optimized listings for **Vinted** in seconds.
 
-Built for privacy-conscious resellers, developers, and vintage enthusiasts, VintStack operates on a **strict Bring Your Own Key (BYOK)** model powered by Google Gemini Multimodal Vision.
+Built for privacy-conscious resellers, developers, and vintage enthusiasts, VintGen operates on a **strict Bring Your Own Key (BYOK)** model powered by Google Gemini Multimodal Vision.
 
 ### Three Delivery Channels:
 1. **Web Studio (`apps/web`)**: Modern Angular 21 application with direct client-to-API communication (no proxy, 100% private in your browser).
-2. **Terminal CLI (`packages/cli`)**: Scriptable command-line tool for local processing and batch workflows (`npx vintstack`).
-3. **Agent Skill (`skills/vintstack`)**: Standardized agent skill for Google Antigravity, Claude Code, GitHub Copilot, and Gemini Gems.
+2. **Terminal CLI (`packages/cli`)**: Scriptable command-line tool for local processing and batch workflows (`npx vintgen`).
+3. **Agent Skill (`skills/vintgen`)**: Standardized agent skill for Google Antigravity, Claude Code, GitHub Copilot, and Gemini Gems.
 
 ---
 
@@ -43,8 +43,8 @@ Built for privacy-conscious resellers, developers, and vintage enthusiasts, Vint
 
 ### 2. Clone & Install Dependencies
 ```bash
-git clone https://github.com/vintstack/vintstack.git
-cd vintstack
+git clone https://github.com/vintgen/vintgen.git
+cd vintgen
 npm install
 ```
 
@@ -67,14 +67,14 @@ npm run cli -- --images ./jacket_front.jpg,./jacket_tag.jpg --notes "Size L, 100
 ## Repository Structure
 
 ```
-vintstack/
+vintgen/
 ├── apps/
 │   └── web/                 # Angular 21 Standalone Web Studio (Signals + SCSS)
 ├── packages/
 │   ├── core/                # Shared AI Engine, JSON Schemas & Platform Adapters
-│   └── cli/                 # Terminal CLI binary (vintstack executable)
+│   └── cli/                 # Terminal CLI binary (vintgen executable)
 ├── skills/
-│   └── vintstack/           # Agent Skill (SKILL.md) & Prompt Templates
+│   └── vintgen/           # Agent Skill (SKILL.md) & Prompt Templates
 ├── docs/                    # Architectural & Developer Guides
 │   ├── architecture.md      # System data flow and package decoupling
 │   ├── byok-security.md     # Private key isolation documentation
@@ -89,7 +89,7 @@ vintstack/
 
 ## Security & Privacy (BYOK)
 
-VintStack contains **zero telemetry proxies** and **zero data-logging servers**:
+VintGen contains **zero telemetry proxies** and **zero data-logging servers**:
 - In the **Web Studio**, your API key is stored exclusively in your browser's local storage and sent directly to Google's official endpoints via client-side `fetch`.
 - In the **CLI**, the key remains in-memory for the duration of the command.
 - Your photos and listings are never stored on external databases or sold to third parties.
@@ -102,11 +102,11 @@ For more information, see [docs/byok-security.md](docs/byok-security.md).
 
 Want your AI assistant to generate Vinted listings for you?
 
-- **Google Antigravity**: Place `skills/vintstack/SKILL.md` inside `.agents/skills/vintstack/SKILL.md`.
-- **Gemini Gems / ChatGPT**: Copy the prompt template from `skills/vintstack/prompts/web-instructions.md`.
+- **Google Antigravity**: Place `skills/vintgen/SKILL.md` inside `.agents/skills/vintgen/SKILL.md`.
+- **Gemini Gems / ChatGPT**: Copy the prompt template from `skills/vintgen/prompts/web-instructions.md`.
 
 ---
 
 ## License
 
-MIT License &copy; 2026 VintStack Contributors.
+MIT License &copy; 2026 VintGen Contributors.

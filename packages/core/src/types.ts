@@ -1,5 +1,5 @@
 /**
- * VintStack Core Type Definitions
+ * VintGen Core Type Definitions
  * 
  * Provides types for multi-modal listing inputs, normalized listing outputs,
  * provider configurations, and platform-specific formatters.

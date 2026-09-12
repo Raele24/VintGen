@@ -16,7 +16,7 @@
     "module": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@vintstack/core": ["../../packages/core/src/index.ts"]
+      "@vintgen/core": ["../../packages/core/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

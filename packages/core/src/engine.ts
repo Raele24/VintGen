@@ -1,5 +1,5 @@
 /**
- * VintStack Main Engine
+ * VintGen Main Engine
  * 
  * Orchestrates multi-modal AI generation and platform adaptation.
  */
@@ -13,7 +13,7 @@ import {
 import { ProviderRegistry } from './providers/registry';
 import { VintedPlatform } from './platforms/vinted.platform';
 
-export class VintStackEngine {
+export class VintGenEngine {
   private registry = ProviderRegistry.getInstance();
 
   /**

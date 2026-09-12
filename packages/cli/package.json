@@ -1,17 +1,17 @@
 {
-  "name": "vintstack",
+  "name": "vintgen",
   "version": "1.0.0",
-  "description": "Command-line interface for VintStack — AI Listing Generator for Vinted & Secondhand Fashion",
+  "description": "Command-line interface for VintGen — AI Listing Generator for Vinted & Secondhand Fashion",
   "bin": {
-    "vintstack": "./bin/vintstack.js"
+    "vintgen": "./bin/vintgen.js"
   },
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node ./bin/vintstack.js"
+    "start": "node ./bin/vintgen.js"
   },
   "dependencies": {
-    "@vintstack/core": "*"
+    "@vintgen/core": "*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

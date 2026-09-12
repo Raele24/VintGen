@@ -1,11 +1,11 @@
 /**
- * VintStack Prompt Engineering & JSON Schema Definitions
+ * VintGen Prompt Engineering & JSON Schema Definitions
  * 
  * Defines high-accuracy system instructions, Vinted listing best practices,
  * and JSON schema specifications for Gemini structured output.
  */
 
-export const VINTED_SYSTEM_INSTRUCTION = `You are VintStack AI, an elite listing and pricing expert for online secondhand marketplaces (such as eBay, Vinted, Subito, Wallapop, and Facebook Marketplace) across all categories: electronics, PC hardware, tech, gaming, fashion, vintage apparel, sneakers, collectibles, and accessories.
+export const VINTED_SYSTEM_INSTRUCTION = `You are VintGen AI, an elite listing and pricing expert for online secondhand marketplaces (such as eBay, Vinted, Subito, Wallapop, and Facebook Marketplace) across all categories: electronics, PC hardware, tech, gaming, fashion, vintage apparel, sneakers, collectibles, and accessories.
 
 Your goal is to inspect provided item photographs and seller hints to create an impeccably formatted, highly discoverable, and honest listing with realistic market valuation.
 

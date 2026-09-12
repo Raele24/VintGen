@@ -1,5 +1,5 @@
 /**
- * VintStack Command-Line Interface (CLI)
+ * VintGen Command-Line Interface (CLI)
  * 
  * Provides automated, scriptable secondhand fashion listing generation
  * using Google Gemini Multimodal Vision API directly from the terminal.
@@ -7,7 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { VintStackEngine, ImageInput, ListingInput } from '@vintstack/core';
+import { VintGenEngine, ImageInput, ListingInput } from '@vintgen/core';
 
 interface CliArgs {
   command?: string;
@@ -97,12 +97,12 @@ function parseArguments(args: string[]): CliArgs {
  */
 function printHelp(): void {
   console.log(`
-vintstack v${PACKAGE_VERSION}
+vintgen v${PACKAGE_VERSION}
 Open-Source AI Listing Generator for Vinted & Secondhand Reselling
 
 USAGE:
-  $ vintstack [command] [options]
-  $ npx vintstack --images path/to/shirt.jpg --notes "Size M, 100% silk"
+  $ vintgen [command] [options]
+  $ npx vintgen --images path/to/shirt.jpg --notes "Size M, 100% silk"
 
 COMMANDS:
   generate              Generate a listing (default)
@@ -123,8 +123,8 @@ OPTIONS:
 
 EXAMPLES:
   $ export GEMINI_API_KEY="AIzaSy..."
-  $ vintstack -i ./front.jpg,./tag.jpg -n "Vintage 90s Ralph Lauren polo"
-  $ vintstack -i ./shoes.jpg --format json -o listing.json
+  $ vintgen -i ./front.jpg,./tag.jpg -n "Vintage 90s Ralph Lauren polo"
+  $ vintgen -i ./shoes.jpg --format json -o listing.json
 `);
 }
 
@@ -157,7 +157,7 @@ async function main(): Promise<void> {
   const args = parseArguments(process.argv.slice(2));
 
   if (args.version) {
-    console.log(`vintstack v${PACKAGE_VERSION}`);
+    console.log(`vintgen v${PACKAGE_VERSION}`);
     process.exitCode = 0; return;
   }
 
@@ -176,7 +176,7 @@ async function main(): Promise<void> {
     process.exitCode = 1; return;
   }
 
-  const engine = new VintStackEngine();
+  const engine = new VintGenEngine();
 
   // Test connection command
   if (args.command === 'test-key') {

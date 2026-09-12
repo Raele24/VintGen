@@ -1,11 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
 import {
-  VintStackEngine,
+  VintGenEngine,
   ListingInput,
   ListingResult,
   FormattedListing,
   VintedPlatform,
-} from '@vintstack/core';
+} from '@vintgen/core';
 import { StorageService } from './storage.service';
 
 @Injectable({
@@ -13,7 +13,7 @@ import { StorageService } from './storage.service';
 })
 export class GeneratorService {
   private storage = inject(StorageService);
-  private engine = new VintStackEngine();
+  private engine = new VintGenEngine();
 
   /** State signals */
   public isGenerating = signal<boolean>(false);

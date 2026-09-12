@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
 /**
- * VintStack CLI Executable Entrypoint
+ * VintGen CLI Executable Entrypoint
  */
 require('../dist/index.js');

@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { ListingResult } from '@vintstack/core';
+import { ListingResult } from '@vintgen/core';
 
 export interface SavedListingItem {
   id: string;
@@ -8,9 +8,9 @@ export interface SavedListingItem {
   previewThumbnail?: string;
 }
 
-const STORAGE_KEY_API_KEY = 'vintstack_gemini_api_key';
-const STORAGE_KEY_MODEL = 'vintstack_gemini_model';
-const STORAGE_KEY_HISTORY = 'vintstack_saved_listings';
+const STORAGE_KEY_API_KEY = 'vintgen_gemini_api_key';
+const STORAGE_KEY_MODEL = 'vintgen_gemini_model';
+const STORAGE_KEY_HISTORY = 'vintgen_saved_listings';
 
 @Injectable({
   providedIn: 'root',
