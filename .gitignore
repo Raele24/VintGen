@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+
+# Build artifacts
+dist/
+tmp/
+out-tsc/
+bazel-out/
+
+# Environment and keys
+.env
+.env.local
+.env.*.local
+*.pem
+
+# IDEs
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Angular / Web
+.angular/
+
+.vercel

@@ -1,0 +1,21 @@
+{
+  "name": "vintstack",
+  "version": "1.0.0",
+  "description": "Command-line interface for VintStack — AI Listing Generator for Vinted & Secondhand Fashion",
+  "bin": {
+    "vintstack": "./bin/vintstack.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/vintstack.js"
+  },
+  "dependencies": {
+    "@vintstack/core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "license": "MIT"
+}

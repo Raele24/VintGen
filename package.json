@@ -1,0 +1,33 @@
+{
+    "name":  "vintstack-workspace",
+    "version":  "1.0.0",
+    "private":  true,
+    "description":  "VintStack — Open-Source AI Listing Generator for Vinted \u0026 Secondhand Fashion",
+    "workspaces":  [
+                       "packages/*",
+                       "apps/*"
+                   ],
+    "scripts":  {
+                    "web":  "npm --workspace=apps/web run start",
+                    "build:core":  "npm --workspace=packages/core run build",
+                    "build:cli":  "npm --workspace=packages/cli run build",
+                    "build:web":  "npm run build:core \u0026\u0026 npm --workspace=apps/web run build",
+                    "build":  "npm run build:core \u0026\u0026 npm run build:cli \u0026\u0026 npm run build:web",
+                    "cli":  "node packages/cli/bin/vintstack.js"
+                },
+    "keywords":  [
+                     "vinted",
+                     "ai",
+                     "listing-generator",
+                     "recommerce",
+                     "secondhand",
+                     "gemini",
+                     "byok",
+                     "angular"
+                 ],
+    "author":  "VintStack Contributors",
+    "license":  "MIT",
+    "devDependencies":  {
+                            "@types/node":  "^22.20.2"
+                        }
+}

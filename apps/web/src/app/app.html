@@ -1,0 +1,734 @@
+<!-- VintStack Application Shell -->
+<div class="app-layout">
+  <!-- Navigation Bar -->
+  <header class="navbar" role="banner">
+    <div class="navbar-inner container">
+      <div class="brand-group">
+        <a href="/" class="brand-link" aria-label="VintStack Home">
+          <svg class="brand-mark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <span class="brand-name">VintStack</span>
+        </a>
+      </div>
+
+      <nav class="nav-actions" aria-label="Main Navigation">
+        <!-- Minimalist API Key Pill -->
+        <button
+          type="button"
+          id="btn-key-status"
+          class="key-status-pill"
+          [class.active]="storage.hasApiKey()"
+          (click)="openKeyModal()"
+          aria-label="Manage Gemini API Key"
+        >
+          <span class="status-indicator"></span>
+          <span class="status-text">{{ storage.hasApiKey() ? 'API Key Active' : 'API Key' }}</span>
+        </button>
+
+        <a
+          href="https://github.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="nav-link"
+          aria-label="GitHub Repository"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="main-body container" role="main">
+    <!-- Clean Minimalist Header -->
+    <section class="workspace-header">
+      <div class="workspace-title-group">
+        <h1 class="workspace-title">New Listing</h1>
+        <p class="workspace-subtitle">Generate title, pricing and description for secondhand marketplaces</p>
+      </div>
+    </section>
+
+    <!-- Studio Grid -->
+    <div class="studio-grid">
+      <!-- LEFT COLUMN: INPUT STUDIO -->
+      <section class="studio-column input-column" aria-labelledby="input-heading">
+        <div class="panel-card">
+          <div class="panel-header">
+            <h2 id="input-heading" class="panel-title">Photos & Details</h2>
+            @if (uploadedImages().length > 0) {
+              <button
+                type="button"
+                class="btn-inline-subtle"
+                (click)="clearAllImages()"
+              >
+                Clear all ({{ uploadedImages().length }})
+              </button>
+            }
+          </div>
+
+          <!-- Drag and Drop Dropzone -->
+          <div
+            id="image-dropzone"
+            class="dropzone-area"
+            [class.drag-over]="isDragging()"
+            (drop)="onDrop($event)"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            role="region"
+            aria-label="Upload item photos"
+          >
+            <input
+              type="file"
+              id="file-upload-input"
+              class="hidden-file-input"
+              multiple
+              accept="image/*"
+              (change)="onFileInputChange($event)"
+            />
+            <label for="file-upload-input" class="dropzone-label">
+              <div class="dropzone-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </div>
+              <div class="dropzone-text-group">
+                <span class="dropzone-primary-text">Drop photos or <span class="browse-link">browse</span></span>
+                <span class="dropzone-sub-text">Front, labels, details, flaws</span>
+              </div>
+            </label>
+          </div>
+
+          <!-- Uploaded Images Thumbnails Strip -->
+          @if (uploadedImages().length > 0) {
+            <div class="thumbnails-grid" aria-label="Uploaded photo previews">
+              @for (img of uploadedImages(); track img.id; let idx = $index) {
+                <div class="thumb-card" [title]="img.name">
+                  <img [src]="img.previewUrl" [alt]="'Photo ' + (idx + 1)" class="thumb-img" />
+                  <button
+                    type="button"
+                    class="thumb-remove-btn"
+                    (click)="removeImage(img.id, $event)"
+                    aria-label="Remove image"
+                  >
+                    &times;
+                  </button>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Context Fields -->
+          <div class="form-fields-group">
+            <div class="form-field">
+              <label for="input-title-hint" class="field-label">Title hint</label>
+              <input
+                type="text"
+                id="input-title-hint"
+                class="field-input"
+                placeholder="e.g. Carhartt Detroit Jacket"
+                [ngModel]="titleHint()"
+                (ngModelChange)="titleHint.set($event)"
+              />
+            </div>
+
+            <div class="fields-row">
+              <div class="form-field flex-1">
+                <label for="input-brand-hint" class="field-label">Brand</label>
+                <input
+                  type="text"
+                  id="input-brand-hint"
+                  class="field-input"
+                  placeholder="e.g. Carhartt, Nike"
+                  [ngModel]="brandHint()"
+                  (ngModelChange)="brandHint.set($event)"
+                />
+              </div>
+
+              <div class="form-field flex-1">
+                <label for="select-condition" class="field-label">Condition</label>
+                <select
+                  id="select-condition"
+                  class="field-select"
+                  [ngModel]="conditionHint()"
+                  (ngModelChange)="conditionHint.set($event)"
+                >
+                  @for (opt of conditionOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="textarea-notes" class="field-label">Notes & Flaws</label>
+              <textarea
+                id="textarea-notes"
+                class="field-textarea"
+                rows="2"
+                placeholder="Mention any wear, stains, fit notes, or fabric composition..."
+                [ngModel]="notes()"
+                (ngModelChange)="notes.set($event)"
+              ></textarea>
+            </div>
+
+            <div class="form-field">
+              <label for="select-language" class="field-label">Language</label>
+              <select
+                id="select-language"
+                class="field-select"
+                [ngModel]="language()"
+                (ngModelChange)="language.set($event)"
+              >
+                @for (lang of languageOptions; track lang.value) {
+                  <option [value]="lang.value">{{ lang.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Error Alert Banner -->
+          @if (generator.error()) {
+            <div class="error-banner" [class.quota-alert]="generator.isQuotaExceeded()" role="alert">
+              @if (generator.isQuotaExceeded()) {
+                <div class="quota-header">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <strong>Temporary Rate Limit Exceeded (Google AI Studio)</strong>
+                </div>
+              }
+              <span class="error-msg">{{ generator.error() }}</span>
+            </div>
+          }
+
+          <!-- Execution Action Bar -->
+          <div class="panel-actions">
+            <button
+              type="button"
+              id="btn-generate"
+              class="btn-primary"
+              [disabled]="!canGenerate()"
+              (click)="generateListing()"
+            >
+              @if (generator.isGenerating()) {
+                <span class="spinner-line" aria-hidden="true"></span>
+                <span>Analyzing item...</span>
+              } @else {
+                <span>Generate listing</span>
+              }
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT COLUMN: OUTPUT DECK -->
+      <section class="studio-column output-column" aria-labelledby="output-heading">
+        <div class="panel-card output-panel">
+          <div class="panel-header">
+            <h2 id="output-heading" class="panel-title">Listing Preview</h2>
+            @if (generator.currentListing()) {
+              <div class="deck-actions">
+                <button
+                  type="button"
+                  id="btn-copy-table"
+                  class="btn-icon-subtle"
+                  (click)="copyMarkdownTable()"
+                  title="Copy Clean Table (Markdown)"
+                  aria-label="Copy Clean Table (Markdown)"
+                >
+                  <span class="badge-mono" [class.badge-active]="copiedTarget() === 'table'">
+                    {{ copiedTarget() === 'table' ? 'Copied Table!' : 'TABLE' }}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  id="btn-export-json"
+                  class="btn-icon-subtle"
+                  (click)="exportJson()"
+                  title="Export JSON"
+                  aria-label="Export JSON"
+                >
+                  <span class="badge-mono">JSON</span>
+                </button>
+                <button
+                  type="button"
+                  id="btn-export-md"
+                  class="btn-icon-subtle"
+                  (click)="exportMarkdown()"
+                  title="Export Markdown"
+                  aria-label="Export Markdown"
+                >
+                  <span class="badge-mono">MD</span>
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- Loading State: Premium Shimmer Table Skeleton -->
+          @if (generator.isGenerating()) {
+            <div class="generating-state" role="status" aria-live="polite">
+              <div class="loader-header-banner">
+                <div class="loader-spinner-ring" aria-hidden="true"></div>
+                <div class="loader-text-group">
+                  <span class="loader-headline">Analyzing photographs with Gemini Vision</span>
+                  <span class="loader-subtext">Detecting model SKU, condition flaws & evaluating real marketplace pricing...</span>
+                </div>
+              </div>
+
+              <!-- Skeleton Replica of the Listing Table Deck -->
+              <div class="skeleton-table-card">
+                <div class="skeleton-card-header">
+                  <div class="skeleton-shimmer" style="width: 76px; height: 22px; border-radius: var(--radius-full);"></div>
+                  <div class="skeleton-shimmer" style="width: 96px; height: 26px; border-radius: var(--radius-sm);"></div>
+                </div>
+
+                <div class="skeleton-rows-list">
+                  <!-- Title Row -->
+                  <div class="skeleton-row-item">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-shimmer skeleton-title-bar"></div>
+                  </div>
+
+                  <!-- Live Searches Row -->
+                  <div class="skeleton-row-item">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-chips-group">
+                      <div class="skeleton-shimmer skeleton-chip-btn"></div>
+                      <div class="skeleton-shimmer skeleton-chip-btn"></div>
+                      <div class="skeleton-shimmer skeleton-chip-btn"></div>
+                    </div>
+                  </div>
+
+                  <!-- Price Row (Highlighted) -->
+                  <div class="skeleton-row-item skeleton-price-row">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-price-stack">
+                      <div class="skeleton-shimmer skeleton-price-input-box"></div>
+                      <div class="skeleton-chips-group">
+                        <div class="skeleton-shimmer skeleton-floor-badge-box"></div>
+                        <div class="skeleton-shimmer skeleton-ceiling-badge-box"></div>
+                      </div>
+                      <div class="skeleton-shimmer skeleton-rationale-line"></div>
+                    </div>
+                  </div>
+
+                  <!-- Brand Row -->
+                  <div class="skeleton-row-item">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-shimmer skeleton-brand-pill"></div>
+                  </div>
+
+                  <!-- Size / Version Row -->
+                  <div class="skeleton-row-item">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-shimmer skeleton-size-pill"></div>
+                  </div>
+
+                  <!-- Condition Row -->
+                  <div class="skeleton-row-item">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-shimmer skeleton-condition-pill"></div>
+                  </div>
+
+                  <!-- Category Row -->
+                  <div class="skeleton-row-item">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-shimmer skeleton-category-bar"></div>
+                  </div>
+
+                  <!-- Description Row -->
+                  <div class="skeleton-row-item skeleton-desc-row">
+                    <div class="skeleton-shimmer skeleton-label-box"></div>
+                    <div class="skeleton-desc-stack">
+                      <div class="skeleton-shimmer skeleton-bullet-line line-1"></div>
+                      <div class="skeleton-shimmer skeleton-bullet-line line-2"></div>
+                      <div class="skeleton-shimmer skeleton-bullet-line line-3"></div>
+                      <div class="skeleton-shimmer skeleton-bullet-line line-4"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Clean Minimalist Empty State -->
+          @if (!generator.isGenerating() && !generator.currentListing()) {
+            <div class="empty-state">
+              <div class="empty-state-graphic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+              </div>
+              <span class="empty-desc">No listing generated yet. Add photos and click Generate.</span>
+            </div>
+          }
+
+          <!-- Generated Listing Display Deck -->
+          @if (!generator.isGenerating() && generator.currentListing(); as listing) {
+            <div class="listing-deck">
+              <!-- Vinted Table Card -->
+              <div class="vinted-table-card">
+                <div class="table-card-header">
+                  <div class="table-header-title">
+                    <span class="table-badge">Ready</span>
+                    @if (listing.confidence) {
+                      <span class="confidence-text">Confidence: {{ (listing.confidence * 100).toFixed(0) }}%</span>
+                    }
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-copy-table-prominent"
+                    [class.copied]="copiedTarget() === 'table'"
+                    (click)="copyMarkdownTable()"
+                  >
+                    {{ copiedTarget() === 'table' ? 'Table Copied!' : 'Copy Table' }}
+                  </button>
+                </div>
+
+                <div class="vinted-rows-table">
+                  <!-- Title -->
+                  <div class="table-row">
+                    <div class="row-label">Title</div>
+                    <div class="row-value font-medium">{{ listing.title }}</div>
+                    <div class="row-action">
+                      <button
+                        type="button"
+                        class="btn-row-copy"
+                        [class.copied]="copiedTarget() === 'title'"
+                        (click)="copyToClipboard(listing.title, 'title')"
+                        title="Copy title"
+                      >
+                        {{ copiedTarget() === 'title' ? 'Copied' : 'Copy' }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Live Searches (Inspect Real Market Listings) -->
+                  <div class="table-row">
+                    <div class="row-label">Live Searches</div>
+                    <div class="row-value">
+                      <div class="search-links-group">
+                        <a [href]="getEbaySearchUrl(listing)" target="_blank" rel="noopener noreferrer" class="link-chip chip-highlight" title="Inspect live listings on eBay">
+                          eBay Live ↗
+                        </a>
+                        <a [href]="getVintedSearchUrl(listing)" target="_blank" rel="noopener noreferrer" class="link-chip" title="Inspect live listings on Vinted">
+                          Vinted Live ↗
+                        </a>
+                        <a [href]="getSubitoSearchUrl(listing)" target="_blank" rel="noopener noreferrer" class="link-chip" title="Inspect live listings on Subito">
+                          Subito Live ↗
+                        </a>
+                      </div>
+                    </div>
+                    <div class="row-action"></div>
+                  </div>
+
+                  <!-- Price (Market Valuation + Floor/Ceiling) -->
+                  <div class="table-row price-highlight-row">
+                    <div class="row-label">Price</div>
+                    <div class="row-value">
+                      <div class="price-editor-block">
+                        <div class="price-input-row">
+                          <div class="price-input-container">
+                            <span class="currency-symbol">€</span>
+                            <input
+                              type="text"
+                              class="price-custom-input"
+                              [placeholder]="listing.price.suggested.toFixed(2)"
+                              [ngModel]="customPrice() || listing.price.suggested.toFixed(2)"
+                              (ngModelChange)="customPrice.set($event)"
+                            />
+                          </div>
+                          <div class="price-valuation-meta">
+                            @if (listing.price.min != null) {
+                              <span class="price-floor-badge" title="Minimum suggested floor for offers / quick negotiation">
+                                Floor: €{{ listing.price.min.toFixed(2) }}
+                              </span>
+                            }
+                            @if (listing.price.max != null && listing.price.max > listing.price.suggested) {
+                              <span class="price-ceiling-badge" title="Ceiling price for patient sellers">
+                                Ceiling: €{{ listing.price.max.toFixed(2) }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                        @if (listing.price.reasoning) {
+                          <div class="price-rationale">{{ listing.price.reasoning }}</div>
+                        }
+                      </div>
+                    </div>
+                    <div class="row-action">
+                      <button
+                        type="button"
+                        class="btn-row-copy"
+                        [class.copied]="copiedTarget() === 'price'"
+                        (click)="copyToClipboard('€' + (customPrice() || listing.price.suggested.toFixed(2)), 'price')"
+                        title="Copy price"
+                      >
+                        {{ copiedTarget() === 'price' ? 'Copied' : 'Copy' }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Brand -->
+                  <div class="table-row">
+                    <div class="row-label">Brand</div>
+                    <div class="row-value">{{ listing.brand }}</div>
+                    <div class="row-action">
+                      <button
+                        type="button"
+                        class="btn-row-copy"
+                        [class.copied]="copiedTarget() === 'brand'"
+                        (click)="copyToClipboard(listing.brand, 'brand')"
+                        title="Copy brand"
+                      >
+                        {{ copiedTarget() === 'brand' ? 'Copied' : 'Copy' }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Size / Version -->
+                  <div class="table-row">
+                    <div class="row-label">Size / Version</div>
+                    <div class="row-value">{{ listing.size }}</div>
+                    <div class="row-action"></div>
+                  </div>
+
+                  <!-- Condition -->
+                  <div class="table-row">
+                    <div class="row-label">Condition</div>
+                    <div class="row-value">
+                      <span class="condition-badge">{{ listing.condition }}</span>
+                    </div>
+                    <div class="row-action"></div>
+                  </div>
+
+                  <!-- Category -->
+                  <div class="table-row">
+                    <div class="row-label">Category</div>
+                    <div class="row-value text-secondary">{{ listing.category }}</div>
+                    <div class="row-action"></div>
+                  </div>
+
+                  @if (listing.material) {
+                    <div class="table-row">
+                      <div class="row-label">Material</div>
+                      <div class="row-value">{{ listing.material }}</div>
+                      <div class="row-action"></div>
+                    </div>
+                  }
+
+                  @if (listing.color) {
+                    <div class="table-row">
+                      <div class="row-label">Color</div>
+                      <div class="row-value">{{ listing.color }}</div>
+                      <div class="row-action"></div>
+                    </div>
+                  }
+
+                  <!-- Description -->
+                  <div class="table-row description-row">
+                    <div class="row-label">Description</div>
+                    <div class="row-value">
+                      <div class="clean-description-box">
+                        <pre class="clean-description-text">{{ generator.formattedListing()?.description }}</pre>
+                      </div>
+                    </div>
+                    <div class="row-action">
+                      <button
+                        type="button"
+                        class="btn-row-copy"
+                        [class.copied]="copiedTarget() === 'desc'"
+                        (click)="copyToClipboard(generator.formattedListing()!.description, 'desc')"
+                        title="Copy description"
+                      >
+                        {{ copiedTarget() === 'desc' ? 'Copied' : 'Copy' }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Hashtags -->
+                  <div class="table-row">
+                    <div class="row-label">Hashtags</div>
+                    <div class="row-value text-secondary tags-display">{{ generator.formattedListing()?.tagsText }}</div>
+                    <div class="row-action">
+                      <button
+                        type="button"
+                        class="btn-row-copy"
+                        [class.copied]="copiedTarget() === 'tags'"
+                        (click)="copyToClipboard(generator.formattedListing()!.tagsText, 'tags')"
+                        title="Copy hashtags"
+                      >
+                        {{ copiedTarget() === 'tags' ? 'Copied' : 'Copy' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Master Copy Action Bar -->
+              <div class="master-action-bar">
+                <button
+                  type="button"
+                  id="btn-copy-all"
+                  class="btn-master-copy"
+                  [class.copied]="copiedTarget() === 'table'"
+                  (click)="copyMarkdownTable()"
+                >
+                  <span>{{ copiedTarget() === 'table' ? 'Table Copied to Clipboard!' : 'Copy Table (Markdown)' }}</span>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+
+    <!-- Recent Listings History -->
+    @if (storage.history().length > 0) {
+      <section class="history-section" aria-labelledby="history-heading">
+        <div class="history-header">
+          <h2 id="history-heading" class="history-title">Recent</h2>
+          <button type="button" class="btn-text-subtle" (click)="storage.clearHistory()">Clear</button>
+        </div>
+        <div class="history-grid">
+          @for (item of storage.history(); track item.id) {
+            <div class="history-card" (click)="loadHistoricalItem(item)" role="button" tabindex="0">
+              <div class="history-card-top">
+                <span class="badge-mono">{{ item.result.brand }}</span>
+                <span class="history-price">€{{ item.result.price.suggested.toFixed(2) }}</span>
+              </div>
+              <div class="history-card-title">{{ item.result.title }}</div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </main>
+
+  <!-- Minimal Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner container">
+      <div class="footer-brand">
+        <span>VintStack</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- API Key Modal Dialog -->
+  @if (showKeyModal()) {
+    <div
+      class="modal-backdrop"
+      (click)="closeKeyModal()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="modal-header-content">
+            <h3 id="modal-title" class="modal-title">Gemini API Key</h3>
+            <span class="modal-subtitle">Private direct BYOK connection</span>
+          </div>
+          <button type="button" class="modal-close-btn" (click)="closeKeyModal()" aria-label="Close modal">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-field-group">
+            <label for="api-key-input" class="field-label">API Key</label>
+            <div class="input-with-action">
+              <input
+                [type]="keyInputType()"
+                id="api-key-input"
+                class="field-input field-input-mono"
+                placeholder="Paste key here (AIzaSy...)"
+                [ngModel]="tempApiKey()"
+                (ngModelChange)="tempApiKey.set($event)"
+                autocomplete="off"
+                spellcheck="false"
+              />
+              <button
+                type="button"
+                class="btn-toggle-mask"
+                (click)="toggleKeyVisibility()"
+                [title]="keyInputType() === 'password' ? 'Show' : 'Hide'"
+                aria-label="Toggle key visibility"
+              >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
+            <div class="modal-hint-row">
+              <span class="hint-text">Saved locally in your browser only.</span>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-subtle">
+                Get key from Google AI Studio ↗
+              </a>
+            </div>
+          </div>
+
+          <!-- Key Test Feedback -->
+          @if (keyTestResult()) {
+            <div class="key-test-feedback" [class.success]="keyTestResult()!.success" [class.error]="!keyTestResult()!.success">
+              {{ keyTestResult()!.message }}
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <div class="modal-footer-left">
+            @if (storage.hasApiKey()) {
+              <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">
+                Remove key
+              </button>
+            }
+          </div>
+          <div class="modal-footer-right">
+            <button
+              type="button"
+              class="btn-ghost"
+              (click)="closeKeyModal()"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              [disabled]="generator.isTestingKey() || !tempApiKey().trim()"
+              (click)="testCandidateKey()"
+            >
+              {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
+            </button>
+            <button
+              type="button"
+              class="btn-primary"
+              (click)="saveApiKeyModal()"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
