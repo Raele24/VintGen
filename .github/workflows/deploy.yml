@@ -1,18 +1,20 @@
-﻿name: Deploy to Vercel (Production)
+name: CI (Build & Validate)
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
-# Ensure concurrent pushes cancel in-progress runs to save resources
 concurrency:
-  group: deploy-production
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Build & Deploy Web App
+  build:
+    name: Build Core Engine and Angular Web App
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -29,12 +31,3 @@ jobs:
 
       - name: Build Core Engine and Angular Web App
         run: npm run build:web
-
-      - name: Deploy to Vercel Production
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./
