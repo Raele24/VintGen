@@ -75,6 +75,7 @@ export class App {
   // PWA Install State
   public deferredPrompt = signal<any>(null);
   public isAppInstalled = signal<boolean>(false);
+  public isMobileMenuOpen = signal<boolean>(false);
 
   @HostListener('window:beforeinstallprompt', ['$event'])
   public onBeforeInstallPrompt(e: Event): void {
@@ -86,6 +87,14 @@ export class App {
   public onAppInstalled(): void {
     this.isAppInstalled.set(true);
     this.deferredPrompt.set(null);
+  }
+
+  public toggleMobileMenu(): void {
+    this.isMobileMenuOpen.update((v) => !v);
+  }
+
+  public closeMobileMenu(): void {
+    this.isMobileMenuOpen.set(false);
   }
 
   public async installPwa(): Promise<void> {
@@ -730,6 +739,10 @@ export class App {
 
   @HostListener('window:keydown.escape')
   public onEscapeKey(): void {
+    if (this.isMobileMenuOpen()) {
+      this.closeMobileMenu();
+      return;
+    }
     if (this.showTourConfirmModal()) {
       this.cancelTourConfirm();
     }

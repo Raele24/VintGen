@@ -20,12 +20,13 @@
           (click)="openKeyModal()" [title]="'Active Provider: ' + (storage.selectedProvider() === 'ollama' ? 'Ollama Local' : (storage.selectedProvider() === 'claude' ? 'Anthropic Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI (ChatGPT)' : 'Google Gemini')))"
           aria-label="Manage AI API Keys">
           <span class="status-indicator"></span>
-          <span class="status-text">{{ storage.selectedProvider() === 'ollama' ? 'Ollama (Local)' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude Active' : (storage.selectedProvider() === 'openai' ? 'OpenAI Active' : 'Gemini Active')) : 'API Key') }}</span>
+          <span class="status-text status-text-desktop">{{ storage.selectedProvider() === 'ollama' ? 'Ollama (Local)' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude Active' : (storage.selectedProvider() === 'openai' ? 'OpenAI Active' : 'Gemini Active')) : 'API Key') }}</span>
+          <span class="status-text status-text-mobile">{{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI' : 'Gemini')) : 'Key') }}</span>
         </button>
 
-        <!-- 2. PWA Install Action Pill -->
+        <!-- 2. PWA Install Action Pill (Desktop Only) -->
         @if (deferredPrompt()) {
-        <button type="button" id="btn-install-pwa" class="btn-install-pwa" (click)="installPwa()"
+        <button type="button" id="btn-install-pwa" class="btn-install-pwa nav-desktop-only" (click)="installPwa()"
           title="Install VintGen App" aria-label="Install VintGen App">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -37,8 +38,8 @@
         </button>
         }
 
-        <!-- 3. Interactive Guide & Tutorial -->
-        <button type="button" id="btn-tour-help" class="tour-toggle-btn" (click)="openTourConfirm()"
+        <!-- 3. Interactive Guide & Tutorial (Desktop Only) -->
+        <button type="button" id="btn-tour-help" class="tour-toggle-btn nav-desktop-only" (click)="openTourConfirm()"
           title="Interactive Guide & Tutorial" aria-label="Interactive Guide & Tutorial">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -73,8 +74,8 @@
           }
         </button>
 
-        <!-- 5. GitHub External Link -->
-        <a href="https://github.com/Raele24/VintGen" target="_blank" rel="noopener noreferrer" class="nav-link"
+        <!-- 5. GitHub External Link (Desktop Only) -->
+        <a href="https://github.com/Raele24/VintGen" target="_blank" rel="noopener noreferrer" class="nav-link nav-desktop-only"
           aria-label="GitHub Repository">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -83,9 +84,155 @@
             </path>
           </svg>
           <span>GitHub</span>
-        </a></nav>
+        </a>
+
+        <!-- 6. Mobile Menu Hamburger Toggle (Mobile Only) -->
+        <button type="button" id="btn-mobile-menu" class="mobile-menu-btn nav-mobile-only"
+          (click)="toggleMobileMenu()" [attr.aria-expanded]="isMobileMenuOpen()" aria-label="Toggle Navigation Menu">
+          @if (!isMobileMenuOpen()) {
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          } @else {
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          }
+        </button>
+      </nav>
     </div>
   </header>
+
+  <!-- Mobile Slide-Over Navigation Drawer -->
+  @if (isMobileMenuOpen()) {
+  <div class="mobile-drawer-backdrop" (click)="closeMobileMenu()"></div>
+  <aside class="mobile-drawer" role="dialog" aria-label="Mobile Navigation Menu">
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <svg class="brand-mark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M7 2.5h10l4.5 4.5v14.5L12 15.2 2.5 21.5V7L7 2.5zm5 2.5a1.85 1.85 0 1 0 0 3.7 1.85 1.85 0 0 0 0-3.7z"/>
+        </svg>
+        <span class="drawer-brand-name">VintGen Menu</span>
+      </div>
+      <button type="button" class="btn-drawer-close" (click)="closeMobileMenu()" aria-label="Close menu">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- AI Engine Status Card -->
+      <div class="drawer-group">
+        <div class="drawer-group-title">AI Provider</div>
+        <button type="button" class="drawer-card-action" (click)="openKeyModal(); closeMobileMenu()">
+          <div class="drawer-card-left">
+            <span class="status-indicator" [class.active]="storage.hasApiKey()"></span>
+            <div class="drawer-card-text">
+              <span class="drawer-card-title">{{ storage.selectedProvider() === 'ollama' ? 'Ollama (Local Engine)' : (storage.selectedProvider() === 'claude' ? 'Anthropic Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI (ChatGPT)' : 'Google Gemini')) }}</span>
+              <span class="drawer-card-desc">{{ storage.selectedProvider() === 'ollama' ? 'Running on localhost:11434' : (storage.hasApiKey() ? 'API Key Configured' : 'Configure API Key') }}</span>
+            </div>
+          </div>
+          <span class="drawer-pill-badge">Configure</span>
+        </button>
+      </div>
+
+      <!-- Actions List -->
+      <div class="drawer-group">
+        <div class="drawer-group-title">Menu & Actions</div>
+        <div class="drawer-actions-list">
+          @if (deferredPrompt()) {
+          <button type="button" class="drawer-action-btn action-install" (click)="installPwa(); closeMobileMenu()">
+            <div class="drawer-btn-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
+            <div class="drawer-btn-info">
+              <span class="drawer-btn-label">Install App</span>
+              <span class="drawer-btn-hint">Install standalone PWA on your home screen</span>
+            </div>
+            <span class="drawer-pill-badge accent-badge">Install</span>
+          </button>
+          }
+
+          <button type="button" class="drawer-action-btn" (click)="openTourConfirm(); closeMobileMenu()">
+            <div class="drawer-btn-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <div class="drawer-btn-info">
+              <span class="drawer-btn-label">Interactive Tutorial</span>
+              <span class="drawer-btn-hint">Step-by-step walkthrough of features</span>
+            </div>
+          </button>
+
+          <button type="button" class="drawer-action-btn" (click)="toggleTheme()">
+            <div class="drawer-btn-icon">
+              @if (theme() === 'dark') {
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+              </svg>
+              } @else {
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+              }
+            </div>
+            <div class="drawer-btn-info">
+              <span class="drawer-btn-label">Appearance</span>
+              <span class="drawer-btn-hint">Switch to {{ theme() === 'dark' ? 'Light' : 'Dark' }} mode</span>
+            </div>
+            <span class="drawer-pill-badge">{{ theme() === 'dark' ? 'Dark Mode' : 'Light Mode' }}</span>
+          </button>
+
+          <a href="https://github.com/Raele24/VintGen" target="_blank" rel="noopener noreferrer" class="drawer-action-btn" (click)="closeMobileMenu()">
+            <div class="drawer-btn-icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </div>
+            <div class="drawer-btn-info">
+              <span class="drawer-btn-label">GitHub Repository</span>
+              <span class="drawer-btn-hint">Source code & star on GitHub</span>
+            </div>
+            <svg class="drawer-arrow-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div class="drawer-footer-section">
+        <div class="drawer-tags-row">
+          <span class="version-badge">v1.0.0</span>
+          <span class="byok-badge">100% Client-Side BYOK</span>
+        </div>
+        <p class="drawer-footer-note">All processing and API keys stay on your local device.</p>
+      </div>
+    </div>
+  </aside>
+  }
 
   <!-- Main Content Layout -->
   <main class="main-body container" role="main">
