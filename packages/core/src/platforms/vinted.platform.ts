@@ -26,17 +26,21 @@ export class VintedPlatform {
     const conditionLabel =
       VintedPlatform.CONDITION_LABELS[result.condition] || result.condition;
 
+    // Strip any trailing hashtags from raw description to prevent duplication
+    let cleanDescription = (result.description || '').trim();
+    cleanDescription = cleanDescription.replace(/(?:\r?\n\s*)*\r?\n\s*#(?:[a-zA-Z0-9_\-\s#]+)$/g, '').trim();
+
     // Build structured clean description - STRICTLY ZERO EMOJIS, ZERO MARKETING SLOP
-    const descriptionLines: string[] = [result.description.trim()];
+    const descriptionLines: string[] = [cleanDescription];
 
     if (result.flaws && result.flaws.length > 0) {
       for (const flaw of result.flaws) {
-        descriptionLines.push(`- Flaw: ${flaw}`);
+        descriptionLines.push('- Flaw: ' + flaw);
       }
     }
 
     // Clean hashtags
-    const tagsText = result.hashtags.join(' ');
+    const tagsText = (result.hashtags || []).map(t => t.startsWith('#') ? t : ('#' + t)).join(' ').trim();
     if (tagsText) {
       descriptionLines.push('');
       descriptionLines.push(tagsText);

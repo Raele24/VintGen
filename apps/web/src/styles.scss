@@ -1,23 +1,25 @@
 /* ==========================================================================
    VINTSTACK DESIGN SYSTEM
-   Modern, Pure, Architectural Aesthetic
-   Zero AI Slop. Zero Rainbow Gradients. Strict Typography & Spatial Geometry.
+   Modern, Precision-Engineered Desktop Workbench Aesthetic
+   Zero Generic AI Slop. Tactile Controls. Strict Typography & Contrast.
    ========================================================================== */
 
 :root {
-  /* Color Tokens */
+  /* Color Tokens - Default Dark Mode (Deep Zinc & Graphite) */
   --bg-canvas: #09090b;
-  --bg-surface: #111114;
-  --bg-surface-elevated: #18181d;
-  --bg-surface-hover: #212127;
-  --bg-input: #141418;
+  --bg-surface: #111115;
+  --bg-surface-elevated: #18181f;
+  --bg-surface-hover: #22222a;
+  --bg-input: #131317;
 
-  --border-subtle: rgba(255, 255, 255, 0.07);
-  --border-default: rgba(255, 255, 255, 0.12);
+  --navbar-bg: rgba(9, 9, 11, 0.85);
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.14);
   --border-focus: #10b981;
   --border-danger: rgba(239, 68, 68, 0.4);
 
-  --text-primary: #f4f4f5;
+  --text-primary: #fafafa;
   --text-secondary: #a1a1aa;
   --text-muted: #71717a;
   --text-inverse: #09090b;
@@ -29,24 +31,101 @@
   --danger: #ef4444;
   --danger-muted: rgba(239, 68, 68, 0.12);
 
+  /* Tactile Button Tokens */
+  --btn-primary-bg: #10b981;
+  --btn-primary-text: #022c22;
+  --btn-primary-hover: #059669;
+  --btn-primary-hover-text: #ffffff;
+  --btn-secondary-bg: #18181f;
+  --btn-secondary-hover: #22222a;
+  --btn-secondary-border: rgba(255, 255, 255, 0.14);
+  --btn-secondary-text: #fafafa;
+  --btn-highlight: rgba(255, 255, 255, 0.12);
+  --btn-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+
+  /* Skeleton Tokens */
+  --skeleton-base: rgba(255, 255, 255, 0.05);
+  --skeleton-highlight: rgba(255, 255, 255, 0.09);
+
+  /* Chip / Link Tokens */
+  --chip-bg: #18181f;
+  --chip-border: rgba(255, 255, 255, 0.12);
+  --chip-text: #e4e4e7;
+  --chip-hover-bg: #22222a;
+
   /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Elevation & Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
 
   /* Radii */
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-lg: 14px;
   --radius-full: 9999px;
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --transition-smooth: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  /* Color Tokens - Modern Light Mode (Refined Slate & Clean White) */
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --bg-input: #ffffff;
+
+  --navbar-bg: rgba(248, 250, 252, 0.88);
+
+  --border-subtle: #e2e8f0;
+  --border-default: #cbd5e1;
+  --border-focus: #0f766e;
+  --border-danger: rgba(220, 38, 38, 0.4);
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  --accent: #0f766e;
+  --accent-muted: rgba(15, 118, 110, 0.08);
+  --accent-hover: #115e59;
+
+  --danger: #dc2626;
+  --danger-muted: rgba(220, 38, 38, 0.08);
+
+  /* Tactile Button Tokens */
+  --btn-primary-bg: #0f172a;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #1e293b;
+  --btn-primary-hover-text: #ffffff;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-hover: #f8fafc;
+  --btn-secondary-border: #cbd5e1;
+  --btn-secondary-text: #0f172a;
+  --btn-highlight: rgba(255, 255, 255, 0.75);
+  --btn-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+
+  /* Skeleton Tokens */
+  --skeleton-base: #e2e8f0;
+  --skeleton-highlight: #cbd5e1;
+
+  /* Chip / Link Tokens */
+  --chip-bg: #ffffff;
+  --chip-border: #cbd5e1;
+  --chip-text: #1e293b;
+  --chip-hover-bg: #f1f5f9;
+
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
 /* CSS Reset & Box Sizing */
@@ -66,6 +145,7 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--transition-smooth), color var(--transition-smooth);
 }
 
 /* Scrollbar styling */
@@ -77,11 +157,11 @@ html, body {
   background: var(--bg-canvas);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--border-default);
   border-radius: var(--radius-full);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--text-muted);
 }
 
 /* Base button reset */

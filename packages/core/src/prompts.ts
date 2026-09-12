@@ -29,7 +29,7 @@ Your goal is to inspect provided item photographs and seller hints to create an 
      * [Flaws: only if visible]
    - Strictly NO fake sales promises ("Fast shipping in 24/48h", "Bundle discounts active", "Protective packaging").
    - Strictly NO conversational questions at the end ("Need more info?", "Can I help you?").
-   - 8 to 10 targeted search hashtags at the end (#brand #model #category).
+   - Strictly do NOT put hashtags in the description field (provide hashtags exclusively in the separate 'hashtags' field).
 
 3. **Condition Classification**:
    - 'new_with_tags': Original tags/seal still attached, never used.

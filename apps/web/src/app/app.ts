@@ -55,6 +55,37 @@ export class App {
   // Custom User Set Price
   public customPrice = signal<string>('');
 
+  // Theme Management (Light / Dark)
+  public theme = signal<'dark' | 'light'>('dark');
+
+  constructor() {
+    this.initTheme();
+  }
+
+  private initTheme(): void {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('vintstack_theme') as 'dark' | 'light' | null;
+      if (saved === 'light' || saved === 'dark') {
+        this.theme.set(saved);
+        document.documentElement.setAttribute('data-theme', saved);
+      } else {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const initial = prefersDark ? 'dark' : 'light';
+        this.theme.set(initial);
+        document.documentElement.setAttribute('data-theme', initial);
+      }
+    }
+  }
+
+  public toggleTheme(): void {
+    const next = this.theme() === 'dark' ? 'light' : 'dark';
+    this.theme.set(next);
+    if (typeof window !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('vintstack_theme', next);
+    }
+  }
+
   // Computed helper for canGenerate
   public canGenerate = computed(() => {
     const hasImages = this.uploadedImages().length > 0;
