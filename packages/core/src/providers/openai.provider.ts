@@ -1,54 +1,50 @@
 /**
- * Gemini AI Provider Implementation
- * 
- * Interacts directly with the Google Gemini REST API (v1beta).
- * Fully compatible with both Node.js (18+) and modern Web Browsers (zero native dependencies).
+ * OpenAI Provider (GPT-4o / GPT-4o-mini with Vision)
+ *
+ * Implements the AIProvider interface for OpenAI's Chat Completions API
+ * with multimodal vision support for image-based listing generation.
  */
 
 import {
   AIProvider,
-  ImageInput,
   ListingInput,
   ListingResult,
   ProviderConfig,
   VintedCondition,
 } from '../types';
-import { GEMINI_RESPONSE_SCHEMA, VINTED_SYSTEM_INSTRUCTION } from '../prompts';
+import { VINTED_SYSTEM_INSTRUCTION } from '../prompts';
 
-export class GeminiProvider implements AIProvider {
-  public readonly id = 'gemini';
-  public readonly name = 'Google Gemini (BYOK)';
+export class OpenAIProvider implements AIProvider {
+  public readonly id = 'openai';
+  public readonly name = 'OpenAI (GPT-4o)';
 
-  /** Default model recommended for speed, multimodal vision accuracy and cost efficiency */
-  public static readonly DEFAULT_MODEL = 'gemini-3.6-flash';
+  public static readonly DEFAULT_MODEL = 'gpt-4o-mini';
 
-  /**
-   * Generates a structured Vinted listing using Gemini Multimodal Vision API.
-   */
   public async generateListing(
     input: ListingInput,
     config: ProviderConfig
   ): Promise<ListingResult> {
     if (!config.apiKey || config.apiKey.trim() === '') {
-      throw new Error('Gemini API key is required. Please provide your API key.');
+      throw new Error('OpenAI API key is required. Please provide your API key.');
     }
 
-    // Assemble user text content with hints
-    const textPromptParts: string[] = [
+    const userContent: Array<Record<string, unknown>> = [];
+
+    const textParts: string[] = [
       'Generate a comprehensive, high-converting Vinted listing based on the provided photographs and hints.',
     ];
 
     if (input.titleHint) {
-      textPromptParts.push(`Seller Tentative Title: "${input.titleHint}"`);
+      textParts.push(`Seller Tentative Title: "${input.titleHint}"`);
     }
     if (input.brandHint) {
-      textPromptParts.push(`Seller Brand Hint: "${input.brandHint}"`);
+      textParts.push(`Seller Brand Hint: "${input.brandHint}"`);
     }
     if (input.conditionHint) {
-      textPromptParts.push(`Expected Condition: "${input.conditionHint}"`);
+      textParts.push(`Expected Condition: "${input.conditionHint}"`);
     }
     if (input.notes) {
-      textPromptParts.push(`Seller Additional Notes / Known Details: "${input.notes}"`);
+      textParts.push(`Seller Additional Notes / Known Details: "${input.notes}"`);
     }
     const languageNames: Record<string, string> = {
       it: 'Italian (Italiano)',
@@ -59,75 +55,90 @@ export class GeminiProvider implements AIProvider {
     };
     const targetLangName = (input.language && languageNames[input.language]) || (input.language ? input.language.toUpperCase() : 'English');
 
-    textPromptParts.push(
+    textParts.push(
       `TARGET OUTPUT LANGUAGE: ${targetLangName.toUpperCase()}\n` +
       `MANDATORY: You MUST generate all text fields (description bullets, title, flaws, condition notes, category, and price reasoning) entirely in ${targetLangName}. Do NOT output English if the target language is ${targetLangName}.\n` +
       `HASHTAGS REQUIREMENT: You MUST generate 10 to 15 relevant search hashtags in the 'hashtags' array (brand, model line, technical specs, category, and community tags). Never provide only 1 or 2 tags.`
     );
 
-    // Build parts: text prompt + multimodal images
-    const parts: Array<Record<string, unknown>> = [
-      { text: textPromptParts.join('\n\n') },
-    ];
+    textParts.push(
+      '\nYou MUST respond with a single valid JSON object matching the schema described in the system prompt. Do NOT include markdown fences or any text outside the JSON.'
+    );
+
+    userContent.push({ type: 'text', text: textParts.join('\n\n') });
 
     if (input.images && input.images.length > 0) {
       for (const img of input.images) {
-        // Strip data:image/...;base64, prefix if present
         const cleanBase64 = img.data.replace(/^data:[a-zA-Z0-9/+-]+;base64,/, '');
-        parts.push({
-          inline_data: {
-            mime_type: img.mimeType || 'image/jpeg',
-            data: cleanBase64,
+        const mimeType = img.mimeType || 'image/jpeg';
+        userContent.push({
+          type: 'image_url',
+          image_url: {
+            url: `data:${mimeType};base64,${cleanBase64}`,
+            detail: 'high',
           },
         });
       }
     }
 
-    const requestBody = {
-      system_instruction: {
-        parts: [{ text: VINTED_SYSTEM_INSTRUCTION }],
-      },
-      contents: [
+    const schemaInstruction = `\n\nYou must output a JSON object with these exact keys:
+{
+  "title": "string - optimized search title under 65 chars",
+  "description": "string - structured bulleted description",
+  "category": "string - e.g. Men > Tops > T-Shirts",
+  "brand": "string",
+  "size": "string - e.g. M / 38",
+  "condition": "one of: new_with_tags, new_without_tags, very_good, good, satisfactory",
+  "color": "string",
+  "material": "string",
+  "price": { "suggested": number, "min": number, "max": number, "currency": "EUR", "reasoning": "string" },
+  "hashtags": ["#brand", "#model", "#spec1", "#spec2", "#category", "#keyword1", "#keyword2", "... (10-15 total)"],
+  "flaws": ["string", ...],
+  "fitNotes": "string",
+  "confidence": number between 0.0 and 1.0
+}`;
+
+    const requestBody: Record<string, unknown> = {
+      model: config.model || OpenAIProvider.DEFAULT_MODEL,
+      messages: [
+        {
+          role: 'system',
+          content: VINTED_SYSTEM_INSTRUCTION + schemaInstruction,
+        },
         {
           role: 'user',
-          parts,
+          content: userContent,
         },
       ],
-      generationConfig: {
-        response_mime_type: 'application/json',
-        response_schema: GEMINI_RESPONSE_SCHEMA,
-        temperature: 0.2,
-      },
+      response_format: { type: 'json_object' },
+      temperature: 0.2,
+      max_tokens: 2048,
     };
 
     const candidateModels = [
       config.model,
-      GeminiProvider.DEFAULT_MODEL,
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
+      OpenAIProvider.DEFAULT_MODEL,
+      'gpt-4o',
     ]
       .filter((m): m is string => Boolean(m))
       .filter((v, i, a) => a.indexOf(v) === i);
 
-    const baseUrl =
-      config.baseUrl || 'https://generativelanguage.googleapis.com/v1beta';
-
+    const baseUrl = config.baseUrl || 'https://api.openai.com/v1';
     let lastError: Error | null = null;
 
     for (let mIdx = 0; mIdx < candidateModels.length; mIdx++) {
       const model = candidateModels[mIdx];
-      const endpoint = `${baseUrl}/models/${model}:generateContent?key=${encodeURIComponent(
-        config.apiKey.trim()
-      )}`;
+      requestBody['model'] = model;
 
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), config.timeoutMs || 45000);
+      const timeout = setTimeout(() => controller.abort(), config.timeoutMs || 60000);
 
       try {
-        const response = await fetch(endpoint, {
+        const response = await fetch(`${baseUrl}/chat/completions`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${config.apiKey.trim()}`,
           },
           body: JSON.stringify(requestBody),
           signal: controller.signal,
@@ -137,7 +148,7 @@ export class GeminiProvider implements AIProvider {
 
         if (!response.ok) {
           const errorText = await response.text();
-          let errorMessage = `Gemini API responded with status ${response.status}`;
+          let errorMessage = `OpenAI API responded with status ${response.status}`;
           try {
             const parsed = JSON.parse(errorText);
             if (parsed.error?.message) {
@@ -147,7 +158,6 @@ export class GeminiProvider implements AIProvider {
             errorMessage = `${errorMessage}: ${errorText.slice(0, 200)}`;
           }
 
-          // If 404 model not found and we have another candidate model, fallback to it
           if (response.status === 404 && mIdx < candidateModels.length - 1) {
             console.warn(`Model ${model} returned 404, falling back to ${candidateModels[mIdx + 1]}`);
             continue;
@@ -157,16 +167,15 @@ export class GeminiProvider implements AIProvider {
         }
 
         const jsonResponse = await response.json();
-        const candidate = jsonResponse.candidates?.[0];
-        const rawText = candidate?.content?.parts?.[0]?.text;
+        const rawText = jsonResponse.choices?.[0]?.message?.content;
 
         if (!rawText) {
-          throw new Error('No content returned from Gemini model.');
+          throw new Error('No content returned from OpenAI model.');
         }
 
-        const parsedData = JSON.parse(rawText);
+        const cleanedText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+        const parsedData = JSON.parse(cleanedText);
 
-        // Sanitize and return strongly-typed ListingResult
         const result: ListingResult = {
           title: String(parsedData.title || '').trim(),
           description: String(parsedData.description || '').trim(),
@@ -199,7 +208,7 @@ export class GeminiProvider implements AIProvider {
         clearTimeout(timeout);
         if (err instanceof Error) {
           if (err.name === 'AbortError') {
-            throw new Error('Gemini API request timed out after 45s. Please check your connection.');
+            throw new Error('OpenAI API request timed out after 60s. Please check your connection.');
           }
           lastError = err;
         } else {
@@ -213,12 +222,9 @@ export class GeminiProvider implements AIProvider {
       }
     }
 
-    throw lastError || new Error('All candidate Gemini models failed.');
+    throw lastError || new Error('All candidate OpenAI models failed.');
   }
 
-  /**
-   * Tests API key validity with a lightweight call to the models endpoint.
-   */
   public async testConnection(
     config: ProviderConfig
   ): Promise<{ success: boolean; message: string }> {
@@ -226,38 +232,32 @@ export class GeminiProvider implements AIProvider {
       return { success: false, message: 'API key is missing' };
     }
 
-    const baseUrl =
-      config.baseUrl || 'https://generativelanguage.googleapis.com/v1beta';
-    const candidateModels = [
-      config.model,
-      GeminiProvider.DEFAULT_MODEL,
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-    ]
-      .filter((m): m is string => Boolean(m))
-      .filter((v, i, a) => a.indexOf(v) === i);
+    const baseUrl = config.baseUrl || 'https://api.openai.com/v1';
 
-    for (const model of candidateModels) {
-      const testUrl = `${baseUrl}/models/${model}?key=${encodeURIComponent(
-        config.apiKey.trim()
-      )}`;
+    try {
+      const res = await fetch(`${baseUrl}/models`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${config.apiKey.trim()}`,
+        },
+      });
 
-      try {
-        const res = await fetch(testUrl, { method: 'GET' });
-        if (res.ok) {
-          return { success: true, message: `Connected successfully to ${model}` };
+      if (res.ok) {
+        const data = await res.json();
+        const models = data.data?.map((m: { id: string }) => m.id) || [];
+        const hasVision = models.some((m: string) => m.includes('gpt-4o'));
+        if (hasVision) {
+          return { success: true, message: 'Connected successfully. GPT-4o Vision models available.' };
         }
-        if (res.status !== 404) {
-          const errorJson = await res.json().catch(() => null);
-          const msg = errorJson?.error?.message || `HTTP ${res.status} (${res.statusText})`;
-          return { success: false, message: `Authentication failed: ${msg}` };
-        }
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : String(err);
-        return { success: false, message: `Network error connecting to Gemini: ${msg}` };
+        return { success: true, message: 'Connected successfully. Note: GPT-4o models recommended for best results.' };
       }
-    }
 
-    return { success: false, message: 'None of the tested Gemini models are reachable with this key.' };
+      const errorJson = await res.json().catch(() => null);
+      const msg = errorJson?.error?.message || `HTTP ${res.status} (${res.statusText})`;
+      return { success: false, message: `Authentication failed: ${msg}` };
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { success: false, message: `Network error connecting to OpenAI: ${msg}` };
+    }
   }
 }

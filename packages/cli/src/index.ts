@@ -10,6 +10,8 @@ import * as path from 'path';
 import { VintGenEngine, ImageInput, ListingInput } from '@vintgen/core';
 
 interface CliArgs {
+  provider?: 'gemini' | 'openai' | 'claude' | 'ollama';
+  endpoint?: string;
   command?: string;
   images: string[];
   title?: string;
@@ -46,6 +48,17 @@ function parseArguments(args: string[]): CliArgs {
       result.help = true;
     } else if (arg === '--version' || arg === '-v') {
       result.version = true;
+    } else if (arg === '--provider' || arg === '-p') {
+      i++;
+      if (i < args.length) {
+        const val = args[i].toLowerCase();
+        if (val === 'gemini' || val === 'openai' || val === 'claude' || val === 'ollama') {
+          result.provider = val;
+        }
+      }
+    } else if (arg === '--endpoint' || arg === '-e') {
+      i++;
+      if (i < args.length) result.endpoint = args[i];
     } else if (arg === '--images' || arg === '-i') {
       i++;
       if (i < args.length) {
@@ -106,16 +119,18 @@ USAGE:
 
 COMMANDS:
   generate              Generate a listing (default)
-  test-key              Test Gemini API key connection
+  test-key              Test AI provider API key connection
 
 OPTIONS:
   -i, --images <paths>  Comma-separated paths to product images (jpg, png, webp)
   -t, --title <text>    Tentative or rough item title
   -n, --notes <text>    Seller notes (condition details, fabric, fit, flaws)
   -b, --brand <brand>   Brand hint or confirmation
-  -k, --key <key>       Google Gemini API key (defaults to $GEMINI_API_KEY env)
-  -m, --model <name>    Gemini model (default: gemini-2.5-flash)
-  -l, --lang <code>     Language: it, en, fr, es, de (default: it)
+  -p, --provider <name> AI provider: gemini (default), openai, claude, or ollama
+  -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434 or $OLLAMA_HOST)
+  -k, --key <key>       API key (defaults to $GEMINI_API_KEY, $OPENAI_API_KEY, or $ANTHROPIC_API_KEY env)
+  -m, --model <name>    Model name (gemini-2.5-flash, gpt-4o-mini, claude-3-5-sonnet, or llama3.2-vision)
+  -l, --lang <code>     Language: en, it, fr, es, de (default: en)
   -f, --format <type>   Output format: text (default), json, vinted
   -o, --output <file>   Write output to a destination file
   -v, --version         Print CLI version
@@ -124,6 +139,11 @@ OPTIONS:
 EXAMPLES:
   $ export GEMINI_API_KEY="AIzaSy..."
   $ vintgen -i ./front.jpg,./tag.jpg -n "Vintage 90s Ralph Lauren polo"
+  $ export OPENAI_API_KEY="sk-..."
+  $ vintgen -p openai -i ./front.jpg -n "Silk blouse"
+  $ export ANTHROPIC_API_KEY="sk-ant-..."
+  $ vintgen -p claude -i ./front.jpg -n "Vintage jacket"
+  $ vintgen -p ollama -i ./front.jpg -n "Vintage jacket" (100% offline & local)
   $ vintgen -i ./shoes.jpg --format json -o listing.json
 `);
 }
@@ -166,13 +186,32 @@ async function main(): Promise<void> {
     process.exitCode = 0; return;
   }
 
-  const apiKey = args.apiKey || process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error(`\nError: Gemini API Key not found.`);
+  const provider = args.provider || 'gemini';
+  const endpoint = args.endpoint || process.env.OLLAMA_HOST || 'http://localhost:11434';
+
+  let defaultEnvKey: string | undefined;
+  if (provider === 'claude') {
+    defaultEnvKey = process.env.ANTHROPIC_API_KEY;
+  } else if (provider === 'openai') {
+    defaultEnvKey = process.env.OPENAI_API_KEY;
+  } else if (provider === 'ollama') {
+    defaultEnvKey = process.env.OLLAMA_API_KEY || '';
+  } else {
+    defaultEnvKey = process.env.GEMINI_API_KEY;
+  }
+  const apiKey = args.apiKey || defaultEnvKey;
+
+  if (provider !== 'ollama' && !apiKey) {
+    const providerName = provider === 'claude' ? 'Anthropic Claude' : (provider === 'openai' ? 'OpenAI' : 'Gemini');
+    const envVar = provider === 'claude' ? 'ANTHROPIC_API_KEY' : (provider === 'openai' ? 'OPENAI_API_KEY' : 'GEMINI_API_KEY');
+    const url = provider === 'claude' 
+      ? 'https://console.anthropic.com/settings/keys' 
+      : (provider === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey');
+    console.error(`\nError: ${providerName} API Key not found.`);
     console.error(`Please provide your key using:`);
-    console.error(`  - Flag: --key <YOUR_GEMINI_API_KEY>`);
-    console.error(`  - Environment: export GEMINI_API_KEY="<YOUR_KEY>"`);
-    console.error(`\nGet your free key at: https://aistudio.google.com/app/apikey\n`);
+    console.error(`  - Flag: --key <YOUR_${envVar}>`);
+    console.error(`  - Environment: export ${envVar}="<YOUR_KEY>"`);
+    console.error(`\nGet your key at: ${url}\n`);
     process.exitCode = 1; return;
   }
 
@@ -180,10 +219,12 @@ async function main(): Promise<void> {
 
   // Test connection command
   if (args.command === 'test-key') {
-    console.log('Testing Gemini API key connection...');
-    const result = await engine.testProvider('gemini', {
-      apiKey,
+    const targetDesc = provider === 'ollama' ? `Ollama instance at ${endpoint}` : `${provider.toUpperCase()} API key`;
+    console.log(`Testing connection with ${targetDesc}...`);
+    const result = await engine.testProvider(provider, {
+      apiKey: apiKey || '',
       model: args.model,
+      baseUrl: endpoint,
     });
     if (result.success) {
       console.log(`[SUCCESS] ${result.message}`);
@@ -222,20 +263,26 @@ async function main(): Promise<void> {
     process.exitCode = 1; return;
   }
 
-  console.log(`Analyzing item with Gemini Multimodal Vision (${imageInputs.length} image(s))...`);
+  let providerDisplay = 'Gemini Multimodal Vision';
+  if (provider === 'claude') providerDisplay = 'Anthropic Claude 3.5 Vision';
+  else if (provider === 'openai') providerDisplay = 'OpenAI GPT-4o Vision';
+  else if (provider === 'ollama') providerDisplay = `Local Ollama (${args.model || 'llama3.2-vision'})`;
+  console.log(`Analyzing item with ${providerDisplay} (${imageInputs.length} image(s))...`);
 
   const listingInput: ListingInput = {
     images: imageInputs,
     titleHint: args.title,
     notes: args.notes,
     brandHint: args.brand,
-    language: args.language || 'it',
+    language: args.language || 'en',
   };
 
   try {
     const { raw, formatted } = await engine.generate(listingInput, {
-      apiKey,
+      apiKey: apiKey || '',
       model: args.model,
+      baseUrl: endpoint,
+      providerId: provider,
     });
 
     let outputContent = '';

@@ -1,0 +1,70 @@
+{
+  "id": "/",
+  "name": "VintGen — Universal Secondhand Listing & Pricing Engine",
+  "short_name": "VintGen",
+  "description": "AI Listing Generator for Vinted and secondhand marketplaces with multi-provider vision and market valuation.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "any",
+  "categories": [
+    "business",
+    "shopping",
+    "utilities"
+  ],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Listing",
+      "short_name": "New",
+      "description": "Create a new AI-powered secondhand listing",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

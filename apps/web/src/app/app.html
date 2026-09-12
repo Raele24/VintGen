@@ -5,23 +5,54 @@
     <div class="navbar-inner container">
       <div class="brand-group">
         <a href="/" class="brand-link" aria-label="VintGen Home">
-          <svg class="brand-mark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-            <polyline points="2 17 12 22 22 17"></polyline>
-            <polyline points="2 12 12 17 22 12"></polyline>
+          <!-- Minimalist Geometric Hangtag "V" Mark -->
+          <svg class="brand-mark" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M7 2.5h10l4.5 4.5v14.5L12 15.2 2.5 21.5V7L7 2.5zm5 2.5a1.85 1.85 0 1 0 0 3.7 1.85 1.85 0 0 0 0-3.7z"/>
           </svg>
           <span class="brand-name">VintGen</span>
         </a>
       </div>
 
       <nav class="nav-actions" aria-label="Main Navigation">
-        <!-- Light / Dark Theme Toggle -->
+        <!-- 1. AI Provider Status / Key Pill -->
+        <button type="button" id="btn-key-status" class="key-status-pill" [class.active]="storage.hasApiKey()"
+          (click)="openKeyModal()" [title]="'Active Provider: ' + (storage.selectedProvider() === 'ollama' ? 'Ollama Local' : (storage.selectedProvider() === 'claude' ? 'Anthropic Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI (ChatGPT)' : 'Google Gemini')))"
+          aria-label="Manage AI API Keys">
+          <span class="status-indicator"></span>
+          <span class="status-text">{{ storage.selectedProvider() === 'ollama' ? 'Ollama (Local)' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude Active' : (storage.selectedProvider() === 'openai' ? 'OpenAI Active' : 'Gemini Active')) : 'API Key') }}</span>
+        </button>
+
+        <!-- 2. PWA Install Action Pill -->
+        @if (deferredPrompt()) {
+        <button type="button" id="btn-install-pwa" class="btn-install-pwa" (click)="installPwa()"
+          title="Install VintGen App" aria-label="Install VintGen App">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Install</span>
+        </button>
+        }
+
+        <!-- 3. Interactive Guide & Tutorial -->
+        <button type="button" id="btn-tour-help" class="tour-toggle-btn" (click)="openTourConfirm()"
+          title="Interactive Guide & Tutorial" aria-label="Interactive Guide & Tutorial">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </button>
+
+        <!-- 4. Light / Dark Theme Toggle -->
         <button type="button" id="btn-theme-toggle" class="theme-toggle-btn" (click)="toggleTheme()"
           [title]="theme() === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'"
           [attr.aria-label]="theme() === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'">
           @if (theme() === 'dark') {
-          <!-- Sun icon for light mode -->
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"></circle>
@@ -35,7 +66,6 @@
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
           </svg>
           } @else {
-          <!-- Moon icon for dark mode -->
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
@@ -43,13 +73,7 @@
           }
         </button>
 
-        <!-- Minimalist API Key Pill -->
-        <button type="button" id="btn-key-status" class="key-status-pill" [class.active]="storage.hasApiKey()"
-          (click)="openKeyModal()" aria-label="Manage Gemini API Key">
-          <span class="status-indicator"></span>
-          <span class="status-text">{{ storage.hasApiKey() ? 'API Key Active' : 'API Key' }}</span>
-        </button>
-
+        <!-- 5. GitHub External Link -->
         <a href="https://github.com/Raele24/VintGen" target="_blank" rel="noopener noreferrer" class="nav-link"
           aria-label="GitHub Repository">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -59,8 +83,7 @@
             </path>
           </svg>
           <span>GitHub</span>
-        </a>
-      </nav>
+        </a></nav>
     </div>
   </header>
 
@@ -190,24 +213,52 @@
                 <circle cx="12" cy="12" r="10"></circle>
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
-              <strong>Temporary Rate Limit Exceeded (Google AI Studio)</strong>
+              <strong>{{ storage.selectedProvider() === 'claude' ? 'Anthropic Claude Quota / Rate Limit Reached' : (storage.selectedProvider() === 'openai' ? 'OpenAI Quota / Rate Limit Reached' : 'Temporary Rate Limit Exceeded (Google AI Studio)') }}</strong>
             </div>
             }
             <span class="error-msg">{{ generator.error() }}</span>
           </div>
           }
 
-          <!-- Execution Action Bar -->
-          <div class="panel-actions">
-            <button type="button" id="btn-generate" class="btn-primary" [disabled]="!canGenerate()"
-              (click)="generateListing()">
-              @if (generator.isGenerating()) {
-              <span class="spinner-line" aria-hidden="true"></span>
-              <span>Analyzing item...</span>
-              } @else {
-              <span>Generate listing</span>
-              }
-            </button>
+          <!-- Provider Selector & Action Bar -->
+          <div class="panel-actions-wrapper">
+            <div class="provider-selector-row">
+              <span class="provider-selector-label">AI Engine</span>
+              <div class="provider-selector-toggle" role="radiogroup" aria-label="Select AI provider">
+                <button type="button" class="btn-provider-toggle"
+                  [class.active]="storage.selectedProvider() === 'gemini'"
+                  (click)="storage.setProvider('gemini')">
+                  Gemini
+                </button>
+                <button type="button" class="btn-provider-toggle"
+                  [class.active]="storage.selectedProvider() === 'openai'"
+                  (click)="storage.setProvider('openai')">
+                  ChatGPT
+                </button>
+                <button type="button" class="btn-provider-toggle"
+                  [class.active]="storage.selectedProvider() === 'claude'"
+                  (click)="storage.setProvider('claude')">
+                  Claude
+                </button>
+                <button type="button" class="btn-provider-toggle"
+                  [class.active]="storage.selectedProvider() === 'ollama'"
+                  (click)="storage.setProvider('ollama')">
+                  Ollama
+                </button>
+              </div>
+            </div>
+
+            <div class="panel-actions">
+              <button type="button" id="btn-generate" class="btn-primary" [disabled]="!canGenerate()"
+                (click)="generateListing()">
+                @if (generator.isGenerating()) {
+                <span class="spinner-line" aria-hidden="true"></span>
+                <span>Analyzing item...</span>
+                } @else {
+                <span>Generate listing ({{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'ChatGPT' : 'Gemini')) }})</span>
+                }
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -247,7 +298,7 @@
             <div class="loader-header-banner">
               <div class="loader-spinner-ring" aria-hidden="true"></div>
               <div class="loader-text-group">
-                <span class="loader-headline">Analyzing photographs with Gemini Vision</span>
+                <span class="loader-headline">{{ generator.statusMessage() || 'Analyzing photographs...' }}</span>
                 <span class="loader-subtext">Detecting model SKU, condition flaws & evaluating real marketplace
                   pricing...</span>
               </div>
@@ -583,8 +634,8 @@
     <div class="modal-card" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <div class="modal-header-content">
-          <h3 id="modal-title" class="modal-title">Gemini API Key</h3>
-          <span class="modal-subtitle">Private direct BYOK connection</span>
+          <h3 id="modal-title" class="modal-title">AI Provider & API Key</h3>
+          <span class="modal-subtitle">Private direct BYOK connection &bull; Stored locally in browser</span>
         </div>
         <button type="button" class="modal-close-btn" (click)="closeKeyModal()" aria-label="Close modal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -596,11 +647,82 @@
       </div>
 
       <div class="modal-body">
+        <!-- Provider Selection Tabs -->
+        <div class="provider-tabs provider-tabs-4" role="tablist" aria-label="AI Provider selection">
+          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'gemini'"
+            [attr.aria-selected]="modalProvider() === 'gemini'"
+            (click)="switchModalProvider('gemini')">
+            <span class="provider-tab-name">Gemini</span>
+            @if (storage.apiKey().trim()) {
+            <span class="provider-pill-badge">Saved</span>
+            }
+          </button>
+          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'openai'"
+            [attr.aria-selected]="modalProvider() === 'openai'"
+            (click)="switchModalProvider('openai')">
+            <span class="provider-tab-name">ChatGPT</span>
+            @if (storage.openaiApiKey().trim()) {
+            <span class="provider-pill-badge">Saved</span>
+            }
+          </button>
+          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'claude'"
+            [attr.aria-selected]="modalProvider() === 'claude'"
+            (click)="switchModalProvider('claude')">
+            <span class="provider-tab-name">Claude</span>
+            @if (storage.claudeApiKey().trim()) {
+            <span class="provider-pill-badge">Saved</span>
+            }
+          </button>
+          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'ollama'"
+            [attr.aria-selected]="modalProvider() === 'ollama'"
+            (click)="switchModalProvider('ollama')">
+            <span class="provider-tab-name">Ollama</span>
+            <span class="provider-pill-badge" style="background: rgba(14, 165, 233, 0.15); color: var(--accent);">Local</span>
+          </button>
+        </div>
+
+        @if (modalProvider() === 'ollama') {
         <div class="modal-field-group">
-          <label for="api-key-input" class="field-label">API Key</label>
+          <label for="ollama-endpoint-input" class="field-label">Ollama Server URL</label>
+          <input type="text" id="ollama-endpoint-input" class="field-input field-input-mono"
+            placeholder="http://localhost:11434"
+            [ngModel]="tempOllamaEndpoint()" (ngModelChange)="tempOllamaEndpoint.set($event)"
+            autocomplete="off" spellcheck="false" />
+          <div class="modal-hint-row">
+            <span class="hint-text">Default endpoint: http://localhost:11434 (100% private & offline)</span>
+          </div>
+        </div>
+
+        <div class="modal-field-group">
+          <label for="ollama-model-input" class="field-label">Vision Model Name</label>
+          <input type="text" id="ollama-model-input" class="field-input field-input-mono"
+            placeholder="llama3.2-vision"
+            [ngModel]="tempOllamaModel()" (ngModelChange)="tempOllamaModel.set($event)"
+            autocomplete="off" spellcheck="false" />
+          <div class="modal-hint-row">
+            <span class="hint-text">Popular vision models: <code>llama3.2-vision</code>, <code>llava</code>, <code>minicpm-v</code></span>
+          </div>
+        </div>
+
+        <div class="modal-field-group">
+          <label for="ollama-token-input" class="field-label">Auth Token (Optional)</label>
+          <input type="password" id="ollama-token-input" class="field-input field-input-mono"
+            placeholder="Leave empty for standard local Ollama"
+            [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
+            autocomplete="off" spellcheck="false" />
+          <div class="modal-hint-row">
+            <span class="hint-text">Only needed if your Ollama instance requires an authorization token.</span>
+          </div>
+        </div>
+        } @else {
+        <div class="modal-field-group">
+          <label for="api-key-input" class="field-label">
+            {{ modalProvider() === 'claude' ? 'Anthropic Claude API Key' : (modalProvider() === 'openai' ? 'OpenAI API Key' : 'Google Gemini API Key') }}
+          </label>
           <div class="input-with-action">
             <input [type]="keyInputType()" id="api-key-input" class="field-input field-input-mono"
-              placeholder="Paste key here (AIzaSy...)" [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
+              [placeholder]="modalProvider() === 'claude' ? 'Paste Claude key (sk-ant-...)' : (modalProvider() === 'openai' ? 'Paste OpenAI key (sk-...)' : 'Paste Gemini key (AIzaSy...)')"
+              [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
               autocomplete="off" spellcheck="false" />
             <button type="button" class="btn-toggle-mask" (click)="toggleKeyVisibility()"
               [title]="keyInputType() === 'password' ? 'Show' : 'Hide'" aria-label="Toggle key visibility">
@@ -613,12 +735,25 @@
           </div>
           <div class="modal-hint-row">
             <span class="hint-text">Saved locally in your browser only.</span>
+            @if (modalProvider() === 'claude') {
+            <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer"
+              class="link-subtle">
+              Get key from Anthropic Console ↗
+            </a>
+            } @else if (modalProvider() === 'openai') {
+            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer"
+              class="link-subtle">
+              Get key from OpenAI Platform ↗
+            </a>
+            } @else {
             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
               class="link-subtle">
               Get key from Google AI Studio ↗
             </a>
+            }
           </div>
         </div>
+        }
 
         <!-- Key Test Feedback -->
         @if (keyTestResult()) {
@@ -631,7 +766,7 @@
 
       <div class="modal-footer">
         <div class="modal-footer-left">
-          @if (storage.hasApiKey()) {
+          @if ((modalProvider() === 'claude' && storage.claudeApiKey().trim()) || (modalProvider() === 'openai' && storage.openaiApiKey().trim()) || (modalProvider() === 'gemini' && storage.apiKey().trim())) {
           <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">
             Remove key
           </button>
@@ -646,11 +781,108 @@
             {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
           </button>
           <button type="button" class="btn-primary" (click)="saveApiKeyModal()">
-            Save
+            Save & Activate
           </button>
         </div>
       </div>
     </div>
   </div>
   }
+
 </div>
+
+
+<!-- Tour Confirmation Prompt Modal -->
+@if (showTourConfirmModal()) {
+<div class="modal-backdrop" (click)="cancelTourConfirm()" role="dialog" aria-modal="true" aria-labelledby="tour-confirm-title">
+  <div class="modal-card tour-confirm-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="tour-confirm-header-left">
+        <div class="tour-confirm-icon-pill">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3 id="tour-confirm-title" class="modal-title">Start guided tour?</h3>
+      </div>
+      <button type="button" class="modal-close-btn" (click)="cancelTourConfirm()" aria-label="Close dialog">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-footer">
+      <div class="modal-footer-left"></div>
+      <div class="modal-footer-right">
+        <button type="button" id="btn-tour-cancel" class="btn-ghost" (click)="cancelTourConfirm()">
+          Cancel
+        </button>
+        <button type="button" id="btn-tour-confirm-yes" class="btn-primary" (click)="confirmAndStartTour()">
+          Start tour
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Interactive Step-by-Step Tour Overlay (Rendered outside app-layout to eliminate zoom distortion) -->
+@if (isTourActive()) {
+<div class="tour-overlay-root" role="dialog" aria-modal="true" aria-label="VintGen Interactive Guide">
+  <!-- Clickable backdrop to close tour -->
+  <div class="tour-backdrop-dismiss" (click)="endTour()"></div>
+
+  <!-- Glowing Blue Spotlight Box over target element -->
+  <div class="tour-spotlight-box" [style.top]="tourSpotlightStyle().top"
+    [style.left]="tourSpotlightStyle().left" [style.width]="tourSpotlightStyle().width"
+    [style.height]="tourSpotlightStyle().height" [style.border-radius]="tourSpotlightStyle().borderRadius">
+    <div class="tour-spotlight-pulse"></div>
+  </div>
+
+  <!-- Floating Popover Card -->
+  <div class="tour-popover-card" [style.top]="tourPopoverStyle().top" [style.left]="tourPopoverStyle().left">
+    <div class="tour-card-header">
+      <div class="tour-step-badge">
+        <span class="tour-step-indicator-dot"></span>
+        <span>STEP {{ currentTourStep() + 1 }} OF {{ tourSteps.length }}</span>
+      </div>
+      <button type="button" class="btn-tour-close" (click)="endTour()" title="Close guide" aria-label="Close guide">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tour-card-body">
+      <h4 class="tour-title">{{ tourSteps[currentTourStep()].title }}</h4>
+      <p class="tour-description">{{ tourSteps[currentTourStep()].description }}</p>
+    </div>
+
+    <div class="tour-card-footer">
+      <div class="tour-dots">
+        @for (step of tourSteps; track $index) {
+        <span class="tour-dot" [class.active]="$index === currentTourStep()"></span>
+        }
+      </div>
+      <div class="tour-btn-group">
+        @if (currentTourStep() > 0) {
+        <button type="button" class="btn-tour-secondary" (click)="prevTourStep()">
+          Previous
+        </button>
+        }
+        <button type="button" class="btn-tour-primary" (click)="nextTourStep()">
+          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour ✓' : 'Next →' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

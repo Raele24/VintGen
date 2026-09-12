@@ -7,6 +7,9 @@
 
 import { AIProvider } from '../types';
 import { GeminiProvider } from './gemini.provider';
+import { OpenAIProvider } from './openai.provider';
+import { ClaudeProvider } from './claude.provider';
+import { OllamaProvider } from './ollama.provider';
 
 export class ProviderRegistry {
   private static instance: ProviderRegistry;
@@ -15,6 +18,9 @@ export class ProviderRegistry {
   private constructor() {
     // Register default built-in providers
     this.register(new GeminiProvider());
+    this.register(new OpenAIProvider());
+    this.register(new ClaudeProvider());
+    this.register(new OllamaProvider());
   }
 
   public static getInstance(): ProviderRegistry {

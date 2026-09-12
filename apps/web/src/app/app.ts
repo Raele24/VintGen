@@ -4,6 +4,7 @@ import {
   signal,
   computed,
   ChangeDetectionStrategy,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +19,13 @@ interface UploadedImage {
   mimeType: string;
   base64: string;
   previewUrl: string;
+}
+
+export interface TourStep {
+  targetSelector: string;
+  title: string;
+  description: string;
+  placement?: 'bottom' | 'top' | 'left' | 'right';
 }
 
 @Component({
@@ -49,6 +57,11 @@ export class App {
   public keyInputType = signal<'password' | 'text'>('password');
   public keyTestResult = signal<{ success: boolean; message: string } | null>(null);
 
+  // Provider tab in modal
+  public modalProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama'>('gemini');
+  public tempOllamaEndpoint = signal<string>('http://localhost:11434');
+  public tempOllamaModel = signal<string>('llama3.2-vision');
+
   // Clipboard Feedback
   public copiedTarget = signal<string | null>(null);
 
@@ -58,6 +71,37 @@ export class App {
 
   // Theme Management (Light / Dark)
   public theme = signal<'dark' | 'light'>('dark');
+
+  // PWA Install State
+  public deferredPrompt = signal<any>(null);
+  public isAppInstalled = signal<boolean>(false);
+
+  @HostListener('window:beforeinstallprompt', ['$event'])
+  public onBeforeInstallPrompt(e: Event): void {
+    e.preventDefault();
+    this.deferredPrompt.set(e);
+  }
+
+  @HostListener('window:appinstalled')
+  public onAppInstalled(): void {
+    this.isAppInstalled.set(true);
+    this.deferredPrompt.set(null);
+  }
+
+  public async installPwa(): Promise<void> {
+    const prompt = this.deferredPrompt();
+    if (!prompt) return;
+    prompt.prompt();
+    try {
+      const choice = await prompt.userChoice;
+      if (choice && choice.outcome === 'accepted') {
+        this.isAppInstalled.set(true);
+      }
+    } catch {
+      // Ignored
+    }
+    this.deferredPrompt.set(null);
+  }
 
   constructor() {
     this.initTheme();
@@ -368,9 +412,37 @@ export class App {
   // --- API Key Modal Controls ---
 
   public openKeyModal(): void {
-    this.tempApiKey.set(this.storage.apiKey());
+    const active = this.storage.selectedProvider();
+    this.modalProvider.set(active);
+    if (active === 'ollama') {
+      this.tempOllamaEndpoint.set(this.storage.ollamaEndpoint());
+      this.tempOllamaModel.set(this.storage.ollamaModel());
+      this.tempApiKey.set(this.storage.ollamaApiKey());
+    } else if (active === 'claude') {
+      this.tempApiKey.set(this.storage.claudeApiKey());
+    } else if (active === 'openai') {
+      this.tempApiKey.set(this.storage.openaiApiKey());
+    } else {
+      this.tempApiKey.set(this.storage.apiKey());
+    }
     this.keyTestResult.set(null);
     this.showKeyModal.set(true);
+  }
+
+  public switchModalProvider(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): void {
+    this.modalProvider.set(provider);
+    if (provider === 'ollama') {
+      this.tempOllamaEndpoint.set(this.storage.ollamaEndpoint());
+      this.tempOllamaModel.set(this.storage.ollamaModel());
+      this.tempApiKey.set(this.storage.ollamaApiKey());
+    } else if (provider === 'claude') {
+      this.tempApiKey.set(this.storage.claudeApiKey());
+    } else if (provider === 'openai') {
+      this.tempApiKey.set(this.storage.openaiApiKey());
+    } else {
+      this.tempApiKey.set(this.storage.apiKey());
+    }
+    this.keyTestResult.set(null);
   }
 
   public closeKeyModal(): void {
@@ -382,23 +454,61 @@ export class App {
   }
 
   public async testCandidateKey(): Promise<void> {
-    const key = this.tempApiKey().trim();
-    if (!key) {
-      this.keyTestResult.set({ success: false, message: 'Please enter an API key first.' });
-      return;
+    const provider = this.modalProvider();
+    let result: { success: boolean; message: string };
+
+    if (provider === 'ollama') {
+      const engine = new (await import('@vintgen/core')).VintGenEngine();
+      result = await engine.testProvider('ollama', {
+        apiKey: this.tempApiKey().trim(),
+        baseUrl: this.tempOllamaEndpoint().trim() || 'http://localhost:11434',
+        model: this.tempOllamaModel().trim() || 'llama3.2-vision',
+      });
+    } else {
+      const key = this.tempApiKey().trim();
+      if (!key) {
+        this.keyTestResult.set({ success: false, message: 'Please enter an API key first.' });
+        return;
+      }
+      if (provider === 'claude' || provider === 'openai') {
+        const engine = new (await import('@vintgen/core')).VintGenEngine();
+        result = await engine.testProvider(provider, { apiKey: key });
+      } else {
+        result = await this.generator.testKey(key);
+      }
     }
-    const result = await this.generator.testKey(key);
     this.keyTestResult.set(result);
   }
 
   public saveApiKeyModal(): void {
-    this.storage.setApiKey(this.tempApiKey());
+    const provider = this.modalProvider();
+    if (provider === 'ollama') {
+      this.storage.setOllamaEndpoint(this.tempOllamaEndpoint().trim() || 'http://localhost:11434');
+      this.storage.setOllamaModel(this.tempOllamaModel().trim() || 'llama3.2-vision');
+      this.storage.setOllamaKey(this.tempApiKey().trim());
+    } else if (provider === 'claude') {
+      this.storage.setClaudeKey(this.tempApiKey());
+    } else if (provider === 'openai') {
+      this.storage.setOpenAIKey(this.tempApiKey());
+    } else {
+      this.storage.setApiKey(this.tempApiKey());
+    }
+    this.storage.setProvider(provider);
     this.showKeyModal.set(false);
   }
 
   public removeApiKey(): void {
     this.tempApiKey.set('');
-    this.storage.clearApiKey();
+    const provider = this.modalProvider();
+    if (provider === 'ollama') {
+      this.storage.clearOllamaKey();
+    } else if (provider === 'claude') {
+      this.storage.clearClaudeKey();
+    } else if (provider === 'openai') {
+      this.storage.clearOpenAIKey();
+    } else {
+      this.storage.clearApiKey();
+    }
     this.keyTestResult.set(null);
     this.showKeyModal.set(false);
   }
@@ -442,5 +552,192 @@ export class App {
   public clearHistory(): void {
     this.selectedHistoryId.set(null);
     this.storage.clearHistory();
+  }
+  // --- Guided Interactive Tour State ---
+  public isTourActive = signal<boolean>(false);
+  public showTourConfirmModal = signal<boolean>(false);
+  public currentTourStep = signal<number>(0);
+  public tourSpotlightStyle = signal<{
+    top: string;
+    left: string;
+    width: string;
+    height: string;
+    borderRadius: string;
+  }>({ top: '0px', left: '0px', width: '0px', height: '0px', borderRadius: '8px' });
+  public tourPopoverStyle = signal<{
+    top: string;
+    left: string;
+  }>({ top: '0px', left: '0px' });
+
+  private tourAnimFrameId: number | null = null;
+
+  public tourSteps: TourStep[] = [
+    {
+      targetSelector: '#btn-key-status',
+      title: '1. AI Engine & API Keys',
+      description: 'Configure your Google Gemini (100% free tier) or OpenAI ChatGPT API key. Credentials remain private and stored only in your local browser.',
+      placement: 'bottom',
+    },
+    {
+      targetSelector: '#image-dropzone',
+      title: '2. Drop Item Photographs',
+      description: 'Drag & drop photos of your item: front view, brand tags, size/composition labels, serial numbers, or close-ups of flaws.',
+      placement: 'right',
+    },
+    {
+      targetSelector: '#select-language',
+      title: '3. Seller Notes & Target Language',
+      description: 'Add optional item details, indicate condition, and select your target marketplace listing language (English, Italian, Spanish, French, German).',
+      placement: 'right',
+    },
+    {
+      targetSelector: '.panel-actions-wrapper',
+      title: '4. Select AI & Generate',
+      description: 'Choose between Gemini (free tier) and ChatGPT, then click Generate. The vision engine inspects details and calculates secondary market valuation in seconds.',
+      placement: 'top',
+    },
+    {
+      targetSelector: '.output-panel',
+      title: '5. Pricing, Hashtags & 1-Click Copy',
+      description: 'Review suggested pricing with negotiation range, 10–15 discoverability hashtags, and 1-click copy formatted descriptions or markdown tables for Vinted, eBay, or Subito.',
+      placement: 'left',
+    },
+  ];
+
+  public openTourConfirm(): void {
+    this.showTourConfirmModal.set(true);
+  }
+
+  public cancelTourConfirm(): void {
+    this.showTourConfirmModal.set(false);
+  }
+
+  public confirmAndStartTour(): void {
+    this.showTourConfirmModal.set(false);
+    this.currentTourStep.set(0);
+    this.isTourActive.set(true);
+    setTimeout(() => {
+      this.updateTourPosition(false);
+    }, 40);
+  }
+
+  public nextTourStep(): void {
+    if (this.currentTourStep() < this.tourSteps.length - 1) {
+      this.currentTourStep.update(s => s + 1);
+      setTimeout(() => this.updateTourPosition(false), 40);
+    } else {
+      this.endTour();
+    }
+  }
+
+  public prevTourStep(): void {
+    if (this.currentTourStep() > 0) {
+      this.currentTourStep.update(s => s - 1);
+      setTimeout(() => this.updateTourPosition(false), 40);
+    }
+  }
+
+  public endTour(): void {
+    if (this.tourAnimFrameId) {
+      cancelAnimationFrame(this.tourAnimFrameId);
+      this.tourAnimFrameId = null;
+    }
+    this.isTourActive.set(false);
+  }
+
+  public updateTourPosition(immediate = false): void {
+    if (!this.isTourActive() || typeof window === 'undefined') return;
+    const step = this.tourSteps[this.currentTourStep()];
+    if (!step) return;
+
+    const el = document.querySelector(step.targetSelector) as HTMLElement | null;
+    if (!el) return;
+
+    // Smooth scroll target into view
+    el.scrollIntoView({ behavior: immediate ? 'auto' : 'smooth', block: 'center', inline: 'nearest' });
+
+    const startTime = performance.now();
+    const duration = immediate ? 0 : 400;
+
+    const applyCoords = () => {
+      if (!this.isTourActive()) return;
+      const rect = el.getBoundingClientRect();
+      const comp = window.getComputedStyle(el);
+      const borderRadius = comp.borderRadius && comp.borderRadius !== '0px' ? comp.borderRadius : '8px';
+
+      const padding = 6;
+      const spotTop = Math.max(0, rect.top - padding);
+      const spotLeft = Math.max(0, rect.left - padding);
+      const spotWidth = rect.width + padding * 2;
+      const spotHeight = rect.height + padding * 2;
+
+      this.tourSpotlightStyle.set({
+        top: `${spotTop}px`,
+        left: `${spotLeft}px`,
+        width: `${spotWidth}px`,
+        height: `${spotHeight}px`,
+        borderRadius,
+      });
+
+      const popoverWidth = Math.min(330, window.innerWidth - 32);
+      const popoverHeight = 175;
+      let pTop = spotTop + spotHeight + 12;
+      let pLeft = spotLeft + (spotWidth / 2) - (popoverWidth / 2);
+
+      const margin = 16;
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      if (step.placement === 'right' && spotLeft + spotWidth + popoverWidth + margin < vw) {
+        pLeft = spotLeft + spotWidth + 14;
+        pTop = Math.max(margin, spotTop + (spotHeight / 2) - (popoverHeight / 2));
+      } else if (step.placement === 'left' && spotLeft - popoverWidth - margin > 0) {
+        pLeft = spotLeft - popoverWidth - 14;
+        pTop = Math.max(margin, spotTop + (spotHeight / 2) - (popoverHeight / 2));
+      } else if (step.placement === 'top' && spotTop - popoverHeight - margin > 0) {
+        pTop = spotTop - popoverHeight - 14;
+        pLeft = spotLeft + (spotWidth / 2) - (popoverWidth / 2);
+      } else if (pTop + popoverHeight > vh - margin && spotTop - popoverHeight - margin > 0) {
+        pTop = spotTop - popoverHeight - 14;
+      }
+
+      pLeft = Math.max(margin, Math.min(pLeft, vw - popoverWidth - margin));
+      pTop = Math.max(margin, Math.min(pTop, vh - popoverHeight - margin));
+
+      this.tourPopoverStyle.set({
+        top: `${pTop}px`,
+        left: `${pLeft}px`,
+      });
+
+      if (performance.now() - startTime < duration) {
+        this.tourAnimFrameId = requestAnimationFrame(applyCoords);
+      }
+    };
+
+    if (this.tourAnimFrameId) {
+      cancelAnimationFrame(this.tourAnimFrameId);
+    }
+    applyCoords();
+  }
+
+  @HostListener('window:resize')
+  @HostListener('window:scroll')
+  public onWindowReposition(): void {
+    if (this.isTourActive()) {
+      this.updateTourPosition(true);
+    }
+  }
+
+  @HostListener('window:keydown.escape')
+  public onEscapeKey(): void {
+    if (this.showTourConfirmModal()) {
+      this.cancelTourConfirm();
+    }
+    if (this.isTourActive()) {
+      this.endTour();
+    }
+    if (this.showKeyModal()) {
+      this.closeKeyModal();
+    }
   }
 }

@@ -48,11 +48,25 @@ Your goal is to inspect provided item photographs and seller hints to create an 
      * suggested: Serious, competitive recommended listing price in EUR.
      * min: Sensible floor price for offers / quick negotiation.
      * max: Ceiling price for patient sellers.
-     * reasoning: Factual English rationale referencing active marketplace price ranges.
+     * reasoning: Factual rationale referencing active marketplace price ranges in the target language.
 
-5. **Language (MANDATORY ENGLISH ONLY)**:
-   - ALL output fields (title, description, price reasoning, category, specs, flaws) MUST be strictly in ENGLISH ('en').
-   - Even if seller notes, images, or packaging labels contain text in Italian, German, French, or another language, ALWAYS translate and output the entire listing, specifications, and pricing rationale in clean, natural English.
+5. **Language & Localization**:
+   - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language.
+   - If the Target Output Language is Italian ('it'): write the description, condition notes, flaws, fit notes, and price reasoning in natural, professional Italian (e.g. "Condizione: Usato, testato e perfettamente funzionante", "Include: Scatola originale", "Prezzo competitivo per kit ad alte prestazioni nel mercato dell'usato"). Keep universal model SKU, brand, and hardware terms (e.g. "Corsair Vengeance LPX", "DDR4 3200MHz", "32GB (2x16GB)", "Size M") intact.
+   - If the Target Output Language is French ('fr'): write in natural, professional French.
+   - If the Target Output Language is Spanish ('es'): write in natural, professional Spanish.
+   - If the Target Output Language is German ('de'): write in natural, professional German.
+   - If the Target Output Language is English ('en') or default: write in clear, professional English.
+
+6. **Hashtags & Marketplace Discoverability (MANDATORY 10-15 TAGS)**:
+   - You MUST generate between 10 and 15 highly targeted, high-traffic marketplace hashtags in the 'hashtags' array.
+   - NEVER output a minimal or single-tag list (like just "#brand"). A listing with 1-2 tags has poor discoverability.
+   - Always include a comprehensive mix:
+     * Brand & exact line: e.g. #corsair #corsairgaming #vengeance #vengeancelpx
+     * Core specs & category: e.g. #ddr4 #ram #32gb #3200mhz #ramddr4 #pcparts
+     * Buyer intent & community keywords: e.g. #gamingpc #pcbuilding #hardware #custompc #gamer #setup
+     * For fashion/clothing: brand, garment, vintage era, aesthetic, style (e.g. #carhartt #detroitjacket #workwear #vintage #streetwear #y2k #menswear)
+   - Every hashtag MUST start with '#' and contain no spaces or special characters.
 
 You must output STRICT JSON adhering exactly to the specified JSON schema.`;
 
@@ -109,7 +123,7 @@ export const GEMINI_RESPONSE_SCHEMA = {
     hashtags: {
       type: 'ARRAY',
       items: { type: 'STRING' },
-      description: 'Array of 8-12 search hashtags starting with #',
+      description: 'Array of 10-15 search hashtags starting with # covering brand, line, specs, and category keywords',
     },
     flaws: {
       type: 'ARRAY',

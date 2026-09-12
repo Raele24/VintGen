@@ -35,7 +35,8 @@ export class VintedPlatform {
 
     if (result.flaws && result.flaws.length > 0) {
       for (const flaw of result.flaws) {
-        descriptionLines.push('- Flaw: ' + flaw);
+        const clean = flaw.trim().replace(/^[-•*]s*/, '');
+        descriptionLines.push('- ' + clean);
       }
     }
 
