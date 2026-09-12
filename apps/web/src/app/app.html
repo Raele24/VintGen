@@ -25,7 +25,7 @@
         </button>
 
         <!-- 2. PWA Install Action Pill (Desktop Only) -->
-        @if (deferredPrompt()) {
+        @if (canInstall()) {
         <button type="button" id="btn-install-pwa" class="btn-install-pwa nav-desktop-only" (click)="installPwa()"
           title="Install VintGen App" aria-label="Install VintGen App">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
@@ -148,7 +148,7 @@
       <div class="drawer-group">
         <div class="drawer-group-title">Menu & Actions</div>
         <div class="drawer-actions-list">
-          @if (deferredPrompt()) {
+          @if (canInstall()) {
           <button type="button" class="drawer-action-btn action-install" (click)="installPwa(); closeMobileMenu()">
             <div class="drawer-btn-icon">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1033,3 +1033,73 @@
   </div>
 </div>
 }
+
+<!-- iOS PWA Installation Guide Modal -->
+@if (showIosInstallModal()) {
+  <div class="modal-backdrop" (click)="closeIosInstallModal()" role="dialog" aria-modal="true" aria-labelledby="ios-install-title">
+    <div class="modal-card ios-install-modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-content">
+          <div class="ios-install-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.01-2.85-.92.04-2.04.62-2.7 1.39-.58.67-1.09 1.74-1.04 2.78 1.03.08 2.1-.57 2.73-1.32z"/>
+            </svg>
+            <span>iPhone / iPad Installation</span>
+          </div>
+          <h3 id="ios-install-title" class="modal-title">Install VintGen on iOS</h3>
+          <span class="modal-subtitle">Add to your Home Screen for full-screen standalone use</span>
+        </div>
+        <button type="button" class="modal-close-btn" (click)="closeIosInstallModal()" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body ios-instructions-body">
+        <div class="ios-step-card">
+          <div class="ios-step-num">1</div>
+          <div class="ios-step-text">
+            <span class="ios-step-heading">Tap the Share Button</span>
+            <p class="ios-step-detail">In Safari's bottom toolbar, tap the <strong>Share</strong> button.</p>
+            <div class="ios-step-icon-row">
+              <div class="ios-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                  <polyline points="16 6 12 2 8 6"></polyline>
+                  <line x1="12" y1="2" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <span class="ios-icon-label">Share button (bottom of Safari)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ios-step-card">
+          <div class="ios-step-num">2</div>
+          <div class="ios-step-text">
+            <span class="ios-step-heading">Select "Add to Home Screen"</span>
+            <p class="ios-step-detail">Scroll down the menu sheet and tap <strong>Add to Home Screen</strong>.</p>
+            <div class="ios-step-icon-row">
+              <div class="ios-icon-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="12" y1="8" x2="12" y2="16"></line>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
+              </div>
+              <span class="ios-icon-label">"Add to Home Screen" option</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-primary-action w-full" (click)="closeIosInstallModal()">
+          Got it!
+        </button>
+      </div>
+    </div>
+  </div>
+  }

@@ -76,6 +76,14 @@ export class App {
   public deferredPrompt = signal<any>(null);
   public isAppInstalled = signal<boolean>(false);
   public isMobileMenuOpen = signal<boolean>(false);
+  public isIos = signal<boolean>(false);
+  public isStandalone = signal<boolean>(false);
+  public showIosInstallModal = signal<boolean>(false);
+
+  public canInstall = computed(() => {
+    if (this.isStandalone() || this.isAppInstalled()) return false;
+    return !!this.deferredPrompt() || this.isIos();
+  });
 
   @HostListener('window:beforeinstallprompt', ['$event'])
   public onBeforeInstallPrompt(e: Event): void {
@@ -97,7 +105,32 @@ export class App {
     this.isMobileMenuOpen.set(false);
   }
 
+  public detectIosAndStandalone(): void {
+    if (typeof window !== 'undefined') {
+      const isIosDevice =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isStandaloneMode =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        (navigator as any).standalone === true;
+      this.isIos.set(isIosDevice);
+      this.isStandalone.set(isStandaloneMode);
+    }
+  }
+
+  public openIosInstallModal(): void {
+    this.showIosInstallModal.set(true);
+  }
+
+  public closeIosInstallModal(): void {
+    this.showIosInstallModal.set(false);
+  }
+
   public async installPwa(): Promise<void> {
+    if (this.isIos()) {
+      this.openIosInstallModal();
+      return;
+    }
     const prompt = this.deferredPrompt();
     if (!prompt) return;
     prompt.prompt();
@@ -114,6 +147,7 @@ export class App {
 
   constructor() {
     this.initTheme();
+    this.detectIosAndStandalone();
   }
 
   private initTheme(): void {
@@ -739,6 +773,10 @@ export class App {
 
   @HostListener('window:keydown.escape')
   public onEscapeKey(): void {
+    if (this.showIosInstallModal()) {
+      this.closeIosInstallModal();
+      return;
+    }
     if (this.isMobileMenuOpen()) {
       this.closeMobileMenu();
       return;
