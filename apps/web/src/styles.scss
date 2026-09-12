@@ -16,7 +16,7 @@
 
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-default: rgba(255, 255, 255, 0.14);
-  --border-focus: #10b981;
+  --border-focus: #0ea5e9;
   --border-danger: rgba(239, 68, 68, 0.4);
 
   --text-primary: #fafafa;
@@ -24,17 +24,17 @@
   --text-muted: #71717a;
   --text-inverse: #09090b;
 
-  --accent: #10b981;
-  --accent-muted: rgba(16, 185, 129, 0.12);
-  --accent-hover: #059669;
+  --accent: #0ea5e9;
+  --accent-muted: rgba(14, 165, 233, 0.12);
+  --accent-hover: #0284c7;
 
   --danger: #ef4444;
   --danger-muted: rgba(239, 68, 68, 0.12);
 
   /* Tactile Button Tokens */
-  --btn-primary-bg: #10b981;
-  --btn-primary-text: #022c22;
-  --btn-primary-hover: #059669;
+  --btn-primary-bg: #0ea5e9;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #0284c7;
   --btn-primary-hover-text: #ffffff;
   --btn-secondary-bg: #18181f;
   --btn-secondary-hover: #22222a;
@@ -85,7 +85,7 @@
 
   --border-subtle: #e2e8f0;
   --border-default: #cbd5e1;
-  --border-focus: #0f766e;
+  --border-focus: #0284c7;
   --border-danger: rgba(220, 38, 38, 0.4);
 
   --text-primary: #0f172a;
@@ -93,17 +93,17 @@
   --text-muted: #64748b;
   --text-inverse: #ffffff;
 
-  --accent: #0f766e;
-  --accent-muted: rgba(15, 118, 110, 0.08);
-  --accent-hover: #115e59;
+  --accent: #0284c7;
+  --accent-muted: rgba(2, 132, 199, 0.1);
+  --accent-hover: #0369a1;
 
   --danger: #dc2626;
   --danger-muted: rgba(220, 38, 38, 0.08);
 
   /* Tactile Button Tokens */
-  --btn-primary-bg: #0f172a;
+  --btn-primary-bg: #0284c7;
   --btn-primary-text: #ffffff;
-  --btn-primary-hover: #1e293b;
+  --btn-primary-hover: #0369a1;
   --btn-primary-hover-text: #ffffff;
   --btn-secondary-bg: #ffffff;
   --btn-secondary-hover: #f8fafc;

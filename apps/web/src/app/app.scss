@@ -54,6 +54,7 @@
 
 .brand-mark {
   color: var(--accent);
+  filter: drop-shadow(0 0 6px var(--accent-muted));
 }
 
 .brand-name {
@@ -66,7 +67,7 @@
 
 .byok-badge {
   color: var(--accent);
-  border-color: rgba(16, 185, 129, 0.2);
+  border-color: rgba(14, 165, 233, 0.2);
   background: var(--accent-muted);
 }
 
@@ -159,7 +160,7 @@
   &.active {
     .status-indicator {
       background: var(--accent);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 8px rgba(14, 165, 233, 0.5);
     }
   }
 }
@@ -669,7 +670,7 @@
   width: 14px;
   height: 14px;
   border: 2px solid rgba(0, 0, 0, 0.3);
-  border-top-color: #042f22;
+  border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -760,15 +761,15 @@
   gap: 14px;
   padding: 14px 18px;
   border-radius: var(--radius-md);
-  background: rgba(16, 185, 129, 0.05);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(14, 165, 233, 0.05);
+  border: 1px solid rgba(14, 165, 233, 0.2);
 }
 
 .loader-spinner-ring {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2.5px solid rgba(16, 185, 129, 0.2);
+  border: 2.5px solid rgba(14, 165, 233, 0.2);
   border-top-color: var(--accent);
   animation: spin 0.8s linear infinite;
   flex-shrink: 0;
@@ -857,8 +858,8 @@
   }
 
   &.skeleton-price-row {
-    background: rgba(16, 185, 129, 0.03);
-    border-left: 3px solid rgba(16, 185, 129, 0.4);
+    background: rgba(14, 165, 233, 0.03);
+    border-left: 3px solid rgba(14, 165, 233, 0.4);
   }
 
   &.skeleton-desc-row {
@@ -991,7 +992,7 @@
   padding: 3px 8px;
   border-radius: var(--radius-full);
   background: var(--accent-muted);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(14, 165, 233, 0.3);
   color: var(--accent);
 }
 
@@ -1062,7 +1063,7 @@
   }
 
   &.price-highlight-row {
-    background: rgba(16, 185, 129, 0.03);
+    background: rgba(14, 165, 233, 0.03);
     border-left: 3px solid var(--accent);
   }
 
@@ -1180,13 +1181,13 @@
   }
 
   &.chip-highlight {
-    border-color: rgba(16, 185, 129, 0.4);
-    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(14, 165, 233, 0.4);
+    background: rgba(14, 165, 233, 0.08);
     color: var(--accent);
     font-weight: 600;
 
     &:hover {
-      background: rgba(16, 185, 129, 0.16);
+      background: rgba(14, 165, 233, 0.16);
       border-color: var(--accent);
     }
   }
@@ -1286,11 +1287,11 @@
   display: inline-block;
   font-size: 12px;
   font-weight: 500;
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.1);
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.1);
   padding: 2px 8px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(14, 165, 233, 0.2);
 }
 
 .clean-description-box {
@@ -1354,7 +1355,7 @@
 
   &.copied {
     background: var(--accent);
-    color: #042f22;
+    color: #ffffff;
   }
 }
 
@@ -1612,7 +1613,7 @@
 
     &:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
     }
   }
 
@@ -1668,8 +1669,8 @@
 
   &.success {
     background: var(--accent-muted);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    color: #6ee7b7;
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    color: #38bdf8;
   }
 
   &.error {
