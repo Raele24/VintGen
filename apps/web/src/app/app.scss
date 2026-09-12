@@ -22,9 +22,12 @@
   border-bottom: 1px solid var(--border-subtle);
   background-color: var(--navbar-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 50;
+  padding-top: env(safe-area-inset-top, 0px);
+  transition: padding-top var(--transition-fast);
 }
 
 .navbar-inner {
@@ -2374,6 +2377,8 @@
   animation: drawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @keyframes drawerSlideIn {
