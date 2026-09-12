@@ -54,6 +54,7 @@ export class App {
 
   // Custom User Set Price
   public customPrice = signal<string>('');
+  public selectedHistoryId = signal<string | null>(null);
 
   // Theme Management (Light / Dark)
   public theme = signal<'dark' | 'light'>('dark');
@@ -87,6 +88,16 @@ export class App {
   }
 
   // Computed helper for canGenerate
+  public hasActiveContent = computed(() => {
+    return (
+      !!this.generator.currentListing() ||
+      this.uploadedImages().length > 0 ||
+      !!this.titleHint().trim() ||
+      !!this.notes().trim() ||
+      !!this.brandHint().trim()
+    );
+  });
+
   public canGenerate = computed(() => {
     const hasImages = this.uploadedImages().length > 0;
     const hasNotes = this.notes().trim().length > 0;
@@ -224,9 +235,11 @@ export class App {
       }, 50);
     }
 
+    this.selectedHistoryId.set(null);
     const success = await this.generator.generate(input, firstPreview);
     if (success) {
       const listing = this.generator.currentListing();
+      this.selectedHistoryId.set(this.storage.history()[0]?.id || null);
       if (listing?.price?.suggested) {
         this.customPrice.set(listing.price.suggested.toFixed(2));
       }
@@ -390,9 +403,31 @@ export class App {
     this.showKeyModal.set(false);
   }
 
-  // --- History Controls ---
+  // --- History & Reset Controls ---
+
+  public clearActiveListing(): void {
+    this.selectedHistoryId.set(null);
+    this.generator.clearActive();
+    this.customPrice.set('');
+  }
+
+  public resetAll(): void {
+    this.clearAllImages();
+    this.titleHint.set('');
+    this.brandHint.set('');
+    this.notes.set('');
+    this.conditionHint.set('');
+    this.clearActiveListing();
+  }
 
   public loadHistoricalItem(item: SavedListingItem): void {
+    if (this.selectedHistoryId() === item.id) {
+      // Toggle off if already loaded
+      this.clearActiveListing();
+      return;
+    }
+
+    this.selectedHistoryId.set(item.id);
     this.generator.selectHistoricalListing(item.result);
     if (item.result?.price?.suggested) {
       this.customPrice.set(item.result.price.suggested.toFixed(2));
@@ -402,5 +437,10 @@ export class App {
         document.getElementById('output-heading')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }
+  }
+
+  public clearHistory(): void {
+    this.selectedHistoryId.set(null);
+    this.storage.clearHistory();
   }
 }

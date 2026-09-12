@@ -204,9 +204,44 @@
 /* --- Workspace Header --- */
 .workspace-header {
   padding: 24px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 
   @media (max-width: 640px) {
     padding: 16px 0 12px;
+    flex-wrap: wrap;
+  }
+}
+
+.btn-reset-workspace {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    color: var(--text-primary);
+    border-color: var(--border-default);
+    background: var(--bg-surface-elevated);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  svg {
+    opacity: 0.8;
   }
 }
 
@@ -699,7 +734,19 @@
 
 .deck-actions {
   display: flex;
+  align-items: center;
   gap: 6px;
+
+  .badge-close {
+    color: var(--text-muted);
+    transition: all var(--transition-fast);
+
+    &:hover {
+      color: #ef4444;
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.08);
+    }
+  }
 }
 
 .btn-icon-subtle {
@@ -1421,6 +1468,35 @@
   flex-direction: column;
   gap: 8px;
   transition: all var(--transition-fast);
+
+  &.active {
+    border-color: var(--accent);
+    background: var(--bg-surface-elevated);
+    box-shadow: 0 0 0 1px var(--accent), 0 0 14px var(--accent-muted);
+
+    .history-card-top .badge-mono {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  }
+
+  .history-active-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    margin-top: 2px;
+
+    .active-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+    }
+  }
 
   @media (max-width: 480px) {
     padding: 12px;

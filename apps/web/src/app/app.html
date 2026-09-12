@@ -82,6 +82,21 @@
         <h1 class="workspace-title">New Listing</h1>
         <p class="workspace-subtitle">Generate title, pricing and description for secondhand marketplaces</p>
       </div>
+      @if (hasActiveContent()) {
+        <button
+          type="button"
+          id="btn-reset-workspace"
+          class="btn-reset-workspace"
+          (click)="resetAll()"
+          title="Reset form and close preview"
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span>Reset / New</span>
+        </button>
+      }
     </section>
 
     <!-- Studio Grid -->
@@ -298,6 +313,16 @@
                   aria-label="Export Markdown"
                 >
                   <span class="badge-mono">MD</span>
+                </button>
+                <button
+                  type="button"
+                  id="btn-close-preview"
+                  class="btn-icon-subtle"
+                  (click)="clearActiveListing()"
+                  title="Close Preview (Reset to empty)"
+                  aria-label="Close Preview"
+                >
+                  <span class="badge-mono badge-close">? CLOSE</span>
                 </button>
               </div>
             }
@@ -630,16 +655,29 @@
       <section class="history-section" aria-labelledby="history-heading">
         <div class="history-header">
           <h2 id="history-heading" class="history-title">Recent</h2>
-          <button type="button" class="btn-text-subtle" (click)="storage.clearHistory()">Clear</button>
+          <button type="button" class="btn-text-subtle" (click)="clearHistory()">Clear</button>
         </div>
         <div class="history-grid">
           @for (item of storage.history(); track item.id) {
-            <div class="history-card" (click)="loadHistoricalItem(item)" role="button" tabindex="0">
+            <div
+              class="history-card"
+              [class.active]="selectedHistoryId() === item.id"
+              (click)="loadHistoricalItem(item)"
+              role="button"
+              tabindex="0"
+              [title]="selectedHistoryId() === item.id ? 'Click to deselect and close preview' : 'Click to preview'"
+            >
               <div class="history-card-top">
                 <span class="badge-mono">{{ item.result.brand }}</span>
-                <span class="history-price">€{{ item.result.price.suggested.toFixed(2) }}</span>
+                <span class="history-price">�{{ item.result.price.suggested.toFixed(2) }}</span>
               </div>
               <div class="history-card-title">{{ item.result.title }}</div>
+              @if (selectedHistoryId() === item.id) {
+                <div class="history-active-badge">
+                  <span class="active-dot"></span>
+                  <span>Active &bull; Click to close</span>
+                </div>
+              }
             </div>
           }
         </div>
