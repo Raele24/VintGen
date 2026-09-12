@@ -158,12 +158,12 @@ async function main(): Promise<void> {
 
   if (args.version) {
     console.log(`vintstack v${PACKAGE_VERSION}`);
-    process.exit(0);
+    process.exitCode = 0; return;
   }
 
   if (args.help || (process.argv.length <= 2 && !args.command)) {
     printHelp();
-    process.exit(0);
+    process.exitCode = 0; return;
   }
 
   const apiKey = args.apiKey || process.env.GEMINI_API_KEY;
@@ -173,7 +173,7 @@ async function main(): Promise<void> {
     console.error(`  - Flag: --key <YOUR_GEMINI_API_KEY>`);
     console.error(`  - Environment: export GEMINI_API_KEY="<YOUR_KEY>"`);
     console.error(`\nGet your free key at: https://aistudio.google.com/app/apikey\n`);
-    process.exit(1);
+    process.exitCode = 1; return;
   }
 
   const engine = new VintStackEngine();
@@ -187,10 +187,10 @@ async function main(): Promise<void> {
     });
     if (result.success) {
       console.log(`[SUCCESS] ${result.message}`);
-      process.exit(0);
+      process.exitCode = 0; return;
     } else {
       console.error(`[FAILURE] ${result.message}`);
-      process.exit(1);
+      process.exitCode = 1; return;
     }
   }
 
@@ -200,7 +200,7 @@ async function main(): Promise<void> {
     const resolvedPath = path.resolve(process.cwd(), imgPath);
     if (!fs.existsSync(resolvedPath)) {
       console.error(`Error: Image file not found at ${resolvedPath}`);
-      process.exit(1);
+      process.exitCode = 1; return;
     }
 
     try {
@@ -213,13 +213,13 @@ async function main(): Promise<void> {
       });
     } catch (err) {
       console.error(`Error reading image ${resolvedPath}:`, err);
-      process.exit(1);
+      process.exitCode = 1; return;
     }
   }
 
   if (imageInputs.length === 0 && !args.title && !args.notes) {
     console.error('Error: Please provide at least one image (--images) or descriptive notes (--notes).');
-    process.exit(1);
+    process.exitCode = 1; return;
   }
 
   console.log(`Analyzing item with Gemini Multimodal Vision (${imageInputs.length} image(s))...`);
@@ -277,11 +277,11 @@ async function main(): Promise<void> {
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`\nGeneration failed: ${errorMsg}`);
-    process.exit(1);
+    process.exitCode = 1; return;
   }
 }
 
 main().catch((err) => {
   console.error('Unexpected CLI error:', err);
-  process.exit(1);
+  process.exitCode = 1; return;
 });
