@@ -40,10 +40,11 @@ export class GeneratorService {
     this.error.set(null);
     this.isQuotaExceeded.set(false);
     const provider = this.storage.selectedProvider();
-    let providerLabel = 'Gemini Vision';
-    if (provider === 'claude') providerLabel = 'Claude 3.5 Vision';
-    else if (provider === 'openai') providerLabel = 'GPT-4o Vision';
-    else if (provider === 'ollama') providerLabel = 'Local Ollama (' + this.storage.ollamaModel() + ')';
+    let providerLabel = 'AI Engine';
+    if (provider === 'claude') providerLabel = 'Claude';
+    else if (provider === 'openai') providerLabel = 'ChatGPT';
+    else if (provider === 'gemini') providerLabel = 'Gemini';
+    else if (provider === 'ollama') providerLabel = 'Ollama';
     this.statusMessage.set('Inspecting photographs with ' + providerLabel + '...');
 
     try {
@@ -80,7 +81,7 @@ export class GeneratorService {
             rawMsg.includes('402')
           ) {
             this.error.set(
-              'Anthropic Claude balance depleted ($0 credit). Check your billing at console.anthropic.com/settings/plans or switch back to Gemini (free tier).'
+              'Anthropic Claude balance depleted ($0 credit). Check your billing at console.anthropic.com/settings/plans or switch to another engine.'
             );
           } else {
             this.error.set(
@@ -94,7 +95,7 @@ export class GeneratorService {
             rawMsg.toLowerCase().includes('plan')
           ) {
             this.error.set(
-              'OpenAI Quota Exceeded ($0 credit balance or unpaid account). Unlike Gemini, OpenAI APIs require prepaid billing credits. Check your billing at platform.openai.com/billing or switch back to Gemini (free tier).'
+              'OpenAI Quota Exceeded ($0 credit balance or unpaid account). Check your billing at platform.openai.com/billing or switch to another engine.'
             );
           } else {
             this.error.set(
@@ -103,7 +104,7 @@ export class GeneratorService {
           }
         } else {
           this.error.set(
-            'Temporary rate limit reached (15 requests/minute on Google AI Studio free tier). Please wait 30–60 seconds and try again!'
+            'Temporary rate limit reached. Please wait 30–60 seconds and try again!'
           );
         }
       } else if (provider === 'ollama') {
@@ -115,7 +116,7 @@ export class GeneratorService {
           rawMsg.includes('ECONNREFUSED')
         ) {
           this.error.set(
-            `Cannot reach local Ollama at ${this.storage.ollamaEndpoint()}. Please verify Ollama is running ('ollama serve'). In web browsers, ensure OLLAMA_ORIGINS="*" is configured.`
+            `Cannot reach local Ollama engine. Please verify Ollama is running ('ollama serve') and accessible.`
           );
         } else {
           this.error.set(rawMsg);

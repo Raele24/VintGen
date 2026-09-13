@@ -59,6 +59,9 @@ export class App {
 
   // Provider tab in modal
   public modalProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama'>('gemini');
+
+  // Studio Engine Selector Dropdown
+  public engineMenuOpen = signal<boolean>(false);
   public tempOllamaEndpoint = signal<string>('http://localhost:11434');
   public tempOllamaModel = signal<string>('llama3.2-vision');
 
@@ -454,6 +457,29 @@ export class App {
 
   // --- API Key Modal Controls ---
 
+  public toggleEngineMenu(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.engineMenuOpen.update((v) => !v);
+  }
+
+  public closeEngineMenu(): void {
+    this.engineMenuOpen.set(false);
+  }
+
+  public selectEngine(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): void {
+    this.storage.setProvider(provider);
+    this.closeEngineMenu();
+  }
+
+  public setProviderAsActive(provider: 'gemini' | 'openai' | 'claude' | 'ollama', event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.storage.setProvider(provider);
+  }
+
   public openKeyModal(): void {
     const active = this.storage.selectedProvider();
     this.modalProvider.set(active);
@@ -617,8 +643,8 @@ export class App {
   public tourSteps: TourStep[] = [
     {
       targetSelector: '#btn-key-status',
-      title: '1. AI Engine & API Keys',
-      description: 'Configure your Google Gemini (100% free tier) or OpenAI ChatGPT API key. Credentials remain private and stored only in your local browser.',
+      title: '1. AI Provider Credentials',
+      description: 'Configure your private AI provider credentials or connect local offline engines. Everything is stored locally in your browser.',
       placement: 'bottom',
     },
     {
@@ -634,15 +660,15 @@ export class App {
       placement: 'right',
     },
     {
-      targetSelector: '.panel-actions-wrapper',
-      title: '4. Select AI & Generate',
-      description: 'Choose between Gemini (free tier) and ChatGPT, then click Generate. The vision engine inspects details and calculates secondary market valuation in seconds.',
+      targetSelector: '.studio-command-deck',
+      title: '4. Choose AI Engine & Generate',
+      description: 'Select your preferred AI engine from the selector, then click Generate. The vision engine analyzes item details and calculates secondary market valuation in seconds.',
       placement: 'top',
     },
     {
       targetSelector: '.output-panel',
       title: '5. Pricing, Hashtags & 1-Click Copy',
-      description: 'Review suggested pricing with negotiation range, 10–15 discoverability hashtags, and 1-click copy formatted descriptions or markdown tables for Vinted, eBay, or Subito.',
+      description: 'Review suggested pricing with negotiation range, 10-15 discoverability hashtags, and 1-click copy formatted descriptions or markdown tables for Vinted, eBay, or Subito.',
       placement: 'left',
     },
   ];

@@ -17,11 +17,37 @@
       <nav class="nav-actions" aria-label="Main Navigation">
         <!-- 1. AI Provider Status / Key Pill -->
         <button type="button" id="btn-key-status" class="key-status-pill" [class.active]="storage.hasApiKey()"
-          (click)="openKeyModal()" [title]="'Active Provider: ' + (storage.selectedProvider() === 'ollama' ? 'Ollama Local' : (storage.selectedProvider() === 'claude' ? 'Anthropic Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI (ChatGPT)' : 'Google Gemini')))"
+          [class.gemini]="storage.selectedProvider() === 'gemini'"
+          [class.openai]="storage.selectedProvider() === 'openai'"
+          [class.claude]="storage.selectedProvider() === 'claude'"
+          [class.ollama]="storage.selectedProvider() === 'ollama'"
+          (click)="openKeyModal()" [title]="'Active Provider: ' + (storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.selectedProvider() === 'claude' ? 'Anthropic Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI (ChatGPT)' : 'Google Gemini')))"
           aria-label="Manage AI API Keys">
-          <span class="status-indicator"></span>
-          <span class="status-text status-text-desktop">{{ storage.selectedProvider() === 'ollama' ? 'Ollama (Local)' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude Active' : (storage.selectedProvider() === 'openai' ? 'OpenAI Active' : 'Gemini Active')) : 'API Key') }}</span>
-          <span class="status-text status-text-mobile">{{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI' : 'Gemini')) : 'Key') }}</span>
+          <span class="nav-engine-icon" [class]="storage.selectedProvider()">
+            @if (storage.selectedProvider() === 'gemini') {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+            </svg>
+            } @else if (storage.selectedProvider() === 'openai') {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+              <circle cx="12" cy="12" r="2.5"/>
+            </svg>
+            } @else if (storage.selectedProvider() === 'claude') {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            } @else {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="4" width="16" height="16" rx="4"/>
+              <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+              <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+              <path d="M9 15h6"/>
+            </svg>
+            }
+          </span>
+          <span class="status-text status-text-desktop">{{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude Active' : (storage.selectedProvider() === 'openai' ? 'ChatGPT Active' : 'Gemini Active')) : 'API Key') }}</span>
+          <span class="status-text status-text-mobile">{{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.hasApiKey() ? (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'ChatGPT' : 'Gemini')) : 'Key') }}</span>
         </button>
 
         <!-- 2. PWA Install Action Pill (Desktop Only) -->
@@ -134,10 +160,32 @@
         <div class="drawer-group-title">AI Provider</div>
         <button type="button" class="drawer-card-action" (click)="openKeyModal(); closeMobileMenu()">
           <div class="drawer-card-left">
-            <span class="status-indicator" [class.active]="storage.hasApiKey()"></span>
+            <span class="drawer-brand-icon" [class]="storage.selectedProvider()">
+              @if (storage.selectedProvider() === 'gemini') {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+              </svg>
+              } @else if (storage.selectedProvider() === 'openai') {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <circle cx="12" cy="12" r="2.5"/>
+              </svg>
+              } @else if (storage.selectedProvider() === 'claude') {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+              } @else {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="4" y="4" width="16" height="16" rx="4"/>
+                <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+                <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                <path d="M9 15h6"/>
+              </svg>
+              }
+            </span>
             <div class="drawer-card-text">
-              <span class="drawer-card-title">{{ storage.selectedProvider() === 'ollama' ? 'Ollama (Local Engine)' : (storage.selectedProvider() === 'claude' ? 'Anthropic Claude' : (storage.selectedProvider() === 'openai' ? 'OpenAI (ChatGPT)' : 'Google Gemini')) }}</span>
-              <span class="drawer-card-desc">{{ storage.selectedProvider() === 'ollama' ? 'Running on localhost:11434' : (storage.hasApiKey() ? 'API Key Configured' : 'Configure API Key') }}</span>
+              <span class="drawer-card-title">{{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'ChatGPT' : 'Gemini')) }}</span>
+              <span class="drawer-card-desc">{{ storage.selectedProvider() === 'ollama' ? 'Local Engine' : (storage.hasApiKey() ? 'API Key Configured' : 'Configure API Key') }}</span>
             </div>
           </div>
           <span class="drawer-pill-badge">Configure</span>
@@ -367,45 +415,164 @@
           </div>
           }
 
-          <!-- Provider Selector & Action Bar -->
-          <div class="panel-actions-wrapper">
-            <div class="provider-selector-row">
-              <span class="provider-selector-label">AI Engine</span>
-              <div class="provider-selector-toggle" role="radiogroup" aria-label="Select AI provider">
-                <button type="button" class="btn-provider-toggle"
-                  [class.active]="storage.selectedProvider() === 'gemini'"
-                  (click)="storage.setProvider('gemini')">
-                  Gemini
+          <!-- Studio Command Deck -->
+          <div class="studio-command-deck">
+            <!-- Engine Bar -->
+            <div class="engine-bar">
+              <span class="engine-bar-label">AI Engine</span>
+
+              <div class="engine-picker-wrapper">
+                <button type="button" class="btn-engine-picker" [class.open]="engineMenuOpen()"
+                  (click)="toggleEngineMenu($event)" aria-haspopup="true" [attr.aria-expanded]="engineMenuOpen()">
+                  <span class="engine-picker-icon">
+                    @if (storage.selectedProvider() === 'gemini') {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                    </svg>
+                    } @else if (storage.selectedProvider() === 'openai') {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                      <circle cx="12" cy="12" r="2.5"/>
+                    </svg>
+                    } @else if (storage.selectedProvider() === 'claude') {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                    } @else {
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="4" y="4" width="16" height="16" rx="4"/>
+                      <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+                      <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                      <path d="M9 15h6"/>
+                    </svg>
+                    }
+                  </span>
+                  <span class="engine-picker-text">
+                    {{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'ChatGPT' : 'Gemini')) }}
+                  </span>
+                  <span class="engine-status-indicator" [class.ready]="storage.hasApiKey()"
+                    [title]="storage.hasApiKey() ? 'Engine configured and ready' : 'API Key required'"></span>
+                  <svg class="engine-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="m6 9 6 6 6-6"/>
+                  </svg>
                 </button>
-                <button type="button" class="btn-provider-toggle"
-                  [class.active]="storage.selectedProvider() === 'openai'"
-                  (click)="storage.setProvider('openai')">
-                  ChatGPT
-                </button>
-                <button type="button" class="btn-provider-toggle"
-                  [class.active]="storage.selectedProvider() === 'claude'"
-                  (click)="storage.setProvider('claude')">
-                  Claude
-                </button>
-                <button type="button" class="btn-provider-toggle"
-                  [class.active]="storage.selectedProvider() === 'ollama'"
-                  (click)="storage.setProvider('ollama')">
-                  Ollama
-                </button>
+
+                <!-- Floating Engine Popover Menu -->
+                @if (engineMenuOpen()) {
+                <div class="engine-popover-backdrop" (click)="closeEngineMenu()"></div>
+                <div class="engine-popover-menu" (click)="$event.stopPropagation()">
+                  <div class="engine-popover-header">
+                    <span>Select AI Engine</span>
+                  </div>
+                  <div class="engine-popover-list">
+                    <!-- Gemini Option -->
+                    <button type="button" class="engine-menu-item" [class.selected]="storage.selectedProvider() === 'gemini'"
+                      (click)="selectEngine('gemini')">
+                      <div class="engine-item-icon gemini">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                        </svg>
+                      </div>
+                      <span class="engine-item-name">Google Gemini</span>
+                      <span class="engine-item-pill" [class.ready]="storage.apiKey().trim().length > 0">
+                        {{ storage.apiKey().trim().length > 0 ? 'Ready' : 'Set Key' }}
+                      </span>
+                    </button>
+
+                    <!-- OpenAI Option -->
+                    <button type="button" class="engine-menu-item" [class.selected]="storage.selectedProvider() === 'openai'"
+                      (click)="selectEngine('openai')">
+                      <div class="engine-item-icon openai">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                          <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                          <circle cx="12" cy="12" r="2.5"/>
+                        </svg>
+                      </div>
+                      <span class="engine-item-name">OpenAI ChatGPT</span>
+                      <span class="engine-item-pill" [class.ready]="storage.openaiApiKey().trim().length > 0">
+                        {{ storage.openaiApiKey().trim().length > 0 ? 'Ready' : 'Set Key' }}
+                      </span>
+                    </button>
+
+                    <!-- Claude Option -->
+                    <button type="button" class="engine-menu-item" [class.selected]="storage.selectedProvider() === 'claude'"
+                      (click)="selectEngine('claude')">
+                      <div class="engine-item-icon claude">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                      </div>
+                      <span class="engine-item-name">Anthropic Claude</span>
+                      <span class="engine-item-pill" [class.ready]="storage.claudeApiKey().trim().length > 0">
+                        {{ storage.claudeApiKey().trim().length > 0 ? 'Ready' : 'Set Key' }}
+                      </span>
+                    </button>
+
+                    <!-- Ollama Option -->
+                    <button type="button" class="engine-menu-item" [class.selected]="storage.selectedProvider() === 'ollama'"
+                      (click)="selectEngine('ollama')">
+                      <div class="engine-item-icon ollama">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <rect x="4" y="4" width="16" height="16" rx="4"/>
+                          <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+                          <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                          <path d="M9 15h6"/>
+                        </svg>
+                      </div>
+                      <span class="engine-item-name">Ollama</span>
+                      <span class="engine-item-pill local">
+                        Local
+                      </span>
+                    </button>
+                  </div>
+
+                  <div class="engine-popover-footer">
+                    <button type="button" class="btn-manage-keys-link" (click)="openKeyModal(); closeEngineMenu()">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                      </svg>
+                      <span>Manage API Keys &rarr;</span>
+                    </button>
+                  </div>
+                </div>
+                }
               </div>
             </div>
 
-            <div class="panel-actions">
-              <button type="button" id="btn-generate" class="btn-primary" [disabled]="!canGenerate()"
-                (click)="generateListing()">
-                @if (generator.isGenerating()) {
-                <span class="spinner-line" aria-hidden="true"></span>
-                <span>Analyzing item...</span>
+            <!-- Primary Generate Button -->
+            <button type="button" id="btn-generate" class="btn-primary btn-generate-hero" [disabled]="!canGenerate()"
+              (click)="generateListing()">
+              @if (generator.isGenerating()) {
+              <span class="spinner-line" aria-hidden="true"></span>
+              <span>Analyzing photos &amp; generating...</span>
+              } @else {
+              <span class="btn-engine-icon" [class]="storage.selectedProvider()">
+                @if (storage.selectedProvider() === 'gemini') {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                </svg>
+                } @else if (storage.selectedProvider() === 'openai') {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="2.5"/>
+                </svg>
+                } @else if (storage.selectedProvider() === 'claude') {
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
                 } @else {
-                <span>Generate listing ({{ storage.selectedProvider() === 'ollama' ? 'Ollama' : (storage.selectedProvider() === 'claude' ? 'Claude' : (storage.selectedProvider() === 'openai' ? 'ChatGPT' : 'Gemini')) }})</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="4" width="16" height="16" rx="4"/>
+                  <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+                  <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                  <path d="M9 15h6"/>
+                </svg>
                 }
-              </button>
-            </div>
+              </span>
+              <span>Generate</span>
+              }
+            </button>
           </div>
         </div>
       </section>
@@ -794,141 +961,303 @@
       </div>
 
       <div class="modal-body">
-        <!-- Provider Selection Tabs -->
-        <div class="provider-tabs provider-tabs-4" role="tablist" aria-label="AI Provider selection">
-          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'gemini'"
-            [attr.aria-selected]="modalProvider() === 'gemini'"
-            (click)="switchModalProvider('gemini')">
-            <span class="provider-tab-name">Gemini</span>
-            @if (storage.apiKey().trim()) {
-            <span class="provider-pill-badge">Saved</span>
-            }
-          </button>
-          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'openai'"
-            [attr.aria-selected]="modalProvider() === 'openai'"
-            (click)="switchModalProvider('openai')">
-            <span class="provider-tab-name">ChatGPT</span>
-            @if (storage.openaiApiKey().trim()) {
-            <span class="provider-pill-badge">Saved</span>
-            }
-          </button>
-          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'claude'"
-            [attr.aria-selected]="modalProvider() === 'claude'"
-            (click)="switchModalProvider('claude')">
-            <span class="provider-tab-name">Claude</span>
-            @if (storage.claudeApiKey().trim()) {
-            <span class="provider-pill-badge">Saved</span>
-            }
-          </button>
-          <button type="button" role="tab" class="provider-tab" [class.active]="modalProvider() === 'ollama'"
-            [attr.aria-selected]="modalProvider() === 'ollama'"
-            (click)="switchModalProvider('ollama')">
-            <span class="provider-tab-name">Ollama</span>
-            <span class="provider-pill-badge" style="background: rgba(14, 165, 233, 0.15); color: var(--accent);">Local</span>
-          </button>
-        </div>
+        <div class="provider-hub-list">
 
-        @if (modalProvider() === 'ollama') {
-        <div class="modal-field-group">
-          <label for="ollama-endpoint-input" class="field-label">Ollama Server URL</label>
-          <input type="text" id="ollama-endpoint-input" class="field-input field-input-mono"
-            placeholder="http://localhost:11434"
-            [ngModel]="tempOllamaEndpoint()" (ngModelChange)="tempOllamaEndpoint.set($event)"
-            autocomplete="off" spellcheck="false" />
-          <div class="modal-hint-row">
-            <span class="hint-text">Default endpoint: http://localhost:11434 (100% private & offline)</span>
-          </div>
-        </div>
+          <!-- 1. Google Gemini Card -->
+          <div class="provider-hub-card" [class.expanded]="modalProvider() === 'gemini'" [class.active-engine]="storage.selectedProvider() === 'gemini'">
+            <div class="provider-hub-header" (click)="switchModalProvider('gemini')">
+              <div class="hub-header-left">
+                <span class="hub-brand-icon gemini">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                </span>
+                <div class="hub-brand-text">
+                  <div class="hub-brand-title">Google Gemini</div>
+                  
+                </div>
+              </div>
+              <div class="hub-header-right">
+                @if (storage.selectedProvider() === 'gemini') {
+                <span class="hub-badge active">Active</span>
+                }
+                @if (storage.apiKey().trim().length > 0) {
+                <span class="hub-badge saved">Saved</span>
+                } @else {
+                <span class="hub-badge missing">No Key</span>
+                }
+                <svg class="hub-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
 
-        <div class="modal-field-group">
-          <label for="ollama-model-input" class="field-label">Vision Model Name</label>
-          <input type="text" id="ollama-model-input" class="field-input field-input-mono"
-            placeholder="llama3.2-vision"
-            [ngModel]="tempOllamaModel()" (ngModelChange)="tempOllamaModel.set($event)"
-            autocomplete="off" spellcheck="false" />
-          <div class="modal-hint-row">
-            <span class="hint-text">Popular vision models: <code>llama3.2-vision</code>, <code>llava</code>, <code>minicpm-v</code></span>
-          </div>
-        </div>
+            @if (modalProvider() === 'gemini') {
+            <div class="provider-hub-body">
+              <div class="modal-field-group">
+                <label for="gemini-key-input" class="field-label">Google Gemini API Key</label>
+                <div class="input-with-action">
+                  <input [type]="keyInputType()" id="gemini-key-input" class="field-input field-input-mono"
+                    placeholder="AIzaSy..." [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
+                    autocomplete="off" spellcheck="false" />
+                  <button type="button" class="btn-toggle-mask" (click)="toggleKeyVisibility()"
+                    [title]="keyInputType() === 'password' ? 'Show' : 'Hide'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <div class="modal-hint-row">
+                  <span class="hint-text">Saved locally in your browser only.</span>
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-subtle">
+                    Get key from Google AI Studio &nearr;
+                  </a>
+                </div>
+              </div>
 
-        <div class="modal-field-group">
-          <label for="ollama-token-input" class="field-label">Auth Token (Optional)</label>
-          <input type="password" id="ollama-token-input" class="field-input field-input-mono"
-            placeholder="Leave empty for standard local Ollama"
-            [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
-            autocomplete="off" spellcheck="false" />
-          <div class="modal-hint-row">
-            <span class="hint-text">Only needed if your Ollama instance requires an authorization token.</span>
+              @if (keyTestResult()) {
+              <div class="key-test-feedback" [class.success]="keyTestResult()!.success" [class.error]="!keyTestResult()!.success">
+                {{ keyTestResult()!.message }}
+              </div>
+              }
+
+              <div class="hub-card-actions">
+                <div class="hub-actions-left">
+                  @if (storage.apiKey().trim().length > 0) {
+                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">Remove Key</button>
+                  }
+                  @if (storage.apiKey().trim().length > 0 && storage.selectedProvider() !== 'gemini') {
+                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('gemini', $event)">Set as Active Engine</button>
+                  }
+                </div>
+                <div class="hub-actions-right">
+                  <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="!tempApiKey().trim() || generator.isTestingKey()">
+                    {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
+                  </button>
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">Save &amp; Activate</button>
+                </div>
+              </div>
+            </div>
+            }
           </div>
-        </div>
-        } @else {
-        <div class="modal-field-group">
-          <label for="api-key-input" class="field-label">
-            {{ modalProvider() === 'claude' ? 'Anthropic Claude API Key' : (modalProvider() === 'openai' ? 'OpenAI API Key' : 'Google Gemini API Key') }}
-          </label>
-          <div class="input-with-action">
-            <input [type]="keyInputType()" id="api-key-input" class="field-input field-input-mono"
-              [placeholder]="modalProvider() === 'claude' ? 'Paste Claude key (sk-ant-...)' : (modalProvider() === 'openai' ? 'Paste OpenAI key (sk-...)' : 'Paste Gemini key (AIzaSy...)')"
-              [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
-              autocomplete="off" spellcheck="false" />
-            <button type="button" class="btn-toggle-mask" (click)="toggleKeyVisibility()"
-              [title]="keyInputType() === 'password' ? 'Show' : 'Hide'" aria-label="Toggle key visibility">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-            </button>
+
+          <!-- 2. OpenAI ChatGPT Card -->
+          <div class="provider-hub-card" [class.expanded]="modalProvider() === 'openai'" [class.active-engine]="storage.selectedProvider() === 'openai'">
+            <div class="provider-hub-header" (click)="switchModalProvider('openai')">
+              <div class="hub-header-left">
+                <span class="hub-brand-icon openai">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="2.5"/>
+                  </svg>
+                </span>
+                <div class="hub-brand-text">
+                  <div class="hub-brand-title">OpenAI ChatGPT</div>
+                  
+                </div>
+              </div>
+              <div class="hub-header-right">
+                @if (storage.selectedProvider() === 'openai') {
+                <span class="hub-badge active">Active</span>
+                }
+                @if (storage.openaiApiKey().trim().length > 0) {
+                <span class="hub-badge saved">Saved</span>
+                } @else {
+                <span class="hub-badge missing">No Key</span>
+                }
+                <svg class="hub-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+
+            @if (modalProvider() === 'openai') {
+            <div class="provider-hub-body">
+              <div class="modal-field-group">
+                <label for="openai-key-input" class="field-label">OpenAI API Key</label>
+                <div class="input-with-action">
+                  <input [type]="keyInputType()" id="openai-key-input" class="field-input field-input-mono"
+                    placeholder="sk-proj-..." [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
+                    autocomplete="off" spellcheck="false" />
+                  <button type="button" class="btn-toggle-mask" (click)="toggleKeyVisibility()"
+                    [title]="keyInputType() === 'password' ? 'Show' : 'Hide'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <div class="modal-hint-row">
+                  <span class="hint-text">Saved locally in your browser only.</span>
+                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="link-subtle">
+                    Get key from OpenAI Platform &nearr;
+                  </a>
+                </div>
+              </div>
+
+              @if (keyTestResult()) {
+              <div class="key-test-feedback" [class.success]="keyTestResult()!.success" [class.error]="!keyTestResult()!.success">
+                {{ keyTestResult()!.message }}
+              </div>
+              }
+
+              <div class="hub-card-actions">
+                <div class="hub-actions-left">
+                  @if (storage.openaiApiKey().trim().length > 0) {
+                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">Remove Key</button>
+                  }
+                  @if (storage.openaiApiKey().trim().length > 0 && storage.selectedProvider() !== 'openai') {
+                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('openai', $event)">Set as Active Engine</button>
+                  }
+                </div>
+                <div class="hub-actions-right">
+                  <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="!tempApiKey().trim() || generator.isTestingKey()">
+                    {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
+                  </button>
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">Save &amp; Activate</button>
+                </div>
+              </div>
+            </div>
+            }
           </div>
-          <div class="modal-hint-row">
-            <span class="hint-text">Saved locally in your browser only.</span>
+
+          <!-- 3. Anthropic Claude Card -->
+          <div class="provider-hub-card" [class.expanded]="modalProvider() === 'claude'" [class.active-engine]="storage.selectedProvider() === 'claude'">
+            <div class="provider-hub-header" (click)="switchModalProvider('claude')">
+              <div class="hub-header-left">
+                <span class="hub-brand-icon claude">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <div class="hub-brand-text">
+                  <div class="hub-brand-title">Anthropic Claude</div>
+                  
+                </div>
+              </div>
+              <div class="hub-header-right">
+                @if (storage.selectedProvider() === 'claude') {
+                <span class="hub-badge active">Active</span>
+                }
+                @if (storage.claudeApiKey().trim().length > 0) {
+                <span class="hub-badge saved">Saved</span>
+                } @else {
+                <span class="hub-badge missing">No Key</span>
+                }
+                <svg class="hub-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+
             @if (modalProvider() === 'claude') {
-            <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer"
-              class="link-subtle">
-              Get key from Anthropic Console ↗
-            </a>
-            } @else if (modalProvider() === 'openai') {
-            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer"
-              class="link-subtle">
-              Get key from OpenAI Platform ↗
-            </a>
-            } @else {
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
-              class="link-subtle">
-              Get key from Google AI Studio ↗
-            </a>
+            <div class="provider-hub-body">
+              <div class="modal-field-group">
+                <label for="claude-key-input" class="field-label">Anthropic Claude API Key</label>
+                <div class="input-with-action">
+                  <input [type]="keyInputType()" id="claude-key-input" class="field-input field-input-mono"
+                    placeholder="sk-ant-..." [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
+                    autocomplete="off" spellcheck="false" />
+                  <button type="button" class="btn-toggle-mask" (click)="toggleKeyVisibility()"
+                    [title]="keyInputType() === 'password' ? 'Show' : 'Hide'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+                <div class="modal-hint-row">
+                  <span class="hint-text">Saved locally in your browser only.</span>
+                  <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" class="link-subtle">
+                    Get key from Anthropic Console &nearr;
+                  </a>
+                </div>
+              </div>
+
+              @if (keyTestResult()) {
+              <div class="key-test-feedback" [class.success]="keyTestResult()!.success" [class.error]="!keyTestResult()!.success">
+                {{ keyTestResult()!.message }}
+              </div>
+              }
+
+              <div class="hub-card-actions">
+                <div class="hub-actions-left">
+                  @if (storage.claudeApiKey().trim().length > 0) {
+                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">Remove Key</button>
+                  }
+                  @if (storage.claudeApiKey().trim().length > 0 && storage.selectedProvider() !== 'claude') {
+                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('claude', $event)">Set as Active Engine</button>
+                  }
+                </div>
+                <div class="hub-actions-right">
+                  <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="!tempApiKey().trim() || generator.isTestingKey()">
+                    {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
+                  </button>
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">Save &amp; Activate</button>
+                </div>
+              </div>
+            </div>
             }
           </div>
-        </div>
-        }
 
-        <!-- Key Test Feedback -->
-        @if (keyTestResult()) {
-        <div class="key-test-feedback" [class.success]="keyTestResult()!.success"
-          [class.error]="!keyTestResult()!.success">
-          {{ keyTestResult()!.message }}
+          <!-- 4. Ollama Local Card -->
+          <div class="provider-hub-card" [class.expanded]="modalProvider() === 'ollama'" [class.active-engine]="storage.selectedProvider() === 'ollama'">
+            <div class="provider-hub-header" (click)="switchModalProvider('ollama')">
+              <div class="hub-header-left">
+                <span class="hub-brand-icon ollama">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="4"/>
+                    <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+                    <circle cx="15" cy="10" r="1.5" fill="currentColor"/>
+                    <path d="M9 15h6"/>
+                  </svg>
+                </span>
+                <div class="hub-brand-text">
+                  <div class="hub-brand-title">Ollama</div>
+                  
+                </div>
+              </div>
+              <div class="hub-header-right">
+                @if (storage.selectedProvider() === 'ollama') {
+                <span class="hub-badge active">Active</span>
+                }
+                <span class="hub-badge local">Local</span>
+                <svg class="hub-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+            </div>
+
+            @if (modalProvider() === 'ollama') {
+            <div class="provider-hub-body">
+              <div class="modal-hint-row">
+                <span class="hint-text">Runs locally and privately on your computer. No API key required.</span>
+              </div>
+
+              @if (keyTestResult()) {
+              <div class="key-test-feedback" [class.success]="keyTestResult()!.success" [class.error]="!keyTestResult()!.success">
+                {{ keyTestResult()!.message }}
+              </div>
+              }
+
+              <div class="hub-card-actions">
+                <div class="hub-actions-left">
+                  @if (storage.selectedProvider() !== 'ollama') {
+                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('ollama', $event)">Set as Active Engine</button>
+                  }
+                </div>
+                <div class="hub-actions-right">
+                  <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="generator.isTestingKey()">
+                    {{ generator.isTestingKey() ? 'Testing...' : 'Test Connection' }}
+                  </button>
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()">Save &amp; Activate</button>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+
         </div>
-        }
       </div>
 
       <div class="modal-footer">
         <div class="modal-footer-left">
-          @if ((modalProvider() === 'claude' && storage.claudeApiKey().trim()) || (modalProvider() === 'openai' && storage.openaiApiKey().trim()) || (modalProvider() === 'gemini' && storage.apiKey().trim())) {
-          <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">
-            Remove key
-          </button>
-          }
+          <span class="modal-footer-hint">Stored securely in your browser localStorage</span>
         </div>
         <div class="modal-footer-right">
-          <button type="button" class="btn-ghost" (click)="closeKeyModal()">
-            Cancel
-          </button>
-          <button type="button" class="btn-secondary" [disabled]="generator.isTestingKey() || !tempApiKey().trim()"
-            (click)="testCandidateKey()">
-            {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
-          </button>
-          <button type="button" class="btn-primary" (click)="saveApiKeyModal()">
-            Save & Activate
+          <button type="button" class="btn-secondary btn-sm" (click)="closeKeyModal()">
+            Done
           </button>
         </div>
       </div>
