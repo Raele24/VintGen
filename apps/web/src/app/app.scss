@@ -1910,6 +1910,19 @@
 }
 
 /* --- Footer --- */
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  color: var(--text-primary);
+
+  .brand-mark {
+    color: var(--color-primary);
+  }
+}
+
 .footer {
   margin-top: auto;
   border-top: 1px solid var(--border-subtle);
@@ -1946,53 +1959,67 @@
   }
 }
 
-/* --- API Key Modal Dialog --- */
+/* --- API Key Modal Dialog (Apple Sheet PC & Mobile) --- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   display: flex;
-  align-items: center;
+  align-items: flex-end; /* Bottom sheet on both PC and mobile */
   justify-content: center;
-  z-index: 100;
-  padding: 20px;
+  z-index: 1200;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+  animation: modalBackdropFadeIn 0.28s ease-out;
+}
 
-  @media (max-width: 640px) {
-    padding: 12px;
-    align-items: flex-end;
+@keyframes modalBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
 .modal-card {
   width: 100%;
-  max-width: 460px;
+  max-width: 520px;
   background: var(--bg-surface);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -12px 48px rgba(0, 0, 0, 0.68), 0 0 0 1px rgba(255, 255, 255, 0.05);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 40px);
-  animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  max-height: 85vh;
+  animation: appleSheetSlideUp 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform;
+  touch-action: pan-y;
+  cursor: default;
 
   @media (max-width: 640px) {
-    max-height: 90vh;
-    border-radius: 18px 18px 14px 14px;
+    max-width: 100%;
+    border-radius: 22px 22px 0 0;
+    max-height: 86vh;
   }
 }
 
-@keyframes modalFadeIn {
+@keyframes appleSheetSlideUp {
   from {
-    opacity: 0;
-    transform: scale(0.97) translateY(8px);
+    transform: translateY(100%);
+    opacity: 0.5;
   }
   to {
+    transform: translateY(0);
     opacity: 1;
-    transform: scale(1) translateY(0);
   }
 }
+
 
 .modal-header {
   display: flex;
@@ -2216,6 +2243,24 @@
       align-items: center;
       gap: 8px;
       margin-left: auto;
+
+      .btn-secondary,
+      .btn-primary,
+      .active-engine-pill {
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        padding: 0 12px !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
+      }
     }
   }
 }
@@ -3046,23 +3091,38 @@
 
 .drawer-footer-section {
   margin-top: auto;
-  padding-top: 16px;
+  padding: 16px 0 16px;
   border-top: 1px solid var(--border-default);
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
 
-  .drawer-tags-row {
-    display: flex;
+  .drawer-footer-brand {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
+    color: var(--text-primary);
+
+    .brand-mark {
+      color: var(--color-primary);
+      flex-shrink: 0;
+    }
+
+    .brand-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
   }
 
-  .drawer-footer-note {
+  .version-badge {
     font-size: 11px;
+    font-weight: 500;
     color: var(--text-muted);
-    margin: 0;
-    line-height: 1.4;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    padding: 2px 7px;
+    border-radius: 6px;
   }
 }
 
@@ -3166,4 +3226,421 @@
       }
     }
   }
+}
+
+/* --- Ollama / Local AI Card Specifics --- */
+.hub-brand-tagline {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+  display: block;
+  margin-top: 1px;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  .field-subtle-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+}
+
+.field-optional {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.model-preset-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+
+  .preset-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: 2px;
+  }
+
+  .preset-chip {
+    font-size: 11px;
+    font-family: var(--font-mono, monospace);
+    background: var(--bg-surface-elevated, rgba(255, 255, 255, 0.04));
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm, 4px);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+
+    &:hover {
+      background: var(--bg-surface-hover);
+      color: var(--text-primary);
+      border-color: var(--border-focus);
+    }
+
+    &.selected {
+      background: rgba(14, 165, 233, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+  }
+}
+
+.ollama-setup-guide {
+  background: var(--bg-surface-subtle, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .guide-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+
+    svg {
+      color: var(--accent);
+    }
+  }
+
+  .guide-content {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    p {
+      margin: 0;
+    }
+
+    code {
+      font-family: var(--font-mono, monospace);
+      font-size: 11px;
+      background: var(--bg-input);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--border-subtle);
+      color: var(--accent);
+    }
+
+    .guide-cmd-box {
+      background: var(--bg-input, #09090b);
+      border: 1px solid var(--border-default);
+      border-radius: 4px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 2px;
+
+      .cmd-line {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+
+        .cmd-os {
+          color: var(--text-muted);
+          font-weight: 500;
+          min-width: 80px;
+        }
+
+        code {
+          border: none;
+          background: transparent;
+          padding: 0;
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+}
+
+/* --- Streamlined AI Provider Modal Styling (Mobile & Desktop) --- */
+.link-get-key {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+    opacity: 0.85;
+  }
+}
+
+.active-engine-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.28) !important;
+  padding: 0 12px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  border-radius: 8px !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+
+  svg {
+    stroke: #10b981;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+}
+
+.btn-danger-subtle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  svg {
+    opacity: 0.7;
+  }
+
+  &:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.2);
+
+    svg {
+      opacity: 1;
+    }
+  }
+}
+
+.btn-modal-done {
+  height: 32px;
+  padding: 0 18px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-surface-elevated, #27272a);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-focus);
+    color: #ffffff;
+  }
+}
+
+@media (max-width: 540px) {
+  .modal-body {
+    padding: 8px 14px 16px !important;
+    gap: 10px !important;
+  }
+
+  .provider-hub-body {
+    padding: 12px 10px !important;
+    gap: 10px !important;
+  }
+
+  .hub-card-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+    padding-top: 8px !important;
+
+    .hub-actions-left {
+      flex-shrink: 0 !important;
+    }
+
+    .hub-actions-right {
+      display: flex !important;
+      align-items: center !important;
+      gap: 6px !important;
+      margin-left: auto !important;
+
+      .btn-secondary,
+      .btn-primary,
+      .active-engine-pill {
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        font-size: 11.5px !important;
+        font-weight: 600 !important;
+        padding: 0 10px !important;
+        border-radius: 8px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
+      }
+    }
+  }
+
+  .modal-footer {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    padding: 10px 14px !important;
+
+    .modal-footer-left {
+      width: auto !important;
+      justify-content: flex-start !important;
+      font-size: 11px !important;
+    }
+
+    .modal-footer-right {
+      width: auto !important;
+
+      .btn-modal-done {
+        flex: none !important;
+      }
+    }
+  }
+}
+
+.btn-subtle-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  svg {
+    opacity: 0.7;
+    transition: transform 0.2s ease;
+  }
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border-default);
+
+    svg {
+      opacity: 1;
+      transform: rotate(-35deg);
+    }
+  }
+}
+
+/* --- Apple-Style Sheet Grabber & Mobile Sheet --- */
+.sheet-grabber-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px 0 4px;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  flex-shrink: 0;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.sheet-grabber-pill {
+  width: 38px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.32);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.sheet-grabber-area:hover .sheet-grabber-pill {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.modal-apple-sheet {
+  will-change: transform;
+  touch-action: pan-y;
+  cursor: default;
+}
+
+.modal-footer {
+  display: flex !important;
+  justify-content: flex-end !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 12px 20px !important;
+  border-top: 1px solid var(--border-default) !important;
+  background: var(--bg-surface) !important;
+  flex-shrink: 0 !important;
+
+  .modal-footer-right {
+    margin-left: auto !important;
+  }
+}
+
+/* --- Global Modal & Menu Scroll Lock --- */
+html.modal-open,
+body.modal-open {
+  overflow: hidden !important;
+  height: 100% !important;
+  overscroll-behavior: none !important;
+}
+
+.modal-backdrop,
+.mobile-drawer-backdrop {
+  touch-action: none;
+  overscroll-behavior: none;
+}
+
+.modal-card {
+  overscroll-behavior: contain;
+}
+
+.modal-body,
+.mobile-drawer {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
 }

@@ -26,7 +26,7 @@
           <span class="nav-engine-icon" [class]="storage.selectedProvider()">
             @if (storage.selectedProvider() === 'gemini') {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+              <path d="M12 2Q12 12 22 12Q12 12 12 22Q12 12 2 12Q12 12 12 2Z"/>
             </svg>
             } @else if (storage.selectedProvider() === 'openai') {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
@@ -136,7 +136,7 @@
 
   <!-- Mobile Slide-Over Navigation Drawer -->
   @if (isMobileMenuOpen()) {
-  <div class="mobile-drawer-backdrop" (click)="closeMobileMenu()"></div>
+  <div class="mobile-drawer-backdrop" (click)="closeMobileMenu()" (touchmove)="$event.preventDefault()"></div>
   <aside class="mobile-drawer" role="dialog" aria-label="Mobile Navigation Menu">
     <div class="drawer-header">
       <div class="drawer-brand">
@@ -163,7 +163,7 @@
             <span class="drawer-brand-icon" [class]="storage.selectedProvider()">
               @if (storage.selectedProvider() === 'gemini') {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                <path d="M12 2Q12 12 22 12Q12 12 12 22Q12 12 2 12Q12 12 12 2Z"/>
               </svg>
               } @else if (storage.selectedProvider() === 'openai') {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -272,11 +272,14 @@
 
       <!-- Drawer Footer -->
       <div class="drawer-footer-section">
-        <div class="drawer-tags-row">
-          <span class="version-badge">v1.0.0</span>
-          <span class="byok-badge">100% Client-Side BYOK</span>
+        <div class="drawer-footer-brand">
+          <svg class="brand-mark" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M7 2.5h10l4.5 4.5v14.5L12 15.2 2.5 21.5V7L7 2.5zm5 2.5a1.85 1.85 0 1 0 0 3.7 1.85 1.85 0 0 0 0-3.7z"/>
+          </svg>
+          <span class="brand-name">VintGen</span>
         </div>
-        <p class="drawer-footer-note">All processing and API keys stay on your local device.</p>
+        <span class="version-badge">v1.0.0</span>
       </div>
     </div>
   </aside>
@@ -427,7 +430,7 @@
                   <span class="engine-picker-icon">
                     @if (storage.selectedProvider() === 'gemini') {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                      <path d="M12 2Q12 12 22 12Q12 12 12 22Q12 12 2 12Q12 12 12 2Z"/>
                     </svg>
                     } @else if (storage.selectedProvider() === 'openai') {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -470,7 +473,7 @@
                       (click)="selectEngine('gemini')">
                       <div class="engine-item-icon gemini">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                          <path d="M12 2Q12 12 22 12Q12 12 12 22Q12 12 2 12Q12 12 12 2Z"/>
                         </svg>
                       </div>
                       <span class="engine-item-name">Google Gemini</span>
@@ -550,7 +553,7 @@
               <span class="btn-engine-icon" [class]="storage.selectedProvider()">
                 @if (storage.selectedProvider() === 'gemini') {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/>
+                  <path d="M12 2Q12 12 22 12Q12 12 12 22Q12 12 2 12Q12 12 12 2Z"/>
                 </svg>
                 } @else if (storage.selectedProvider() === 'openai') {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
@@ -934,6 +937,10 @@
   <footer class="footer" role="contentinfo">
     <div class="footer-inner container">
       <div class="footer-brand">
+        <svg class="brand-mark" width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M7 2.5h10l4.5 4.5v14.5L12 15.2 2.5 21.5V7L7 2.5zm5 2.5a1.85 1.85 0 1 0 0 3.7 1.85 1.85 0 0 0 0-3.7z"/>
+        </svg>
         <span>VintGen</span>
       </div>
       <div class="footer-links">
@@ -944,12 +951,29 @@
 
   <!-- API Key Modal Dialog -->
   @if (showKeyModal()) {
-  <div class="modal-backdrop" (click)="closeKeyModal()" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
+  <div class="modal-backdrop"
+       (click)="onBackdropClick($event)"
+       (touchend)="onBackdropTouch($event)"
+       (touchmove)="onBackdropTouchMove($event)"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="modal-title">
+    <div class="modal-card modal-apple-sheet"
+         [style.transform]="sheetTranslateY() > 0 ? 'translateY(' + sheetTranslateY() + 'px)' : null"
+         [style.transition]="isSheetDragging() ? 'none' : 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)'"
+         (click)="$event.stopPropagation()"
+         (touchstart)="onSheetTouchStart($event)"
+         (touchmove)="onSheetTouchMove($event)"
+         (touchend)="onSheetTouchEnd($event)">
+      <!-- Apple Sheet Grabber Pill Handle -->
+      <div class="sheet-grabber-area" (mousedown)="onGrabberMouseDown($event)">
+        <div class="sheet-grabber-pill"></div>
+      </div>
+
+      <div class="modal-header" (mousedown)="onHeaderMouseDown($event)">
         <div class="modal-header-content">
-          <h3 id="modal-title" class="modal-title">AI Provider & API Key</h3>
-          <span class="modal-subtitle">Private direct BYOK connection &bull; Stored locally in browser</span>
+          <h3 id="modal-title" class="modal-title">AI Provider &amp; API Key</h3>
+          <span class="modal-subtitle">Private direct connection</span>
         </div>
         <button type="button" class="modal-close-btn" (click)="closeKeyModal()" aria-label="Close modal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -968,11 +992,10 @@
             <div class="provider-hub-header" (click)="switchModalProvider('gemini')">
               <div class="hub-header-left">
                 <span class="hub-brand-icon gemini">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"/></svg>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2Q12 12 22 12Q12 12 12 22Q12 12 2 12Q12 12 12 2Z"/></svg>
                 </span>
                 <div class="hub-brand-text">
                   <div class="hub-brand-title">Google Gemini</div>
-                  
                 </div>
               </div>
               <div class="hub-header-right">
@@ -991,7 +1014,12 @@
             @if (modalProvider() === 'gemini') {
             <div class="provider-hub-body">
               <div class="modal-field-group">
-                <label for="gemini-key-input" class="field-label">Google Gemini API Key</label>
+                <div class="field-label-row">
+                  <label for="gemini-key-input" class="field-label">Google Gemini API Key</label>
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key">
+                    Get key &nearr;
+                  </a>
+                </div>
                 <div class="input-with-action">
                   <input [type]="keyInputType()" id="gemini-key-input" class="field-input field-input-mono"
                     placeholder="AIzaSy..." [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
@@ -1004,12 +1032,6 @@
                     </svg>
                   </button>
                 </div>
-                <div class="modal-hint-row">
-                  <span class="hint-text">Saved locally in your browser only.</span>
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-subtle">
-                    Get key from Google AI Studio &nearr;
-                  </a>
-                </div>
               </div>
 
               @if (keyTestResult()) {
@@ -1020,18 +1042,37 @@
 
               <div class="hub-card-actions">
                 <div class="hub-actions-left">
-                  @if (storage.apiKey().trim().length > 0) {
-                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">Remove Key</button>
-                  }
-                  @if (storage.apiKey().trim().length > 0 && storage.selectedProvider() !== 'gemini') {
-                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('gemini', $event)">Set as Active Engine</button>
+                  @if (isCurrentProviderSaved('gemini')) {
+                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()" title="Remove saved key">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Remove</span>
+                  </button>
                   }
                 </div>
                 <div class="hub-actions-right">
                   <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="!tempApiKey().trim() || generator.isTestingKey()">
                     {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
                   </button>
-                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">Save &amp; Activate</button>
+
+                  @if (isCurrentKeyModified('gemini') || !isCurrentProviderSaved('gemini')) {
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">
+                    Save &amp; Activate
+                  </button>
+                  } @else if (isCurrentProviderActive('gemini')) {
+                  <span class="active-engine-pill">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Active</span>
+                  </span>
+                  } @else {
+                  <button type="button" class="btn-primary btn-sm" (click)="setProviderAsActive('gemini', $event)">
+                    Set as Active
+                  </button>
+                  }
                 </div>
               </div>
             </div>
@@ -1050,7 +1091,6 @@
                 </span>
                 <div class="hub-brand-text">
                   <div class="hub-brand-title">OpenAI ChatGPT</div>
-                  
                 </div>
               </div>
               <div class="hub-header-right">
@@ -1069,7 +1109,12 @@
             @if (modalProvider() === 'openai') {
             <div class="provider-hub-body">
               <div class="modal-field-group">
-                <label for="openai-key-input" class="field-label">OpenAI API Key</label>
+                <div class="field-label-row">
+                  <label for="openai-key-input" class="field-label">OpenAI API Key</label>
+                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="link-get-key">
+                    Get key &nearr;
+                  </a>
+                </div>
                 <div class="input-with-action">
                   <input [type]="keyInputType()" id="openai-key-input" class="field-input field-input-mono"
                     placeholder="sk-proj-..." [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
@@ -1082,12 +1127,6 @@
                     </svg>
                   </button>
                 </div>
-                <div class="modal-hint-row">
-                  <span class="hint-text">Saved locally in your browser only.</span>
-                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="link-subtle">
-                    Get key from OpenAI Platform &nearr;
-                  </a>
-                </div>
               </div>
 
               @if (keyTestResult()) {
@@ -1098,18 +1137,37 @@
 
               <div class="hub-card-actions">
                 <div class="hub-actions-left">
-                  @if (storage.openaiApiKey().trim().length > 0) {
-                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">Remove Key</button>
-                  }
-                  @if (storage.openaiApiKey().trim().length > 0 && storage.selectedProvider() !== 'openai') {
-                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('openai', $event)">Set as Active Engine</button>
+                  @if (isCurrentProviderSaved('openai')) {
+                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()" title="Remove saved key">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Remove</span>
+                  </button>
                   }
                 </div>
                 <div class="hub-actions-right">
                   <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="!tempApiKey().trim() || generator.isTestingKey()">
                     {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
                   </button>
-                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">Save &amp; Activate</button>
+
+                  @if (isCurrentKeyModified('openai') || !isCurrentProviderSaved('openai')) {
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">
+                    Save &amp; Activate
+                  </button>
+                  } @else if (isCurrentProviderActive('openai')) {
+                  <span class="active-engine-pill">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Active</span>
+                  </span>
+                  } @else {
+                  <button type="button" class="btn-primary btn-sm" (click)="setProviderAsActive('openai', $event)">
+                    Set as Active
+                  </button>
+                  }
                 </div>
               </div>
             </div>
@@ -1127,7 +1185,6 @@
                 </span>
                 <div class="hub-brand-text">
                   <div class="hub-brand-title">Anthropic Claude</div>
-                  
                 </div>
               </div>
               <div class="hub-header-right">
@@ -1146,7 +1203,12 @@
             @if (modalProvider() === 'claude') {
             <div class="provider-hub-body">
               <div class="modal-field-group">
-                <label for="claude-key-input" class="field-label">Anthropic Claude API Key</label>
+                <div class="field-label-row">
+                  <label for="claude-key-input" class="field-label">Anthropic Claude API Key</label>
+                  <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" class="link-get-key">
+                    Get key &nearr;
+                  </a>
+                </div>
                 <div class="input-with-action">
                   <input [type]="keyInputType()" id="claude-key-input" class="field-input field-input-mono"
                     placeholder="sk-ant-..." [ngModel]="tempApiKey()" (ngModelChange)="tempApiKey.set($event)"
@@ -1159,12 +1221,6 @@
                     </svg>
                   </button>
                 </div>
-                <div class="modal-hint-row">
-                  <span class="hint-text">Saved locally in your browser only.</span>
-                  <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" class="link-subtle">
-                    Get key from Anthropic Console &nearr;
-                  </a>
-                </div>
               </div>
 
               @if (keyTestResult()) {
@@ -1175,18 +1231,37 @@
 
               <div class="hub-card-actions">
                 <div class="hub-actions-left">
-                  @if (storage.claudeApiKey().trim().length > 0) {
-                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()">Remove Key</button>
-                  }
-                  @if (storage.claudeApiKey().trim().length > 0 && storage.selectedProvider() !== 'claude') {
-                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('claude', $event)">Set as Active Engine</button>
+                  @if (isCurrentProviderSaved('claude')) {
+                  <button type="button" class="btn-danger-subtle" (click)="removeApiKey()" title="Remove saved key">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Remove</span>
+                  </button>
                   }
                 </div>
                 <div class="hub-actions-right">
                   <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="!tempApiKey().trim() || generator.isTestingKey()">
                     {{ generator.isTestingKey() ? 'Testing...' : 'Test' }}
                   </button>
-                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">Save &amp; Activate</button>
+
+                  @if (isCurrentKeyModified('claude') || !isCurrentProviderSaved('claude')) {
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()" [disabled]="!tempApiKey().trim()">
+                    Save &amp; Activate
+                  </button>
+                  } @else if (isCurrentProviderActive('claude')) {
+                  <span class="active-engine-pill">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Active</span>
+                  </span>
+                  } @else {
+                  <button type="button" class="btn-primary btn-sm" (click)="setProviderAsActive('claude', $event)">
+                    Set as Active
+                  </button>
+                  }
                 </div>
               </div>
             </div>
@@ -1206,15 +1281,15 @@
                   </svg>
                 </span>
                 <div class="hub-brand-text">
-                  <div class="hub-brand-title">Ollama</div>
-                  
+                  <div class="hub-brand-title">Ollama / Custom Local AI</div>
+                  <span class="hub-brand-tagline">Self-hosted &amp; custom vision models</span>
                 </div>
               </div>
               <div class="hub-header-right">
                 @if (storage.selectedProvider() === 'ollama') {
                 <span class="hub-badge active">Active</span>
                 }
-                <span class="hub-badge local">Local</span>
+                <span class="hub-badge local">Local / Offline</span>
                 <svg class="hub-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
               </div>
             </div>
@@ -1222,7 +1297,108 @@
             @if (modalProvider() === 'ollama') {
             <div class="provider-hub-body">
               <div class="modal-hint-row">
-                <span class="hint-text">Runs locally and privately on your computer. No API key required.</span>
+                <span class="hint-text">Run 100% offline &amp; private vision models on your computer or local network. No external API keys or cloud billing required.</span>
+              </div>
+
+              <!-- Endpoint Field -->
+              <div class="modal-field-group">
+                <div class="field-label-row">
+                  <label for="ollama-endpoint-input" class="field-label">Server Endpoint URL</label>
+                  <span class="field-subtle-hint">Local / LAN / Remote</span>
+                </div>
+                <input
+                  type="text"
+                  id="ollama-endpoint-input"
+                  class="field-input field-input-mono"
+                  placeholder="http://localhost:11434"
+                  [ngModel]="tempOllamaEndpoint()"
+                  (ngModelChange)="tempOllamaEndpoint.set($event)"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <div class="modal-hint-row">
+                  <span class="hint-text">Default: <code>http://localhost:11434</code> (or LAN IP e.g. <code>http://192.168.1.50:11434</code>)</span>
+                </div>
+              </div>
+
+              <!-- Model Name Field -->
+              <div class="modal-field-group">
+                <div class="field-label-row">
+                  <label for="ollama-model-input" class="field-label">Vision Model Name</label>
+                  <span class="field-subtle-hint">Custom or open-weights</span>
+                </div>
+                <input
+                  type="text"
+                  id="ollama-model-input"
+                  class="field-input field-input-mono"
+                  placeholder="llama3.2-vision"
+                  [ngModel]="tempOllamaModel()"
+                  (ngModelChange)="tempOllamaModel.set($event)"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <!-- Quick Preset Chips -->
+                <div class="model-preset-pills">
+                  <span class="preset-label">Presets:</span>
+                  <button type="button" class="preset-chip" [class.selected]="tempOllamaModel() === 'llama3.2-vision'" (click)="tempOllamaModel.set('llama3.2-vision')">
+                    llama3.2-vision
+                  </button>
+                  <button type="button" class="preset-chip" [class.selected]="tempOllamaModel() === 'llava'" (click)="tempOllamaModel.set('llava')">
+                    llava
+                  </button>
+                  <button type="button" class="preset-chip" [class.selected]="tempOllamaModel() === 'minicpm-v'" (click)="tempOllamaModel.set('minicpm-v')">
+                    minicpm-v
+                  </button>
+                  <button type="button" class="preset-chip" [class.selected]="tempOllamaModel() === 'qwen2.5-vl'" (click)="tempOllamaModel.set('qwen2.5-vl')">
+                    qwen2.5-vl
+                  </button>
+                </div>
+                <div class="modal-hint-row">
+                  <span class="hint-text">You can type any custom vision model installed on your machine.</span>
+                </div>
+              </div>
+
+              <!-- Optional Auth Token -->
+              <div class="modal-field-group">
+                <label for="ollama-token-input" class="field-label">Bearer Token / Auth Key <span class="field-optional">(Optional)</span></label>
+                <div class="input-with-action">
+                  <input
+                    [type]="keyInputType()"
+                    id="ollama-token-input"
+                    class="field-input field-input-mono"
+                    placeholder="Optional token (leave blank for local Ollama)"
+                    [ngModel]="tempApiKey()"
+                    (ngModelChange)="tempApiKey.set($event)"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                  <button type="button" class="btn-toggle-mask" (click)="toggleKeyVisibility()" [title]="keyInputType() === 'password' ? 'Show' : 'Hide'">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Setup Guide Box -->
+              <div class="ollama-setup-guide">
+                <div class="guide-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>Quick Setup &amp; Browser CORS</span>
+                </div>
+                <div class="guide-content">
+                  <p><strong>1. Pull model:</strong> <code>ollama run {{ tempOllamaModel() || 'llama3.2-vision' }}</code></p>
+                  <p><strong>2. Allow browser web requests:</strong> Launch Ollama with CORS allowed:</p>
+                  <div class="guide-cmd-box">
+                    <div class="cmd-line"><span class="cmd-os">PowerShell:</span> <code>$env:OLLAMA_ORIGINS="*"; ollama serve</code></div>
+                    <div class="cmd-line"><span class="cmd-os">Mac / Linux:</span> <code>OLLAMA_ORIGINS="*" ollama serve</code></div>
+                  </div>
+                </div>
               </div>
 
               @if (keyTestResult()) {
@@ -1233,30 +1409,45 @@
 
               <div class="hub-card-actions">
                 <div class="hub-actions-left">
-                  @if (storage.selectedProvider() !== 'ollama') {
-                  <button type="button" class="btn-activate-subtle" (click)="setProviderAsActive('ollama', $event)">Set as Active Engine</button>
-                  }
+                  <button type="button" class="btn-subtle-reset" (click)="resetOllamaDefaults()" title="Reset to default local settings (localhost:11434 &amp; llama3.2-vision)">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="1 4 1 10 7 10"></polyline>
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                    <span>Reset</span>
+                  </button>
                 </div>
                 <div class="hub-actions-right">
                   <button type="button" class="btn-secondary btn-sm" (click)="testCandidateKey()" [disabled]="generator.isTestingKey()">
                     {{ generator.isTestingKey() ? 'Testing...' : 'Test Connection' }}
                   </button>
-                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()">Save &amp; Activate</button>
+
+                  @if (isCurrentKeyModified('ollama')) {
+                  <button type="button" class="btn-primary btn-sm" (click)="saveApiKeyModal()">
+                    Save &amp; Activate
+                  </button>
+                  } @else if (isCurrentProviderActive('ollama')) {
+                  <span class="active-engine-pill">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>Active</span>
+                  </span>
+                  } @else {
+                  <button type="button" class="btn-primary btn-sm" (click)="setProviderAsActive('ollama', $event)">
+                    Set as Active
+                  </button>
+                  }
                 </div>
               </div>
             </div>
             }
-          </div>
-
-        </div>
+          </div></div>
       </div>
 
       <div class="modal-footer">
-        <div class="modal-footer-left">
-          <span class="modal-footer-hint">Stored securely in your browser localStorage</span>
-        </div>
         <div class="modal-footer-right">
-          <button type="button" class="btn-secondary btn-sm" (click)="closeKeyModal()">
+          <button type="button" class="btn-modal-done" (click)="closeKeyModal()">
             Done
           </button>
         </div>

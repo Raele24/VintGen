@@ -5,6 +5,7 @@ import {
   computed,
   ChangeDetectionStrategy,
   HostListener,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -58,7 +59,15 @@ export class App {
   public keyTestResult = signal<{ success: boolean; message: string } | null>(null);
 
   // Provider tab in modal
-  public modalProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama'>('gemini');
+    // Apple Sheet Gestures & State
+  public sheetTranslateY = signal<number>(0);
+  public isSheetDragging = signal<boolean>(false);
+  public isSheetDismissing = signal<boolean>(false);
+  private sheetTouchStartY = 0;
+  private sheetLastTouchY = 0;
+  private sheetTouchStartTime = 0;
+
+  public modalProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama' | null>('gemini');
 
   // Studio Engine Selector Dropdown
   public engineMenuOpen = signal<boolean>(false);
@@ -151,6 +160,23 @@ export class App {
   constructor() {
     this.initTheme();
     this.detectIosAndStandalone();
+    effect(() => {
+      const isAnyModalOpen =
+        this.showKeyModal() ||
+        this.isMobileMenuOpen() ||
+        this.showTourConfirmModal() ||
+        this.showIosInstallModal();
+
+      if (typeof document !== 'undefined') {
+        if (isAnyModalOpen) {
+          document.body.classList.add('modal-open');
+          document.documentElement.classList.add('modal-open');
+        } else {
+          document.body.classList.remove('modal-open');
+          document.documentElement.classList.remove('modal-open');
+        }
+      }
+    });
   }
 
   private initTheme(): void {
@@ -495,10 +521,18 @@ export class App {
       this.tempApiKey.set(this.storage.apiKey());
     }
     this.keyTestResult.set(null);
+    this.sheetTranslateY.set(0);
+    this.isSheetDragging.set(false);
+    this.isSheetDismissing.set(false);
     this.showKeyModal.set(true);
   }
 
   public switchModalProvider(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): void {
+    if (this.modalProvider() === provider) {
+      this.modalProvider.set(null);
+      this.keyTestResult.set(null);
+      return;
+    }
     this.modalProvider.set(provider);
     if (provider === 'ollama') {
       this.tempOllamaEndpoint.set(this.storage.ollamaEndpoint());
@@ -515,7 +549,123 @@ export class App {
   }
 
   public closeKeyModal(): void {
-    this.showKeyModal.set(false);
+    if (this.isSheetDismissing()) return;
+    this.isSheetDismissing.set(true);
+    this.sheetTranslateY.set(680);
+    setTimeout(() => {
+      this.showKeyModal.set(false);
+      this.sheetTranslateY.set(0);
+      this.isSheetDragging.set(false);
+      this.isSheetDismissing.set(false);
+    }, 220);
+  }
+
+    public onBackdropTouchMove(event: TouchEvent): void {
+    if (event.target === event.currentTarget && event.cancelable) {
+      event.preventDefault();
+    }
+  }
+
+  public onBackdropClick(event: Event): void {
+    if (event.target === event.currentTarget) {
+      this.closeKeyModal();
+    }
+  }
+
+  public onBackdropTouch(event: TouchEvent): void {
+    if (event.target === event.currentTarget) {
+      event.preventDefault();
+      this.closeKeyModal();
+    }
+  }
+
+  public onSheetTouchStart(event: TouchEvent): void {
+    if (event.touches.length !== 1) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, select')) return;
+    this.sheetTouchStartY = event.touches[0].clientY;
+    this.sheetLastTouchY = this.sheetTouchStartY;
+    this.sheetTouchStartTime = Date.now();
+    this.isSheetDragging.set(true);
+  }
+
+  public onSheetTouchMove(event: TouchEvent): void {
+    if (!this.isSheetDragging() || this.isSheetDismissing()) return;
+    const currentY = event.touches[0].clientY;
+    const deltaY = currentY - this.sheetTouchStartY;
+
+    const target = event.target as HTMLElement | null;
+    const isHeaderOrGrabber = !!target?.closest('.sheet-grabber-area, .modal-header');
+    const modalBody = (event.currentTarget as HTMLElement)?.querySelector('.modal-body') as HTMLElement | null;
+    const isAtTop = modalBody ? modalBody.scrollTop <= 2 : true;
+
+    if (deltaY > 0 && (isHeaderOrGrabber || isAtTop)) {
+      this.sheetLastTouchY = currentY;
+      const dampedY = deltaY < 120 ? deltaY : 120 + (deltaY - 120) * 0.65;
+      this.sheetTranslateY.set(dampedY);
+      if (event.cancelable && deltaY > 8) {
+        event.preventDefault();
+      }
+    } else {
+      this.sheetTranslateY.set(0);
+    }
+  }
+
+  public onSheetTouchEnd(event: TouchEvent): void {
+    if (!this.isSheetDragging() || this.isSheetDismissing()) return;
+    this.isSheetDragging.set(false);
+    const deltaY = this.sheetLastTouchY - this.sheetTouchStartY;
+    const elapsed = Date.now() - this.sheetTouchStartTime;
+    const velocity = deltaY / Math.max(1, elapsed);
+
+    if (deltaY > 70 || (deltaY > 30 && velocity > 0.35)) {
+      this.closeKeyModal();
+    } else {
+      this.sheetTranslateY.set(0);
+    }
+  }
+
+    public onHeaderMouseDown(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, input, select, a, textarea')) return;
+    this.onGrabberMouseDown(event);
+  }
+
+  public onGrabberMouseDown(event: MouseEvent): void {
+    event.preventDefault();
+    const startY = event.clientY;
+    let lastY = startY;
+    const startTime = Date.now();
+    this.isSheetDragging.set(true);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaY = moveEvent.clientY - startY;
+      if (deltaY > 0) {
+        lastY = moveEvent.clientY;
+        const dampedY = deltaY < 120 ? deltaY : 120 + (deltaY - 120) * 0.65;
+        this.sheetTranslateY.set(dampedY);
+      } else {
+        this.sheetTranslateY.set(0);
+      }
+    };
+
+    const onMouseUp = (upEvent: MouseEvent) => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      this.isSheetDragging.set(false);
+      const deltaY = lastY - startY;
+      const elapsed = Date.now() - startTime;
+      const velocity = deltaY / Math.max(1, elapsed);
+
+      if (deltaY > 70 || (deltaY > 30 && velocity > 0.35)) {
+        this.closeKeyModal();
+      } else {
+        this.sheetTranslateY.set(0);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
   }
 
   public toggleKeyVisibility(): void {
@@ -524,6 +674,7 @@ export class App {
 
   public async testCandidateKey(): Promise<void> {
     const provider = this.modalProvider();
+    if (!provider) return;
     let result: { success: boolean; message: string };
 
     if (provider === 'ollama') {
@@ -551,6 +702,7 @@ export class App {
 
   public saveApiKeyModal(): void {
     const provider = this.modalProvider();
+    if (!provider) return;
     if (provider === 'ollama') {
       this.storage.setOllamaEndpoint(this.tempOllamaEndpoint().trim() || 'http://localhost:11434');
       this.storage.setOllamaModel(this.tempOllamaModel().trim() || 'llama3.2-vision');
@@ -566,9 +718,51 @@ export class App {
     this.showKeyModal.set(false);
   }
 
-  public removeApiKey(): void {
+    public isCurrentProviderActive(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): boolean {
+    return this.storage.selectedProvider() === provider;
+  }
+
+  public isCurrentProviderSaved(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): boolean {
+    if (provider === 'gemini') return this.storage.apiKey().trim().length > 0;
+    if (provider === 'openai') return this.storage.openaiApiKey().trim().length > 0;
+    if (provider === 'claude') return this.storage.claudeApiKey().trim().length > 0;
+    if (provider === 'ollama') return true;
+    return false;
+  }
+
+  public isCurrentKeyModified(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): boolean {
+    if (provider === 'gemini') return this.tempApiKey().trim() !== this.storage.apiKey().trim();
+    if (provider === 'openai') return this.tempApiKey().trim() !== this.storage.openaiApiKey().trim();
+    if (provider === 'claude') return this.tempApiKey().trim() !== this.storage.claudeApiKey().trim();
+    if (provider === 'ollama') {
+      return (
+        this.tempOllamaEndpoint().trim() !== this.storage.ollamaEndpoint().trim() ||
+        this.tempOllamaModel().trim() !== this.storage.ollamaModel().trim() ||
+        this.tempApiKey().trim() !== this.storage.ollamaApiKey().trim()
+      );
+    }
+    return false;
+  }
+
+    public resetOllamaDefaults(): void {
+    const defaultEndpoint = 'http://localhost:11434';
+    const defaultModel = 'llama3.2-vision';
+    this.tempOllamaEndpoint.set(defaultEndpoint);
+    this.tempOllamaModel.set(defaultModel);
     this.tempApiKey.set('');
+    this.storage.setOllamaEndpoint(defaultEndpoint);
+    this.storage.setOllamaModel(defaultModel);
+    this.storage.clearOllamaKey();
+    this.keyTestResult.set({
+      success: true,
+      message: 'Reset to default local settings: http://localhost:11434 and llama3.2-vision.',
+    });
+  }
+
+  public removeApiKey(): void {
     const provider = this.modalProvider();
+    if (!provider) return;
+    this.tempApiKey.set('');
     if (provider === 'ollama') {
       this.storage.clearOllamaKey();
     } else if (provider === 'claude') {
@@ -644,7 +838,7 @@ export class App {
     {
       targetSelector: '#btn-key-status',
       title: '1. AI Provider Credentials',
-      description: 'Configure your private AI provider credentials or connect local offline engines. Everything is stored locally in your browser.',
+      description: 'Configure your private AI provider credentials or connect local offline engines. Everything stays directly in your private connection.',
       placement: 'bottom',
     },
     {
