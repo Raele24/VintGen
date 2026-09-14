@@ -1,4 +1,4 @@
-﻿# vintgen
+# vintgen
 
 > Create marketplace listings from item photos directly in your terminal.
 
@@ -105,7 +105,8 @@ vintgen -i ./front.jpg,./tag.jpg,./details.jpg
 | `--key <key>` | `-k` | API key override |
 | `--model <name>` | `-m` | Model name override |
 | `--endpoint <url>` | `-e` | Ollama URL (default: `http://localhost:11434`) |
-| `--format <type>` | `-f` | Output format: `text` (default), `json`, `vinted` |
+| `--platform <name>` | `-P` | Target marketplace: `universal` (default), `vinted`, `ebay`, `depop`, `subito`, `wallapop` |
+| `--format <type>` | `-f` | Output format: `text` (default), `json`, `markdown` |
 | `--output <file>` | `-o` | Output file path (default: `vintgen-listing.txt`) |
 | `--help` | `-h` | Show help |
 | `--version` | `-v` | Show version |

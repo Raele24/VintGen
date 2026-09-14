@@ -11,10 +11,12 @@ import {
   ProviderConfig,
 } from './types';
 import { ProviderRegistry } from './providers/registry';
-import { MarketplacePlatform } from './platforms/marketplace.platform';
+import { PlatformRegistry } from './platforms/platform-registry';
+import { PlatformAdapter, PlatformId } from './platforms/platform.interface';
 
 export class VintGenEngine {
   private registry = ProviderRegistry.getInstance();
+  private platformRegistry = PlatformRegistry.getInstance();
 
   /**
    * Generates a structured listing using the selected AI provider.
@@ -22,18 +24,29 @@ export class VintGenEngine {
    */
   public async generate(
     input: ListingInput,
-    config: ProviderConfig & { providerId?: string }
+    config: ProviderConfig & { providerId?: string; platformId?: PlatformId | string }
   ): Promise<{ raw: ListingResult; formatted: FormattedListing }> {
     const providerId = config.providerId || 'gemini';
     const provider = this.registry.get(providerId);
 
     const rawResult = await provider.generateListing(input, config);
-    const formatted = MarketplacePlatform.format(rawResult);
+    const platformId = config.platformId || input.platform || 'universal';
+    const formatted = this.platformRegistry.format(rawResult, platformId);
 
     return {
       raw: rawResult,
       formatted,
     };
+  }
+
+  /**
+   * Formats a raw listing result for a specific marketplace platform.
+   */
+  public formatPlatform(
+    result: ListingResult,
+    platformId?: PlatformId | string
+  ): FormattedListing {
+    return this.platformRegistry.format(result, platformId);
   }
 
   /**
@@ -52,5 +65,12 @@ export class VintGenEngine {
    */
   public getProviders(): Array<{ id: string; name: string }> {
     return this.registry.getAll();
+  }
+
+  /**
+   * Returns list of supported marketplace platform adapters.
+   */
+  public getPlatforms(): PlatformAdapter[] {
+    return this.platformRegistry.getAll();
   }
 }

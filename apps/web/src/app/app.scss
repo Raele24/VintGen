@@ -4033,3 +4033,83 @@ body.modal-open {
   }
 }
 
+
+/* --- Multi-Marketplace Platform Selector Tabs --- */
+.platform-selector-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 10px;
+  margin-bottom: 4px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.platform-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 550;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-default);
+  }
+
+  &.active {
+    background: var(--accent);
+    color: var(--btn-primary-text);
+    border-color: var(--accent);
+    box-shadow: 0 1px 3px rgba(14, 165, 233, 0.3);
+  }
+}
+
+.platform-tab-name {
+  line-height: 1;
+}
+
+.platform-tab-badge {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.2);
+  color: inherit;
+}
+
+.char-counter {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  margin-left: 6px;
+  background: rgba(14, 165, 233, 0.1);
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+
+  &.warn {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+.platform-tag-hint {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  margin-left: 6px;
+}

@@ -1,59 +1,55 @@
 ﻿/**
- * Vinted Platform Adapter
+ * Wallapop Platform Adapter
  * 
- * Formats listings for direct copying into Vinted item uploads.
+ * Formats listings for direct resale with punchy item specs and shipping notice.
  */
 
 import { FormattedListing, ListingResult, ItemCondition } from '../types';
 import { PlatformAdapter } from './platform.interface';
 
-export class VintedPlatform implements PlatformAdapter {
-  public readonly id = 'vinted';
-  public readonly name = 'Vinted';
-  public readonly shortLabel = 'Vinted';
-  public readonly description = 'Conversational secondhand format with bundle notes, condition details, and hashtags.';
+export class WallapopPlatform implements PlatformAdapter {
+  public readonly id = 'wallapop';
+  public readonly name = 'Wallapop';
+  public readonly shortLabel = 'Wallapop';
+  public readonly description = 'Direct resale format with condition, handover notes, and buyer protection compliance.';
 
   public static readonly CONDITION_MAP: Record<ItemCondition, string> = {
     new_with_tags: 'New with tags',
     new_without_tags: 'New without tags',
     very_good: 'Very good condition',
     good: 'Good condition',
-    satisfactory: 'Satisfactory condition',
+    satisfactory: 'Fair condition',
   };
 
   public format(result: ListingResult): FormattedListing {
-    return VintedPlatform.format(result);
+    return WallapopPlatform.format(result);
   }
 
   public static format(result: ListingResult): FormattedListing {
-    const conditionText = VintedPlatform.CONDITION_MAP[result.condition] || result.condition;
+    const conditionText = WallapopPlatform.CONDITION_MAP[result.condition] || result.condition;
 
     let body = (result.description || '').trim();
     body = body.replace(/(?:\r?\n\s*)*\r?\n\s*#(?:[a-zA-Z0-9_\-\s#]+)$/g, '').trim();
 
     const sections: string[] = [body];
-
-    const specs: string[] = [];
-    if (result.brand) specs.push(`Brand: ${result.brand}`);
-    if (result.size) specs.push(`Size: ${result.size}`);
-    if (result.color) specs.push(`Color: ${result.color}`);
-    if (result.material) specs.push(`Material: ${result.material}`);
-    specs.push(`Condition: ${conditionText}`);
-    if (result.fitNotes) specs.push(`Fit: ${result.fitNotes}`);
-
     sections.push('');
-    sections.push(specs.join('\n'));
+
+    sections.push(`Brand: ${result.brand}`);
+    if (result.size) sections.push(`Size: ${result.size}`);
+    if (result.color) sections.push(`Color: ${result.color}`);
+    if (result.material) sections.push(`Material: ${result.material}`);
+    sections.push(`Condition: ${conditionText}`);
 
     if (result.flaws && result.flaws.length > 0) {
       sections.push('');
-      sections.push('Flaws / Notes:');
+      sections.push('Flaws / Details:');
       for (const flaw of result.flaws) {
         sections.push('- ' + flaw.trim().replace(/^[-*]\s*/, ''));
       }
     }
 
     sections.push('');
-    sections.push('Discounts active on bundles. Fast dispatch within 24-48 hours. Feel free to ask questions or make an offer.');
+    sections.push('Shipping available via Wallapop Shipping or in-person pickup. Fast reply to offers.');
 
     const tagsText = (result.hashtags || []).map(t => t.startsWith('#') ? t : ('#' + t)).join(' ').trim();
     if (tagsText) {
@@ -65,12 +61,9 @@ export class VintedPlatform implements PlatformAdapter {
     const priceString = result.price.suggested.toFixed(2);
 
     const fullBundle = [
-      `=== VINTED LISTING ===`,
+      `=== WALLAPOP LISTING ===`,
       `TITLE: ${result.title}`,
       `PRICE: EUR ${priceString}`,
-      `BRAND: ${result.brand}`,
-      `SIZE: ${result.size}`,
-      `CONDITION: ${conditionText}`,
       '',
       `=== DESCRIPTION ===`,
       description,

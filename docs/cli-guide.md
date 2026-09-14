@@ -1,4 +1,4 @@
-﻿# VintGen CLI User Guide
+# VintGen CLI User Guide
 
 The `vintgen` CLI provides listing creation directly in your terminal from item photos.
 
@@ -64,7 +64,8 @@ vintgen [options]
 | `--key` | `-k` | none | API key override. |
 | `--model` | `-m` | auto | Model identifier override. |
 | `--endpoint` | `-e` | `http://localhost:11434` | Ollama endpoint URL. |
-| `--format` | `-f` | `text` | Output format: `text`, `json`, or `vinted`. |
+| `--platform` | `-P` | `universal` | Target marketplace (`universal`, `vinted`, `ebay`, `depop`, `subito`, `wallapop`). |
+| `--format` | `-f` | `text` | Output format: `text`, `json`, or `markdown`. |
 | `--output` | `-o` | `vintgen-listing.txt` | Custom output file destination. |
 | `--version` | `-v` | none | Print CLI version. |
 | `--help` | `-h` | none | Print help menu. |

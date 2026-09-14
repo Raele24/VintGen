@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { StorageService, SavedListingItem } from './core/storage.service';
 import { GeneratorService } from './core/generator.service';
 import { UpdateService } from './core/update.service';
-import { ListingInput, ItemCondition, ListingResult } from '@vintgen/core';
+import { ListingInput, ItemCondition, ListingResult, PlatformId, PlatformAdapter, FormattedListing, PlatformRegistry } from '@vintgen/core';
 
 interface UploadedImage {
   id: string;
@@ -50,6 +50,33 @@ export class App {
   public notes = signal<string>('');
   public conditionHint = signal<ItemCondition | ''>('');
   public language = signal<'en' | 'it' | 'fr' | 'es' | 'de'>('en');
+
+  // Multi-Marketplace Platform Selection
+  public selectedPlatformId = signal<PlatformId>('universal');
+  public availablePlatforms = signal<PlatformAdapter[]>([]);
+
+  public activeFormattedListing = computed<FormattedListing | null>(() => {
+    const listing = this.generator.currentListing();
+    if (!listing) return null;
+    return this.generator.formatForPlatform(this.selectedPlatformId());
+  });
+
+  public activeTitle = computed<string>(() => {
+    return this.activeFormattedListing()?.title || this.generator.currentListing()?.title || '';
+  });
+
+  public activeDescription = computed<string>(() => {
+    return this.activeFormattedListing()?.description || '';
+  });
+
+  public activeTags = computed<string>(() => {
+    return this.activeFormattedListing()?.tagsText || '';
+  });
+
+  public activePlatformAdapter = computed<PlatformAdapter | undefined>(() => {
+    const id = this.selectedPlatformId();
+    return this.availablePlatforms().find((p) => p.id === id);
+  });
 
   // Drag-and-drop state
   public isDragging = signal<boolean>(false);
@@ -212,6 +239,7 @@ export class App {
   }
 
   constructor() {
+    this.availablePlatforms.set(this.generator.getAvailablePlatforms());
     this.initTheme();
     this.detectIosAndStandalone();
     effect(() => {
@@ -289,8 +317,8 @@ export class App {
   public languageOptions = [
     { value: 'en', label: 'English (Default)' },
     { value: 'it', label: 'Italian (Italiano)' },
-    { value: 'fr', label: 'French (FranÃ§ais)' },
-    { value: 'es', label: 'Spanish (EspaÃ±ol)' },
+    { value: 'fr', label: 'French' },
+    { value: 'es', label: 'Spanish' },
     { value: 'de', label: 'German (Deutsch)' },
   ];
 
@@ -439,6 +467,17 @@ export class App {
   /**
    * Copies the master bundle for online marketplaces.
    */
+  public selectPlatform(id: PlatformId): void {
+    this.selectedPlatformId.set(id);
+  }
+
+  public copyActivePlatformBundle(): void {
+    const bundle = this.activeFormattedListing()?.fullBundleText;
+    if (bundle) {
+      this.copyToClipboard(bundle, 'bundle');
+    }
+  }
+
   public copyMasterBundle(): void {
     const bundle = this.generator.formattedListing()?.fullBundleText;
     if (bundle) {
@@ -454,9 +493,9 @@ export class App {
     if (table) {
       const listing = this.generator.currentListing();
       const priceVal = this.customPrice().trim() || (listing?.price?.suggested ? listing.price.suggested.toFixed(2) : '');
-      const floorVal = listing?.price?.min ? ` (Floor: €${listing.price.min.toFixed(2)})` : '';
+      const floorVal = listing?.price?.min ? ` (Floor: EUR ${listing.price.min.toFixed(2)})` : '';
       if (priceVal) {
-        table = table.replace(/\| \*\*Price\*\* \| .* \|/, `| **Price** | €${priceVal}${floorVal} |`);
+        table = table.replace(/\| \*\*Price\*\* \| .* \|/, `| **Price** | EUR ${priceVal}${floorVal} |`);
       }
       this.copyToClipboard(table, 'table');
     }
@@ -504,7 +543,7 @@ export class App {
       `# ${listing.title}`,
       '',
       `**Brand**: ${listing.brand} | **Size**: ${listing.size} | **Condition**: ${listing.condition}`,
-      `**Suggested Price**: €${listing.price.suggested.toFixed(2)} (Min: €${listing.price.min.toFixed(2)} - Max: €${listing.price.max.toFixed(2)})`,
+      `**Suggested Price**: EUR ${listing.price.suggested.toFixed(2)} (Min: EUR ${listing.price.min.toFixed(2)} - Max: EUR ${listing.price.max.toFixed(2)})`,
       '',
       '## Description',
       '```text',

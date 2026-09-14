@@ -648,7 +648,7 @@
               </button>
               <button type="button" id="btn-close-preview" class="btn-icon-subtle" (click)="clearActiveListing()"
                 title="Close Preview (Reset to empty)" aria-label="Close Preview">
-                <span class="badge-mono badge-close">? CLOSE</span>
+                <span class="badge-mono badge-close">CLOSE</span>
               </button>
             </div>
             }
@@ -762,29 +762,57 @@
           <!-- Generated Listing Display Deck -->
           @if (!generator.isGenerating() && generator.currentListing(); as listing) {
           <div class="listing-deck">
+            <!-- Platform Selector Bar -->
+            <div class="platform-selector-bar" role="tablist" aria-label="Marketplace Platform">
+              @for (plat of availablePlatforms(); track plat.id) {
+              <button type="button" role="tab" class="platform-tab-btn"
+                [class.active]="selectedPlatformId() === plat.id"
+                [attr.aria-selected]="selectedPlatformId() === plat.id"
+                (click)="selectPlatform(plat.id)"
+                [title]="plat.description">
+                <span class="platform-tab-name">{{ plat.shortLabel }}</span>
+                
+              </button>
+              }
+            </div>
+
             <!-- Marketplace Table Card -->
             <div class="vinted-table-card">
               <div class="table-card-header">
                 <div class="table-header-title">
-                  <span class="table-badge">Ready</span>
+                  <span class="table-badge">{{ activePlatformAdapter()?.shortLabel || 'Ready' }}</span>
                   @if (listing.confidence) {
                   <span class="confidence-text">Confidence: {{ (listing.confidence * 100).toFixed(0) }}%</span>
                   }
                 </div>
+                @if (selectedPlatformId() === 'universal') {
                 <button type="button" class="btn-copy-table-prominent" [class.copied]="copiedTarget() === 'table'"
                   (click)="copyMarkdownTable()">
                   {{ copiedTarget() === 'table' ? 'Table Copied!' : 'Copy Table' }}
                 </button>
+                } @else {
+                <button type="button" class="btn-copy-table-prominent" [class.copied]="copiedTarget() === 'bundle'"
+                  (click)="copyActivePlatformBundle()">
+                  {{ copiedTarget() === 'bundle' ? 'Copied!' : 'Copy ' + (activePlatformAdapter()?.shortLabel || '') }}
+                </button>
+                }
               </div>
 
               <div class="vinted-rows-table">
                 <!-- Title -->
                 <div class="table-row">
-                  <div class="row-label">Title</div>
-                  <div class="row-value font-medium">{{ listing.title }}</div>
+                  <div class="row-label">
+                    <span>Title</span>
+                    @if (selectedPlatformId() === 'ebay') {
+                    <span class="char-counter" [class.warn]="activeTitle().length > 80">
+                      {{ activeTitle().length }}/80
+                    </span>
+                    }
+                  </div>
+                  <div class="row-value font-medium">{{ activeTitle() }}</div>
                   <div class="row-action">
                     <button type="button" class="btn-row-copy" [class.copied]="copiedTarget() === 'title'"
-                      (click)="copyToClipboard(listing.title, 'title')" title="Copy title">
+                      (click)="copyToClipboard(activeTitle(), 'title')" title="Copy title">
                       {{ copiedTarget() === 'title' ? 'Copied' : 'Copy' }}
                     </button>
                   </div>
@@ -816,7 +844,7 @@
                     <div class="price-editor-block">
                       <div class="price-input-row">
                         <div class="price-input-container">
-                          <span class="currency-symbol">€</span>
+                          <span class="currency-symbol">&euro;</span>
                           <input type="text" class="price-custom-input"
                             [placeholder]="listing.price.suggested.toFixed(2)"
                             [ngModel]="customPrice() || listing.price.suggested.toFixed(2)"
@@ -826,12 +854,12 @@
                           @if (listing.price.min != null) {
                           <span class="price-floor-badge"
                             title="Minimum suggested floor for offers / quick negotiation">
-                            Floor: €{{ listing.price.min.toFixed(2) }}
+                            Floor: &euro;{{ listing.price.min.toFixed(2) }}
                           </span>
                           }
                           @if (listing.price.max != null && listing.price.max > listing.price.suggested) {
                           <span class="price-ceiling-badge" title="Ceiling price for patient sellers">
-                            Ceiling: €{{ listing.price.max.toFixed(2) }}
+                            Ceiling: &euro;{{ listing.price.max.toFixed(2) }}
                           </span>
                           }
                         </div>
@@ -843,7 +871,7 @@
                   </div>
                   <div class="row-action">
                     <button type="button" class="btn-row-copy" [class.copied]="copiedTarget() === 'price'"
-                      (click)="copyToClipboard('€' + (customPrice() || listing.price.suggested.toFixed(2)), 'price')"
+                      (click)="copyToClipboard('EUR ' + (customPrice() || listing.price.suggested.toFixed(2)), 'price')"
                       title="Copy price">
                       {{ copiedTarget() === 'price' ? 'Copied' : 'Copy' }}
                     </button>
@@ -903,41 +931,53 @@
 
                 <!-- Description -->
                 <div class="table-row description-row">
-                  <div class="row-label">Description</div>
+                  <div class="row-label">
+                    <span>Description</span>
+                    <span class="platform-tag-hint">{{ selectedPlatformId() | uppercase }}</span>
+                  </div>
                   <div class="row-value">
                     <div class="clean-description-box">
-                      <pre class="clean-description-text">{{ generator.formattedListing()?.description }}</pre>
+                      <pre class="clean-description-text">{{ activeDescription() }}</pre>
                     </div>
                   </div>
                   <div class="row-action">
                     <button type="button" class="btn-row-copy" [class.copied]="copiedTarget() === 'desc'"
-                      (click)="copyToClipboard(generator.formattedListing()!.description, 'desc')"
+                      (click)="copyToClipboard(activeDescription(), 'desc')"
                       title="Copy description">
                       {{ copiedTarget() === 'desc' ? 'Copied' : 'Copy' }}
                     </button>
                   </div>
                 </div>
 
+                @if (activeTags()) {
                 <!-- Hashtags -->
                 <div class="table-row">
                   <div class="row-label">Hashtags</div>
-                  <div class="row-value text-secondary tags-display">{{ generator.formattedListing()?.tagsText }}</div>
+                  <div class="row-value text-secondary tags-display">{{ activeTags() }}</div>
                   <div class="row-action">
                     <button type="button" class="btn-row-copy" [class.copied]="copiedTarget() === 'tags'"
-                      (click)="copyToClipboard(generator.formattedListing()!.tagsText, 'tags')" title="Copy hashtags">
+                      (click)="copyToClipboard(activeTags(), 'tags')" title="Copy hashtags">
                       {{ copiedTarget() === 'tags' ? 'Copied' : 'Copy' }}
                     </button>
                   </div>
                 </div>
+                }
               </div>
             </div>
 
             <!-- Master Copy Action Bar -->
             <div class="master-action-bar">
+              @if (selectedPlatformId() === 'universal') {
               <button type="button" id="btn-copy-all" class="btn-master-copy"
                 [class.copied]="copiedTarget() === 'table'" (click)="copyMarkdownTable()">
                 <span>{{ copiedTarget() === 'table' ? 'Table Copied to Clipboard!' : 'Copy Table (Markdown)' }}</span>
               </button>
+              } @else {
+              <button type="button" id="btn-copy-all" class="btn-master-copy"
+                [class.copied]="copiedTarget() === 'bundle'" (click)="copyActivePlatformBundle()">
+                <span>{{ copiedTarget() === 'bundle' ? 'Listing Copied for ' + (activePlatformAdapter()?.name || 'Platform') + '!' : 'Copy ' + (activePlatformAdapter()?.shortLabel || 'Platform') + ' Listing' }}</span>
+              </button>
+              }
             </div>
           </div>
           }
@@ -959,7 +999,7 @@
           [title]="selectedHistoryId() === item.id ? 'Click to deselect and close preview' : 'Click to preview'">
           <div class="history-card-top">
             <span class="badge-mono">{{ item.result.brand }}</span>
-            <span class="history-price">ï¿½{{ item.result.price.suggested.toFixed(2) }}</span>
+            <span class="history-price">&euro;{{ item.result.price.suggested.toFixed(2) }}</span>
           </div>
           <div class="history-card-title">{{ item.result.title }}</div>
           @if (selectedHistoryId() === item.id) {
@@ -1588,7 +1628,7 @@
         </button>
         }
         <button type="button" class="btn-tour-primary" (click)="nextTourStep()">
-          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour âœ“' : 'Next â†’' }}
+          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour' : 'Next' }}
         </button>
       </div>
     </div>
@@ -1923,7 +1963,7 @@
         </button>
         }
         <button type="button" class="btn-tour-primary" (click)="nextTourStep()">
-          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour âœ“' : 'Next â†’' }}
+          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour' : 'Next' }}
         </button>
       </div>
     </div>

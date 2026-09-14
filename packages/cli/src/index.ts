@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VintGen Command-Line Interface (CLI)
  * 
  * Automated, scriptable secondhand fashion listing generator
@@ -16,6 +16,7 @@ interface CliConfig {
   model?: string;
   language?: 'it' | 'en' | 'fr' | 'es' | 'de' | 'auto';
   endpoint?: string;
+  platform?: 'universal' | 'vinted' | 'ebay' | 'depop' | 'subito' | 'wallapop';
 }
 
 const CONFIG_DIR = path.join(os.homedir(), '.vintgen');
@@ -27,7 +28,7 @@ function loadConfig(): CliConfig {
       const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
       return JSON.parse(raw);
     }
-  } catch {}
+  } catch { }
   return {};
 }
 
@@ -57,13 +58,14 @@ interface CliArgs {
   apiKey?: string;
   model?: string;
   language?: 'it' | 'en' | 'fr' | 'es' | 'de' | 'auto';
+  platform?: 'universal' | 'vinted' | 'ebay' | 'depop' | 'subito' | 'wallapop';
   format: 'text' | 'json' | 'markdown' | 'vinted';
   output?: string;
   help: boolean;
   version: boolean;
 }
 
-const PACKAGE_VERSION = '1.0.1';
+const PACKAGE_VERSION = '1.0.2';
 
 /**
  * Parses raw command-line arguments into structured configuration.
@@ -126,6 +128,11 @@ function parseArguments(args: string[]): CliArgs {
     } else if (arg === '--output' || arg === '-o') {
       i++;
       if (i < args.length) result.output = args[i];
+    } else if (arg === '--platform' || arg === '-P') {
+      i++;
+      if (i < args.length) {
+        result.platform = args[i].toLowerCase() as any;
+      }
     } else if (arg === '--lang' || arg === '-l') {
       i++;
       if (i < args.length) {
@@ -173,6 +180,7 @@ OPTIONS:
   -p, --provider <name> AI provider: gemini (default), openai, claude, ollama
   -m, --model <name>    Model name (e.g. gemini-2.5-flash, gpt-4o-mini, llama3.2-vision)
   -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434)
+  -P, --platform <name> Target platform: universal (default), vinted, ebay, depop, subito, wallapop
   -f, --format <type>   Output format: text (default), json, markdown
   -o, --output <file>   Write output to destination file (defaults to vintgen-listing.txt)
   -v, --version         Print CLI version
@@ -254,13 +262,14 @@ async function main(): Promise<void> {
 
   // Handle config command
   if (args.command === 'config') {
-    if (args.apiKey || args.provider || args.language || args.model || args.endpoint) {
+    if (args.apiKey || args.provider || args.language || args.model || args.endpoint || args.platform) {
       const updates: Partial<CliConfig> = {};
       if (args.apiKey) updates.apiKey = args.apiKey;
       if (args.provider) updates.provider = args.provider;
       if (args.language) updates.language = args.language;
       if (args.model) updates.model = args.model;
       if (args.endpoint) updates.endpoint = args.endpoint;
+      if (args.platform) updates.platform = args.platform;
       saveConfig(updates);
       console.log(`Configuration updated in ${CONFIG_FILE}:`, loadConfig());
     } else {
@@ -276,7 +285,7 @@ async function main(): Promise<void> {
   }
 
   const provider = args.provider || savedConfig.provider || 'gemini';
-  const endpoint = args.endpoint || savedConfig.endpoint || process.env.OLLAMA_HOST || 'http://localhost:11434';
+  const endpoint = args.endpoint || (provider === 'ollama' ? (savedConfig.endpoint || process.env.OLLAMA_HOST || 'http://localhost:11434') : (savedConfig.provider === provider ? savedConfig.endpoint : undefined));
   const language = args.language || savedConfig.language || 'en';
   const model = args.model || savedConfig.model;
 
@@ -296,10 +305,10 @@ async function main(): Promise<void> {
   if (provider !== 'ollama' && !apiKey) {
     const providerName = provider === 'claude' ? 'Anthropic Claude' : (provider === 'openai' ? 'OpenAI' : 'Google Gemini');
     const envVar = provider === 'claude' ? 'ANTHROPIC_API_KEY' : (provider === 'openai' ? 'OPENAI_API_KEY' : 'GEMINI_API_KEY');
-    const url = provider === 'claude' 
-      ? 'https://console.anthropic.com/settings/keys' 
+    const url = provider === 'claude'
+      ? 'https://console.anthropic.com/settings/keys'
       : (provider === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey');
-    
+
     console.error(`\nError: ${providerName} API Key not found.`);
     console.error('You can save your key permanently with:');
     console.error('  $ vintgen set-key <YOUR_API_KEY>\n');
@@ -314,7 +323,7 @@ async function main(): Promise<void> {
 
   // Test connection command
   if (args.command === 'test-key') {
-    const targetDesc = provider === 'ollama' ? `Ollama instance at ${endpoint}` : `${provider.toUpperCase()} API key`;
+    const targetDesc = provider === 'ollama' ? `Ollama instance at ${endpoint || 'http://localhost:11434'}` : `${provider.toUpperCase()} API key`;
     console.log(`Testing connection with ${targetDesc}...`);
     const result = await engine.testProvider(provider, {
       apiKey: apiKey || '',
@@ -374,13 +383,10 @@ async function main(): Promise<void> {
   }
 
   let providerDisplay = 'AI Vision Model';
-  if (provider === 'claude') providerDisplay = 'Anthropic Claude';
-  else if (provider === 'openai') providerDisplay = 'OpenAI';
-  else if (provider === 'ollama') providerDisplay = 'Local Ollama';
-  else if (provider === 'gemini') providerDisplay = 'Google Gemini';
-  if (provider === 'claude') providerDisplay = 'Anthropic Claude 3.5 Vision';
-  else if (provider === 'openai') providerDisplay = 'OpenAI GPT-4o Vision';
+  if (provider === 'claude') providerDisplay = `Anthropic Claude (${model || 'claude-3-5-sonnet-latest'})`;
+  else if (provider === 'openai') providerDisplay = `OpenAI (${model || 'gpt-4o-mini'})`;
   else if (provider === 'ollama') providerDisplay = `Local Ollama (${model || 'llama3.2-vision'})`;
+  else if (provider === 'gemini') providerDisplay = `Google Gemini (${model || 'gemini-3.6-flash'})`;
   console.log(`\nAnalyzing item with ${providerDisplay} (${imageInputs.length} image(s), language: ${language.toUpperCase()})...`);
 
   const listingInput: ListingInput = {
@@ -392,11 +398,13 @@ async function main(): Promise<void> {
   };
 
   try {
+    const platformId = args.platform || savedConfig.platform || 'universal';
     const { raw, formatted } = await engine.generate(listingInput, {
       apiKey: apiKey || '',
       model,
       baseUrl: endpoint,
       providerId: provider,
+      platformId,
     });
 
     let outputContent = '';
@@ -411,7 +419,7 @@ async function main(): Promise<void> {
         `  VINTGEN LISTING: ${raw.title}`,
         '============================================================',
         `Title:       ${raw.title}`,
-        `Price:       â‚¬${raw.price.suggested.toFixed(2)} (Range: â‚¬${raw.price.min.toFixed(2)} - â‚¬${raw.price.max.toFixed(2)})`,
+        `Price:       EUR ${raw.price.suggested.toFixed(2)} (Range: EUR ${raw.price.min.toFixed(2)} - EUR ${raw.price.max.toFixed(2)})`,
         `Reasoning:   ${raw.price.reasoning}`,
         `Brand:       ${raw.brand}`,
         `Size:        ${raw.size}`,
@@ -430,10 +438,10 @@ async function main(): Promise<void> {
     console.log(`\n${outputContent}`);
 
     // Write output to file
-    const targetFile = args.output 
+    const targetFile = args.output
       ? path.resolve(process.cwd(), args.output)
       : path.resolve(process.cwd(), 'vintgen-listing.txt');
-    
+
     fs.writeFileSync(targetFile, outputContent, 'utf-8');
     console.log(`Listing successfully saved to: ${path.basename(targetFile)}`);
   } catch (err: unknown) {

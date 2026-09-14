@@ -139,6 +139,33 @@ You can also set environment variables:
 
 ---
 
+---
+
+## Multi-Marketplace Platform Adapters
+
+VintGen automatically adapts listings to the specific requirements and formatting conventions of each major secondhand marketplace:
+
+| Platform | Key Features | Title Constraint | Tag Rules |
+| :--- | :--- | :--- | :--- |
+| **Universal** | Clean markdown table, full item specifications, and direct market search links. | Standard | All detected hashtags |
+| **Vinted** | Conversational tone, bundle discount disclaimer, condition details, and hashtags. | Standard | Unlimited hashtags |
+| **eBay** | Structured Item Specifics, condition report, and shipping & handling policy. | Enforced 80-character limit | Search keywords in title/specifics |
+| **Depop** | Aesthetic style hooks, fit and measurement emphasis, and instant-buy note. | Standard | Enforced 5-hashtag limit |
+| **Subito** | Clear classifieds structure with item state, local pickup, and tracked shipping. | Standard | Categorical tags |
+| **Wallapop** | Punchy resale format with condition summary and handover availability. | Standard | Standard hashtags |
+
+### In the Web App:
+Above the generated listing card, click on any platform tab (`Universal`, `Vinted`, `eBay`, `Depop`, `Subito`, `Wallapop`) to switch views. The title, description, character counters, and 1-click copy buttons update immediately.
+
+### In the CLI:
+Specify your target marketplace with the `--platform` or `-P` flag:
+```bash
+# Generate tailored for eBay
+vintgen -n "Vintage denim jacket" --platform ebay
+
+# Generate tailored for Depop
+vintgen -n "Y2K leather boots" --platform depop
+```
 ## Command Line Options
 
 | Option | Short | Description |

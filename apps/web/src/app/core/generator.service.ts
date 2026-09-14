@@ -5,6 +5,8 @@ import {
   ListingResult,
   FormattedListing,
   MarketplacePlatform,
+  PlatformId,
+  PlatformAdapter,
 } from '@vintgen/core';
 import { StorageService } from './storage.service';
 
@@ -23,6 +25,22 @@ export class GeneratorService {
   public isQuotaExceeded = signal<boolean>(false);
   public error = signal<string | null>(null);
   public statusMessage = signal<string>('');
+
+  /**
+   * Returns list of supported marketplace platforms.
+   */
+  public getAvailablePlatforms(): PlatformAdapter[] {
+    return this.engine.getPlatforms();
+  }
+
+  /**
+   * Formats current listing for a specific marketplace platform.
+   */
+  public formatForPlatform(platformId: PlatformId | string): FormattedListing | null {
+    const listing = this.currentListing();
+    if (!listing) return null;
+    return this.engine.formatPlatform(listing, platformId);
+  }
 
   /**
    * Generates a listing with the current configured API key.
@@ -179,4 +197,3 @@ export class GeneratorService {
     this.error.set(null);
   }
 }
-
