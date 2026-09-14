@@ -1,6 +1,6 @@
 ﻿# VintGen CLI User Guide
 
-The `vintgen` CLI provides listing creation directly in your terminal from clothing photos.
+The `vintgen` CLI provides listing creation directly in your terminal from item photos.
 
 ---
 
@@ -74,7 +74,7 @@ vintgen [options]
 ## 4. Usage Examples
 
 ### 1. Automatic Folder Scan
-Navigate to any directory with clothing photos:
+Navigate to any directory with item photos:
 ```bash
 cd /path/to/photos
 vintgen
@@ -97,5 +97,7 @@ vintgen -i ./item.jpg -f json -o ./listing.json
 ```bash
 vintgen -i ./item.jpg -f vinted
 ```
+
+
 
 

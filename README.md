@@ -1,6 +1,6 @@
 ﻿# VintGen
 
-> Create marketplace listings from clothing photos with AI.  
+> Create marketplace listings from item photos with AI.  
 > Works in your browser, on Android, Windows, and the terminal.
 
 [![npm version](https://img.shields.io/npm/v/vintgen.svg)](https://www.npmjs.com/package/vintgen)
@@ -11,9 +11,9 @@
 
 ## Overview
 
-VintGen creates ready-to-copy listings for Vinted, eBay, Depop, Subito, and Wallapop from your clothing photos.
+VintGen creates ready-to-copy listings for Vinted, eBay, Depop, Subito, and Wallapop from photos of any secondhand item (clothing, electronics, tech, collectibles, and accessories).
 
-Upload photos of an item, and VintGen reads the brand, size, material, and condition. It then writes a clean title, a description, and suggests realistic selling prices.
+Upload photos of an item, and VintGen identifies the brand, model, condition, and key specifications. It then writes a clean title, a description, and suggests realistic selling prices.
 
 You can use it with Google Gemini, OpenAI, Anthropic Claude, or run it 100% offline on your computer using Ollama. No accounts or subscriptions needed.
 
@@ -150,3 +150,5 @@ You can also set environment variables:
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
+
+

@@ -41,4 +41,5 @@ To run VintGen within the browser versions of Gemini, ChatGPT, or Claude:
    - **Google Gemini**: Navigate to **Gemini Gems** -> **Create New Gem** -> Paste into **Instructions**. Name it `VintGen Reseller`.
    - **ChatGPT**: Navigate to **Explore GPTs** -> **Create a GPT** -> Paste into **Instructions**.
    - **Claude**: Create a **Claude Project** -> Paste into **Project Instructions**.
-4. Drag and drop clothing photos directly into the conversation to receive structured, search-optimized listings.
+4. Drag and drop item photos directly into the conversation to receive structured, search-optimized listings.
+

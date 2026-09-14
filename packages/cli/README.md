@@ -1,8 +1,8 @@
 ﻿# vintgen
 
-> Create marketplace listings from clothing photos directly in your terminal.
+> Create marketplace listings from item photos directly in your terminal.
 
-VintGen scans photos of clothes and writes ready-to-copy listings for Vinted, eBay, Depop, Subito, and Wallapop, with suggested prices and descriptions.
+VintGen scans photos of any item and writes ready-to-copy listings for Vinted, eBay, Depop, Subito, and Wallapop, with suggested prices and descriptions.
 
 [![npm version](https://img.shields.io/npm/v/vintgen.svg)](https://www.npmjs.com/package/vintgen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -115,3 +115,4 @@ vintgen -i ./front.jpg,./tag.jpg,./details.jpg
 ## License
 
 MIT License.
+
