@@ -22,3 +22,7 @@ These rules are mandatory and must be strictly adhered to across all tasks, modi
    - Review and update documentation (root README.md, package-specific READMEs, and relevant guides in docs/) on every modification, feature addition, platform release, or configuration change.
    - Keep all delivery channels (Web/PWA, Android APK, Windows Desktop, npm CLI, and local development) indexed, accurate, and easy to follow.
    - Ensure all documentation maintains strict English and zero emojis.
+
+6. **NO AI BUZZWORDS OR MARKETING JARGON (USE PLAIN HUMAN LANGUAGE)**:
+   - Never use marketing buzzwords, over-hyped AI terms, or promotional fluff (such as "Instant", "Multimodal Vision AI", "high-converting", "pricing corridors", "revolutionary", "state-of-the-art").
+   - Write simple, clear, direct human sentences. Explain what the tool actually does so that anyone understands it immediately.

@@ -1,6 +1,6 @@
-# VintStack System Architecture
+﻿# VintGen System Architecture
 
-**VintStack** is an open-source, modular toolkit engineered to automate high-converting listing creation for Vinted and secondhand fashion marketplaces.
+VintGen is an open-source, modular toolkit engineered to automate high-converting listing creation for Vinted and secondhand fashion marketplaces.
 
 ---
 
@@ -9,31 +9,39 @@
 ```mermaid
 graph TB
     subgraph "Delivery Channels"
-        WEB["Angular 21 Web Studio<br/>Client-Side BYOK"]
-        CLI["Terminal CLI<br/>Node.js / npx"]
+        WEB["Angular 21 Web Studio<br/>Client-Side BYOK & PWA"]
+        CLI["Terminal CLI (vintgen)<br/>Node.js / npx"]
+        WIN["Windows Desktop<br/>Tauri v2 (Installer & Portable)"]
+        AND["Android Mobile App<br/>Capacitor Native + OTA"]
         SKILL["AI Agent Skill<br/>Antigravity / Claude / Copilot"]
     end
 
-    subgraph "Core Engine (@vintstack/core)"
+    subgraph "Core Engine (@vintgen/core)"
+        ENG["VintGen Orchestrator"]
         REG["Provider Registry"]
-        SCH["Multimodal JSON Schema & Prompts"]
+        SCH["Listing Schemas & Prompts"]
         PLT["Vinted Platform Adapter"]
-        ENG["VintStack Orchestrator"]
     end
 
-    subgraph "AI Providers"
-        GEMINI["Google Gemini 2.5 Flash<br/>Multimodal Vision"]
-        FUTURE["Future: Claude / OpenAI / Ollama"]
+    subgraph "Implemented AI Providers (BYOK)"
+        GEMINI["Google Gemini<br/>gemini-2.5-flash"]
+        OPENAI["OpenAI<br/>gpt-4o-mini"]
+        CLAUDE["Anthropic Claude<br/>claude-3-5-sonnet"]
+        OLLAMA["Local Ollama<br/>llama3.2-vision (Offline)"]
     end
 
     WEB --> ENG
     CLI --> ENG
+    WIN --> ENG
+    AND --> ENG
     SKILL -.-> SCH
 
     ENG --> REG
-    REG --> GEMINI
-    REG -.-> FUTURE
     ENG --> PLT
+    REG --> GEMINI
+    REG --> OPENAI
+    REG --> CLAUDE
+    REG --> OLLAMA
 ```
 
 ---
@@ -42,38 +50,45 @@ graph TB
 
 The project is structured as an npm workspace monorepo:
 
-| Path | Package | Description |
-|---|---|---|
-| `packages/core/` | `@vintstack/core` | Zero-dependency generation orchestrator, schema validator, Gemini provider, and Vinted platform formatter. |
-| `packages/cli/` | `vintstack` | Command-line tool executable via `npx vintstack` or global install. |
-| `apps/web/` | `web` | Modern Angular 21 standalone client-side web application with Signals and architectural styling. |
-| `skills/vintstack/` | — | Ready-to-use agent skill definitions for Antigravity, Claude Code, and Copilot. |
-| `docs/` | — | Developer, architecture, and deployment documentation. |
+| Path | Package / Component | Description |
+| :--- | :--- | :--- |
+| `packages/core/` | `@vintgen/core` | Multi-provider AI orchestrator, JSON schema validation, platform adapters, and prompts. |
+| `packages/cli/` | `vintgen` | Standalone terminal CLI tool executable via `npx vintgen` or global npm install. |
+| `apps/web/` | `web` | Angular 21 standalone client-side web application with Signals and PWA offline capabilities. |
+| `src-tauri/` | Desktop Runner | Tauri v2 desktop integration generating NSIS installers and portable Windows executables. |
+| `android/` | Android App | Capacitor native shell for Android with camera integration and live OTA synchronization. |
+| `skills/vintgen/` | Agent Skill | Standardized agent skill definitions for Google Antigravity, Claude Code, and GitHub Copilot. |
+| `docs/` | Documentation | Architecture, provider guides, security manuals, and CLI usage documentation. |
 
 ---
 
 ## 3. Data Flow
 
 1. **Input Intake**:
-   - The user provides 1 or more garment images (as Files, paths, or base64) alongside optional hints (title, brand, condition, flaws, desired language).
-2. **Multimodal Analysis**:
-   - The core engine forwards the image parts and system instructions to Google Gemini Multimodal Vision (`gemini-2.5-flash`).
-   - Enforces strict response structure using Gemini's native JSON schema parsing.
+   - The user provides one or more garment images (as files, local filesystem paths, or base64 strings) alongside optional seller notes (title, brand, condition, flaws, target language).
+2. **Photo Analysis**:
+   - The core orchestrator forwards the images and structured instructions to the user-selected AI provider:
+     - **Google Gemini**: Uses native vision schemas with `gemini-2.5-flash`.
+     - **OpenAI**: Uses Vision structured outputs with `gpt-4o-mini`.
+     - **Anthropic Claude**: Uses Claude Messages API with images with `claude-3-5-sonnet`.
+     - **Local Ollama**: Executes entirely on-device via local vision models (such as `llama3.2-vision`), requiring zero external network requests.
 3. **Normalization**:
-   - Attributes are mapped:
-     - `brand`, `size`, `condition` (mapped to official Vinted enum: `new_with_tags`, `new_without_tags`, `very_good`, `good`, `satisfactory`).
-     - `price`: Fair-market estimation with `suggested`, `min` floor, and `max` ceiling.
-     - `description`: Structured, honest buyer-facing description including flaw disclosures, bundle discounts, and shipping turnaround.
-     - `hashtags`: High-traffic search tags.
+   - Extracted attributes are validated and mapped:
+     - `brand`, `size`, `condition` (mapped to official marketplace conditions: `new_with_tags`, `new_without_tags`, `very_good`, `good`, `satisfactory`).
+     - `price`: Secondary market valuation including `suggested` price, negotiation `floor`, and `ceiling`.
+     - `description`: Structured, honest buyer-facing text including flaw disclosures, bundle details, and dispatch timeframe.
+     - `hashtags`: High-traffic search tags for marketplace discovery.
 4. **Platform Adaptation**:
-   - Formatted into clipboard-ready text blocks tailored to Vinted mobile and web forms.
+   - Formatted into clipboard-ready text blocks tailored to Vinted mobile and desktop interfaces.
 5. **Local Persistence**:
-   - The browser app maintains recent listing history in `localStorage` without cloud tracking.
+   - History and API credentials remain strictly stored in local storage (`localStorage` in Web/Desktop/Android or `~/.vintgen/config.json` in CLI) without external telemetry.
 
 ---
 
 ## 4. Design Philosophy
 
-- **Zero AI Slop**: Strict avoidance of emoji spam, cartoonish sparkles, and rainbow gradient backgrounds.
-- **Architectural UI**: Dark zinc aesthetic (`#09090b`), 1px subtle borders, high-contrast monospace badges, and micro-interactions.
-- **Strict BYOK**: The user's Google Gemini API key is never transmitted through proxy servers.
+- **Zero AI Slop**: Strict avoidance of emoji spam, decorative unicode symbols, and rainbow gradient backgrounds.
+- **Architectural UI**: Dark zinc aesthetic, subtle borders, high-contrast monospace indicators, and micro-interactions.
+- **Strict BYOK Privacy**: Direct client-to-provider communications with zero telemetry or middleman servers across all four AI providers.
+
+

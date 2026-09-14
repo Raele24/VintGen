@@ -1,6 +1,6 @@
 ﻿# VintGen CLI User Guide
 
-The `vintgen` CLI provides automated multimodal AI listing generation directly from your terminal. Designed for resellers, script automation, and bulk inventory workflows.
+The `vintgen` CLI provides listing creation directly in your terminal from clothing photos.
 
 ---
 
@@ -25,16 +25,16 @@ npm install -g vintgen
 VintGen supports multi-provider Bring Your Own Key (BYOK) configurations:
 
 ```bash
-# Google Gemini (default)
+# Example: Google Gemini
 vintgen config --provider gemini --key <YOUR_KEY>
 
-# OpenAI
+# Example: OpenAI
 vintgen config --provider openai --key <YOUR_KEY>
 
-# Anthropic Claude
+# Example: Anthropic Claude
 vintgen config --provider claude --key <YOUR_KEY>
 
-# Local Ollama (offline, zero API key)
+# Example: Local Ollama (offline, zero API key)
 vintgen config --provider ollama
 ```
 
@@ -97,3 +97,5 @@ vintgen -i ./item.jpg -f json -o ./listing.json
 ```bash
 vintgen -i ./item.jpg -f vinted
 ```
+
+

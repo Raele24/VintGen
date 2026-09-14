@@ -1,8 +1,8 @@
-{
-  "name": "vintstack-workspace",
+﻿{
+  "name": "vintgen-workspace",
   "version": "1.0.0",
   "private": true,
-  "description": "VintStack — Open-Source AI Listing Generator for Vinted & Secondhand Fashion",
+  "description": "VintGen - Open-Source AI Listing Generator for Vinted & Secondhand Fashion",
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -27,10 +27,13 @@
     "recommerce",
     "secondhand",
     "gemini",
+    "openai",
+    "claude",
+    "ollama",
     "byok",
     "angular"
   ],
-  "author": "VintStack Contributors",
+  "author": "VintGen Contributors",
   "license": "MIT",
   "devDependencies": {
     "@capacitor/android": "^8.5.2",

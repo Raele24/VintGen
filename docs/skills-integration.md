@@ -1,22 +1,22 @@
-# AI Skills & Agent Integration Guide
+﻿# AI Skills & Agent Integration Guide
 
-VintStack provides standardized skill definitions and system instructions, allowing you to use VintStack directly inside your favorite AI tools and coding assistants.
+VintGen provides standardized skill definitions and system instructions, allowing you to use VintGen directly inside AI tools and coding assistants.
 
 ---
 
 ## 1. Google Antigravity IDE
 
-To make VintStack a permanent global or project skill in Antigravity:
+To configure VintGen as a permanent skill in Antigravity:
 
 1. **Project Skill (Current Workspace)**:
-   Place `skills/vintstack/SKILL.md` inside `.agents/skills/vintstack/SKILL.md`.
+   Place `skills/vintgen/SKILL.md` inside `.agents/skills/vintgen/SKILL.md`.
 2. **Global Skill**:
-   Copy the `skills/vintstack/` directory to:
+   Copy the `skills/vintgen/` directory to:
    ```text
-   C:\Users\<YOUR_USER>\.gemini\config\skills\vintstack\SKILL.md
+   C:\Users\<YOUR_USER>\.gemini\config\skills\vintgen\SKILL.md
    ```
-3. Once placed, Antigravity will automatically discover the skill. Simply ask:
-   > *"Analyze these 3 photos of a jacket and prepare the Vinted listing"*
+3. Once placed, Antigravity automatically discovers the skill. You can run requests like:
+   > "Analyze these photos of a vintage denim jacket and generate the marketplace listing."
 
 ---
 
@@ -25,20 +25,20 @@ To make VintStack a permanent global or project skill in Antigravity:
 For agent environments like **Claude Code** or **GitHub Copilot CLI**:
 
 - **Claude Code**:
-  Copy the contents of `skills/vintstack/SKILL.md` into your `.claude/skills/vintstack/SKILL.md` or append to `CLAUDE.md`.
+  Copy the contents of `skills/vintgen/SKILL.md` into your `.claude/skills/vintgen/SKILL.md` or reference in `CLAUDE.md`.
 - **Copilot**:
-  Add a reference to `skills/vintstack/SKILL.md` inside `.github/copilot-instructions.md`.
+  Add a reference to `skills/vintgen/SKILL.md` inside `.github/copilot-instructions.md`.
 
 ---
 
 ## 3. Gemini Gems & Custom GPTs (Web Interfaces)
 
-If you want to use VintStack inside the web versions of Gemini, ChatGPT, or Claude:
+To run VintGen within the browser versions of Gemini, ChatGPT, or Claude:
 
-1. Open `skills/vintstack/prompts/web-instructions.md`.
+1. Open `skills/vintgen/prompts/web-instructions.md`.
 2. Copy the text block.
 3. Paste into:
-   - **Google Gemini**: Go to **Gemini Gems** &rarr; **Create New Gem** &rarr; Paste into **Instructions**. Name it `VintStack Reseller`.
-   - **ChatGPT**: Go to **Explore GPTs** &rarr; **Create a GPT** &rarr; Paste into **Instructions**.
-   - **Claude**: Create a new **Claude Project** &rarr; Paste into **Project Instructions**.
-4. Now you can drag-and-drop photos straight into the chat and receive VintStack-formatted listings!
+   - **Google Gemini**: Navigate to **Gemini Gems** -> **Create New Gem** -> Paste into **Instructions**. Name it `VintGen Reseller`.
+   - **ChatGPT**: Navigate to **Explore GPTs** -> **Create a GPT** -> Paste into **Instructions**.
+   - **Claude**: Create a **Claude Project** -> Paste into **Project Instructions**.
+4. Drag and drop clothing photos directly into the conversation to receive structured, search-optimized listings.

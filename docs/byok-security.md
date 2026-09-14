@@ -1,46 +1,41 @@
-# BYOK (Bring Your Own Key) & Security Model
+﻿# BYOK (Bring Your Own Key) & Security Model
 
-VintStack is architected with a strict **Bring Your Own Key (BYOK)** privacy model.
+VintGen is architected around a strict **Bring Your Own Key (BYOK)** privacy model.
 
 ---
 
 ## 1. Why BYOK?
 
 Most commercial listing tools operate with centralized servers that:
-1. Charge monthly subscriptions for AI tokens.
-2. Intercept and log user photos, item descriptions, and user behavior.
-3. Introduce vendor lock-in and potential data breaches.
+1. Charge recurring monthly subscriptions for AI tokens with heavy markups.
+2. Intercept and store user photographs, garment notes, and personal resale data.
+3. Introduce vendor lock-in and potential single-point-of-failure data breaches.
 
-In contrast, **VintStack gives full ownership to the user**:
-- You obtain a free API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
-- You incur zero markups or subscription fees.
-- You can process thousands of listings within Google's free tier.
+In contrast, **VintGen gives complete privacy and control to the user**:
+- You provide your own API credentials directly for your preferred provider (Google Gemini, OpenAI, Anthropic Claude) or run 100% offline via Ollama without any key.
+- You incur zero subscription markups or platform fees.
+- You leverage your own accounts, existing API credits, or run 100% free locally with Ollama.
 
 ---
 
-## 2. Browser Key Isolation
+## 2. Browser & Desktop Key Isolation
 
-In the Angular web application:
-- **Key Storage**: Your Gemini API key is stored locally in your browser's `window.localStorage`.
-- **Direct Communication**: HTTP requests are made directly from your browser (`fetch`) to `https://generativelanguage.googleapis.com/v1beta/...`.
-- **Zero Intermediary**: There is NO backend server, NO telemetry proxy, and NO analytics middleware that receives your API key.
-- **Masking & Clearing**: The web UI masks the key by default and provides a one-click **"Delete Key"** button that permanently purges the key from browser storage.
+In the Web Studio (and Windows / Android shells):
+- **Key Storage**: Your API keys are stored exclusively in your local device storage (`window.localStorage`).
+- **Direct Communication**: HTTP calls are made directly from your client machine to official AI provider endpoints:
+  - Google Gemini: `https://generativelanguage.googleapis.com`
+  - OpenAI: `https://api.openai.com`
+  - Anthropic Claude: `https://api.anthropic.com`
+  - Ollama: `http://localhost:11434`
+- **Zero Intermediaries**: There is no proxy server, telemetry middleware, or central backend intercepting your credentials or photographs.
+- **Masking & Clearing**: The UI masks keys by default and provides a one-click action to delete saved keys immediately from storage.
 
 ---
 
 ## 3. Terminal CLI Key Handling
 
-In the CLI tool:
-- You pass the key either as a flag (`--key <KEY>`) or as an environment variable (`GEMINI_API_KEY`).
-- The key is held strictly in-memory during script execution and terminates when the process exits.
-- No config files with plaintext keys are written to disk unless you explicitly configure an `.env` file.
-
----
-
-## 4. Future Option: Optional Firebase Backend
-
-If a team or organization wishes to deploy VintStack with Google OAuth login and centralized rate limiting:
-- An optional Firebase Cloud Functions proxy layer can be enabled.
-- The Cloud Function receives requests authenticated with Firebase Auth (Google Sign-In).
-- It injects the user's BYOK key strictly in-memory per request and forwards to Gemini.
-- App Check with reCAPTCHA Enterprise can protect the Cloud Function endpoints against abuse.
+In the `vintgen` CLI:
+- Keys can be passed as command-line flags (`--key <KEY>`), set as environment variables (`GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`), or saved locally using `vintgen config`.
+- When saved with `vintgen config`, settings are stored locally in `~/.vintgen/config.json` on your machine.
+- Keys are loaded into memory strictly for the execution of the requested command.
+- When using local Ollama (`--provider ollama`), no API keys or external internet connectivity are needed.

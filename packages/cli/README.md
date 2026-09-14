@@ -1,26 +1,26 @@
 ﻿# vintgen
 
-> Open-Source AI Listing Generator for Vinted and Secondhand Reselling.
+> Create marketplace listings from clothing photos directly in your terminal.
 
-Generate search-optimized listings for online marketplaces (such as Vinted, eBay, Depop, Subito, and Wallapop) directly from your terminal using Multimodal Vision AI.
+VintGen scans photos of clothes and writes ready-to-copy listings for Vinted, eBay, Depop, Subito, and Wallapop, with suggested prices and descriptions.
 
 [![npm version](https://img.shields.io/npm/v/vintgen.svg)](https://www.npmjs.com/package/vintgen)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## Ecosystem
+## Other Platforms
 
 VintGen is also available as:
-- **Web App & PWA:** [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app)
-- **Windows Desktop (Installer & Portable):** [GitHub Releases](https://github.com/Raele24/VintGen/releases)
-- **Android Mobile App (APK):** [GitHub Releases](https://github.com/Raele24/VintGen/releases)
+- **Web App (Browser):** [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app)
+- **Windows App (Installer & Portable):** [GitHub Releases](https://github.com/Raele24/VintGen/releases)
+- **Android App (APK):** [GitHub Releases](https://github.com/Raele24/VintGen/releases)
 
 ---
 
 ## Quick Start
 
-### 1. Run without installation (via npx):
+### 1. Run without installing:
 ```bash
 npx vintgen
 ```
@@ -32,53 +32,53 @@ npm install -g vintgen
 
 ---
 
-## Provider Setup
+## Setting Up Your AI Provider
 
-Configure an API key for your preferred AI provider, or run 100% locally with Ollama:
+Choose your preferred AI provider or run 100% offline with Ollama:
 
 ```bash
-# Set key for Google Gemini (default provider)
+# Example: Google Gemini
 vintgen config --provider gemini --key <YOUR_KEY>
 
-# Or set key for OpenAI
+# Example: OpenAI
 vintgen config --provider openai --key <YOUR_KEY>
 
-# Or set key for Anthropic Claude
+# Example: Anthropic Claude
 vintgen config --provider claude --key <YOUR_KEY>
 
-# Or use local Ollama (no API key required, runs offline)
+# Example: local Ollama (runs offline on your PC, no key needed)
 vintgen config --provider ollama
 ```
 
-You can also provide API keys via environment variables (`GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) or CLI flags (`-k, --key`).
+You can also pass keys using environment variables (`GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) or the `-k, --key` flag.
 
 ---
 
-## Usage
+## How to Use
 
-### Automatic Folder Scan (Default)
-Place item photos in any folder, navigate to it in your terminal, and run:
+### Scan the current folder (Default)
+Place photos in any folder, open your terminal there, and run:
 ```bash
 vintgen
 ```
 
 vintgen will:
-1. Auto-detect supported image files in the directory (.jpg, .png, .webp, .heic).
-2. Analyze the item using Vision AI (brand, size, condition, material, color).
-3. Compute a secondary market valuation (with suggested floor and ceiling prices).
-4. Output the ready-to-copy listing and write vintgen-listing.txt to the directory.
+1. Find image files in the folder (.jpg, .png, .webp, .heic).
+2. Inspect the item (brand, size, condition, material, color).
+3. Suggest realistic resale prices (minimum, recommended, maximum).
+4. Print the listing and save it to `vintgen-listing.txt`.
 
 ### With Seller Notes:
 ```bash
-vintgen -n "Size M, pure silk, vintage 90s Ralph Lauren"
+vintgen -n "Size M, pure silk, vintage Ralph Lauren"
 ```
 
-### Language Selection:
+### Choose Language:
 ```bash
-# Italian listing
+# Italian
 vintgen -l it -n "Ottime condizioni, pura lana vergine"
 
-# English listing (default)
+# English (default)
 vintgen -l en
 
 # French, Spanish, or German
@@ -94,24 +94,24 @@ vintgen -i ./front.jpg,./tag.jpg,./details.jpg
 
 ## Options
 
-| Option | Description |
-| :--- | :--- |
-| -i, --images <paths> | Comma-separated image paths (scans folder if omitted) |
-| -n, --notes <text> | Seller notes (condition details, fabric, fit, flaws) |
-| -t, --title <text> | Tentative or rough item title |
-| -b, --brand <brand> | Brand hint or confirmation |
-| -l, --lang <code> | Listing language: en (default), it, fr, es, de |
-| -k, --key <key> | API key (defaults to saved config or environment variable) |
-| -p, --provider <name> | AI provider: gemini (default), openai, claude, ollama |
-| -m, --model <name> | Model name (e.g. gemini-2.5-flash, gpt-4o-mini, llama3.2-vision) |
-| -e, --endpoint <url> | Ollama endpoint URL (default: http://localhost:11434) |
-| -f, --format <type> | Output format: text (default), json, vinted |
-| -o, --output <file> | Custom output file path (defaults to vintgen-listing.txt) |
-| -h, --help | Display help information |
-| -v, --version | Display version |
+| Option | Short | Description |
+| :--- | :--- | :--- |
+| `--images <paths>` | `-i` | Comma-separated image paths (scans folder if omitted) |
+| `--notes <text>` | `-n` | Notes about the item (condition, fabric, flaws) |
+| `--title <text>` | `-t` | Item title hint |
+| `--brand <brand>` | `-b` | Brand name hint |
+| `--lang <code>` | `-l` | Language for listing: `en` (default), `it`, `fr`, `es`, `de` |
+| `--provider <name>` | `-p` | AI provider: `gemini`, `openai`, `claude`, `ollama` |
+| `--key <key>` | `-k` | API key override |
+| `--model <name>` | `-m` | Model name override |
+| `--endpoint <url>` | `-e` | Ollama URL (default: `http://localhost:11434`) |
+| `--format <type>` | `-f` | Output format: `text` (default), `json`, `vinted` |
+| `--output <file>` | `-o` | Output file path (default: `vintgen-listing.txt`) |
+| `--help` | `-h` | Show help |
+| `--version` | `-v` | Show version |
 
 ---
 
 ## License
 
-MIT (c) Raele24
+MIT License.
