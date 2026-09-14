@@ -7,12 +7,48 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import { VintGenEngine, ImageInput, ListingInput } from '@vintgen/core';
+
+interface CliConfig {
+  apiKey?: string;
+  provider?: 'gemini' | 'openai' | 'claude' | 'ollama';
+  model?: string;
+  language?: 'it' | 'en' | 'fr' | 'es' | 'de' | 'auto';
+  endpoint?: string;
+}
+
+const CONFIG_DIR = path.join(os.homedir(), '.vintgen');
+const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
+
+function loadConfig(): CliConfig {
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return {};
+}
+
+function saveConfig(cfg: Partial<CliConfig>): void {
+  try {
+    if (!fs.existsSync(CONFIG_DIR)) {
+      fs.mkdirSync(CONFIG_DIR, { recursive: true });
+    }
+    const current = loadConfig();
+    const merged = { ...current, ...cfg };
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Errore durante il salvataggio della configurazione:', err);
+  }
+}
 
 interface CliArgs {
   provider?: 'gemini' | 'openai' | 'claude' | 'ollama';
   endpoint?: string;
   command?: string;
+  commandArg?: string;
   images: string[];
   title?: string;
   notes?: string;
@@ -97,6 +133,8 @@ function parseArguments(args: string[]): CliArgs {
       }
     } else if (!result.command && !arg.startsWith('-')) {
       result.command = arg;
+    } else if (result.command && !result.commandArg && !arg.startsWith('-')) {
+      result.commandArg = arg;
     }
 
     i++;
@@ -111,41 +149,56 @@ function parseArguments(args: string[]): CliArgs {
 function printHelp(): void {
   console.log(`
 vintgen v${PACKAGE_VERSION}
-Open-Source AI Listing Generator for Vinted & Secondhand Reselling
+Open-Source AI Listing Generator per Vinted & Secondhand Fashion
 
-USAGE:
-  $ vintgen [command] [options]
-  $ npx vintgen --images path/to/shirt.jpg --notes "Size M, 100% silk"
+USO RAPIDO:
+  $ vintgen                                  (rileva automaticamente le foto nella cartella corrente)
+  $ vintgen -n "Taglia M, ottimo stato"      (con note venditore)
+  $ vintgen -i foto1.jpg,foto2.jpg           (specificando le foto a mano)
+  $ vintgen set-key <tua-api-key>            (salva la chiave per sempre nel profilo utente)
 
-COMMANDS:
-  generate              Generate a listing (default)
-  test-key              Test AI provider API key connection
+COMANDI:
+  generate              Genera l'annuncio Vinted (predefinito)
+  set-key <chiave>      Salva la tua Gemini API key in modo permanente
+  config                Gestisci la configurazione (~/.vintgen/config.json)
+  test-key              Testa la connessione al provider AI
 
-OPTIONS:
-  -i, --images <paths>  Comma-separated paths to product images (jpg, png, webp)
-  -t, --title <text>    Tentative or rough item title
-  -n, --notes <text>    Seller notes (condition details, fabric, fit, flaws)
-  -b, --brand <brand>   Brand hint or confirmation
-  -p, --provider <name> AI provider: gemini (default), openai, claude, or ollama
-  -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434 or $OLLAMA_HOST)
-  -k, --key <key>       API key (defaults to $GEMINI_API_KEY, $OPENAI_API_KEY, or $ANTHROPIC_API_KEY env)
-  -m, --model <name>    Model name (gemini-2.5-flash, gpt-4o-mini, claude-3-5-sonnet, or llama3.2-vision)
-  -l, --lang <code>     Language: en, it, fr, es, de (default: en)
-  -f, --format <type>   Output format: text (default), json, vinted
-  -o, --output <file>   Write output to a destination file
-  -v, --version         Print CLI version
-  -h, --help            Print help information
+OPZIONI:
+  -i, --images <paths>  Percorsi immagini separati da virgola (se omesso cerca foto nella cartella)
+  -n, --notes <text>    Note venditore (condizioni, difetti, vestibilita, taglia)
+  -t, --title <text>    Bozza o suggerimento titolo
+  -b, --brand <brand>   Brand / Marca confermata
+  -l, --lang <code>     Lingua annuncio: it (predefinita), en, fr, es, de
+  -k, --key <key>       API key (usa config salvata o GEMINI_API_KEY)
+  -p, --provider <name> Provider AI: gemini (default), openai, claude, ollama
+  -m, --model <name>    Nome modello (es. gemini-2.5-flash, gpt-4o-mini, llama3.2-vision)
+  -f, --format <type>   Formato output: text (default), json, vinted
+  -o, --output <file>   Salva su file specifico (di default crea vintgen-listing.txt)
+  -v, --version         Mostra la versione
+  -h, --help            Mostra questa guida
 
-EXAMPLES:
-  $ export GEMINI_API_KEY="AIzaSy..."
-  $ vintgen -i ./front.jpg,./tag.jpg -n "Vintage 90s Ralph Lauren polo"
-  $ export OPENAI_API_KEY="sk-..."
-  $ vintgen -p openai -i ./front.jpg -n "Silk blouse"
-  $ export ANTHROPIC_API_KEY="sk-ant-..."
-  $ vintgen -p claude -i ./front.jpg -n "Vintage jacket"
-  $ vintgen -p ollama -i ./front.jpg -n "Vintage jacket" (100% offline & local)
-  $ vintgen -i ./shoes.jpg --format json -o listing.json
+ESEMPI:
+  $ vintgen set-key AIzaSy...
+  $ cd C:\Vendite\GiaccaVintage
+  $ vintgen
+  $ vintgen -n "Nuovo con cartellino, pura lana vergine"
 `);
+}
+
+/**
+ * Scans directory for supported image formats.
+ */
+function findImagesInDir(dir: string): string[] {
+  const supported = new Set(['.jpg', '.jpeg', '.png', '.webp', '.heic', '.jfif']);
+  try {
+    const files = fs.readdirSync(dir);
+    return files
+      .filter((f) => supported.has(path.extname(f).toLowerCase()))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+      .map((f) => path.join(dir, f));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -156,6 +209,7 @@ function getMimeType(filePath: string): string {
   switch (ext) {
     case '.jpg':
     case '.jpeg':
+    case '.jfif':
       return 'image/jpeg';
     case '.png':
       return 'image/png';
@@ -175,19 +229,53 @@ function getMimeType(filePath: string): string {
  */
 async function main(): Promise<void> {
   const args = parseArguments(process.argv.slice(2));
+  const savedConfig = loadConfig();
 
   if (args.version) {
     console.log(`vintgen v${PACKAGE_VERSION}`);
     process.exitCode = 0; return;
   }
 
-  if (args.help || (process.argv.length <= 2 && !args.command)) {
+  // Handle set-key shortcut: vintgen set-key AIza...
+  if (args.command === 'set-key') {
+    const keyToSave = args.commandArg || args.apiKey;
+    if (!keyToSave) {
+      console.error('Errore: specifica la chiave da salvare. Esempio: vintgen set-key AIzaSy...');
+      process.exitCode = 1; return;
+    }
+    saveConfig({ apiKey: keyToSave, provider: args.provider || 'gemini' });
+    console.log(`API Key salvata con successo in ${CONFIG_FILE}!`);
+    console.log('Ora puoi eseguire "vintgen" in qualunque cartella senza dover reinserire la chiave.');
+    process.exitCode = 0; return;
+  }
+
+  // Handle config command
+  if (args.command === 'config') {
+    if (args.apiKey || args.provider || args.language || args.model || args.endpoint) {
+      const updates: Partial<CliConfig> = {};
+      if (args.apiKey) updates.apiKey = args.apiKey;
+      if (args.provider) updates.provider = args.provider;
+      if (args.language) updates.language = args.language;
+      if (args.model) updates.model = args.model;
+      if (args.endpoint) updates.endpoint = args.endpoint;
+      saveConfig(updates);
+      console.log(`Configurazione aggiornata in ${CONFIG_FILE}:`, loadConfig());
+    } else {
+      console.log('Configurazione attuale:', savedConfig);
+      console.log(`File: ${CONFIG_FILE}`);
+    }
+    process.exitCode = 0; return;
+  }
+
+  if (args.help) {
     printHelp();
     process.exitCode = 0; return;
   }
 
-  const provider = args.provider || 'gemini';
-  const endpoint = args.endpoint || process.env.OLLAMA_HOST || 'http://localhost:11434';
+  const provider = args.provider || savedConfig.provider || 'gemini';
+  const endpoint = args.endpoint || savedConfig.endpoint || process.env.OLLAMA_HOST || 'http://localhost:11434';
+  const language = args.language || savedConfig.language || 'it';
+  const model = args.model || savedConfig.model;
 
   let defaultEnvKey: string | undefined;
   if (provider === 'claude') {
@@ -199,19 +287,23 @@ async function main(): Promise<void> {
   } else {
     defaultEnvKey = process.env.GEMINI_API_KEY;
   }
-  const apiKey = args.apiKey || defaultEnvKey;
+
+  const apiKey = args.apiKey || savedConfig.apiKey || defaultEnvKey;
 
   if (provider !== 'ollama' && !apiKey) {
-    const providerName = provider === 'claude' ? 'Anthropic Claude' : (provider === 'openai' ? 'OpenAI' : 'Gemini');
+    const providerName = provider === 'claude' ? 'Anthropic Claude' : (provider === 'openai' ? 'OpenAI' : 'Google Gemini');
     const envVar = provider === 'claude' ? 'ANTHROPIC_API_KEY' : (provider === 'openai' ? 'OPENAI_API_KEY' : 'GEMINI_API_KEY');
     const url = provider === 'claude' 
       ? 'https://console.anthropic.com/settings/keys' 
       : (provider === 'openai' ? 'https://platform.openai.com/api-keys' : 'https://aistudio.google.com/app/apikey');
-    console.error(`\nError: ${providerName} API Key not found.`);
-    console.error(`Please provide your key using:`);
-    console.error(`  - Flag: --key <YOUR_${envVar}>`);
-    console.error(`  - Environment: export ${envVar}="<YOUR_KEY>"`);
-    console.error(`\nGet your key at: ${url}\n`);
+    
+    console.error(`\n[!] Nessuna API Key trovata per ${providerName}.`);
+    console.error('Puoi salvarla una volta per sempre con il comando:');
+    console.error(`  $ vintgen set-key <TUA_API_KEY>\n`);
+    console.error('Oppure passarla da flag o variabile d\'ambiente:');
+    console.error(`  - Flag: --key <TUA_KEY>`);
+    console.error(`  - Variabile d'ambiente: ${envVar}`);
+    console.error(`\nOttieni la tua chiave gratuita su: ${url}\n`);
     process.exitCode = 1; return;
   }
 
@@ -220,67 +312,82 @@ async function main(): Promise<void> {
   // Test connection command
   if (args.command === 'test-key') {
     const targetDesc = provider === 'ollama' ? `Ollama instance at ${endpoint}` : `${provider.toUpperCase()} API key`;
-    console.log(`Testing connection with ${targetDesc}...`);
+    console.log(`Verifica connessione con ${targetDesc}...`);
     const result = await engine.testProvider(provider, {
       apiKey: apiKey || '',
-      model: args.model,
+      model,
       baseUrl: endpoint,
     });
     if (result.success) {
-      console.log(`[SUCCESS] ${result.message}`);
+      console.log(`[OK] ${result.message}`);
       process.exitCode = 0; return;
     } else {
-      console.error(`[FAILURE] ${result.message}`);
+      console.error(`[ERRORE] ${result.message}`);
       process.exitCode = 1; return;
     }
   }
 
-  // Read images if provided
+  // Resolve images: either from -i flag OR automatic discovery in current directory!
+  let resolvedImagePaths: string[] = [];
+  if (args.images && args.images.length > 0) {
+    resolvedImagePaths = args.images.map((p) => path.resolve(process.cwd(), p));
+  } else {
+    const autoFound = findImagesInDir(process.cwd());
+    if (autoFound.length > 0) {
+      resolvedImagePaths = autoFound;
+      console.log(`\n[*] Rilevate automaticamente ${autoFound.length} foto nella cartella:`);
+      autoFound.forEach((f) => console.log(`    - ${path.basename(f)}`));
+    }
+  }
+
   const imageInputs: ImageInput[] = [];
-  for (const imgPath of args.images) {
-    const resolvedPath = path.resolve(process.cwd(), imgPath);
-    if (!fs.existsSync(resolvedPath)) {
-      console.error(`Error: Image file not found at ${resolvedPath}`);
+  for (const imgPath of resolvedImagePaths) {
+    if (!fs.existsSync(imgPath)) {
+      console.error(`Errore: Immagine non trovata in ${imgPath}`);
       process.exitCode = 1; return;
     }
 
     try {
-      const buffer = fs.readFileSync(resolvedPath);
-      const mimeType = getMimeType(resolvedPath);
+      const buffer = fs.readFileSync(imgPath);
+      const mimeType = getMimeType(imgPath);
       imageInputs.push({
         data: buffer.toString('base64'),
         mimeType,
-        fileName: path.basename(resolvedPath),
+        fileName: path.basename(imgPath),
       });
     } catch (err) {
-      console.error(`Error reading image ${resolvedPath}:`, err);
+      console.error(`Errore durante la lettura dell'immagine ${imgPath}:`, err);
       process.exitCode = 1; return;
     }
   }
 
   if (imageInputs.length === 0 && !args.title && !args.notes) {
-    console.error('Error: Please provide at least one image (--images) or descriptive notes (--notes).');
+    console.error('\n[!] Nessuna immagine specificata o trovata nella cartella corrente.');
+    console.error('Suggerimento:');
+    console.error('  1. Posiziona le foto del capo in questa cartella ed esegui "vintgen"');
+    console.error('  2. Oppure specifica le immagini a mano: vintgen -i foto1.jpg,foto2.jpg');
+    console.error('  3. Oppure usa le note: vintgen -n "Giacca di pelle vintage nera"\n');
     process.exitCode = 1; return;
   }
 
-  let providerDisplay = 'Gemini Multimodal Vision';
+  let providerDisplay = 'Google Gemini Vision AI';
   if (provider === 'claude') providerDisplay = 'Anthropic Claude 3.5 Vision';
   else if (provider === 'openai') providerDisplay = 'OpenAI GPT-4o Vision';
-  else if (provider === 'ollama') providerDisplay = `Local Ollama (${args.model || 'llama3.2-vision'})`;
-  console.log(`Analyzing item with ${providerDisplay} (${imageInputs.length} image(s))...`);
+  else if (provider === 'ollama') providerDisplay = `Local Ollama (${model || 'llama3.2-vision'})`;
+  console.log(`\n[AI] Analisi capo in corso con ${providerDisplay} (${imageInputs.length} foto, lingua: ${language.toUpperCase()})...`);
 
   const listingInput: ListingInput = {
     images: imageInputs,
     titleHint: args.title,
     notes: args.notes,
     brandHint: args.brand,
-    language: args.language || 'en',
+    language,
   };
 
   try {
     const { raw, formatted } = await engine.generate(listingInput, {
       apiKey: apiKey || '',
-      model: args.model,
+      model,
       baseUrl: endpoint,
       providerId: provider,
     });
@@ -292,43 +399,44 @@ async function main(): Promise<void> {
     } else if (args.format === 'vinted') {
       outputContent = formatted.fullBundleText;
     } else {
-      // Default clean formatted terminal representation
       outputContent = [
         '============================================================',
-        `  VINTSTACK LISTING: ${raw.title}`,
+        `  VINTGEN LISTING: ${raw.title}`,
         '============================================================',
-        `Title:       ${raw.title}`,
-        `Price:       €${raw.price.suggested.toFixed(2)} (Range: €${raw.price.min.toFixed(2)} - €${raw.price.max.toFixed(2)})`,
-        `Reasoning:   ${raw.price.reasoning}`,
-        `Brand:       ${raw.brand}`,
-        `Size:        ${raw.size}`,
-        `Condition:   ${raw.condition}`,
-        `Category:    ${raw.category}`,
-        `Color:       ${raw.color}`,
-        `Material:    ${raw.material}`,
-        `Fit:         ${raw.fitNotes}`,
+        `Titolo:       ${raw.title}`,
+        `Prezzo:       €${raw.price.suggested.toFixed(2)} (Consigliato: €${raw.price.min.toFixed(2)} - €${raw.price.max.toFixed(2)})`,
+        `Motivazione:  ${raw.price.reasoning}`,
+        `Brand:        ${raw.brand}`,
+        `Taglia:       ${raw.size}`,
+        `Condizione:   ${raw.condition}`,
+        `Categoria:    ${raw.category}`,
+        `Colore:       ${raw.color}`,
+        `Materiale:    ${raw.material}`,
+        `Vestibilità:  ${raw.fitNotes}`,
         '------------------------------------------------------------',
-        'DESCRIPTION:',
+        'DESCRIZIONE PRONTA PER VINTED:',
         formatted.description,
         '============================================================',
       ].join('\n');
     }
 
-    if (args.output) {
-      const outPath = path.resolve(process.cwd(), args.output);
-      fs.writeFileSync(outPath, outputContent, 'utf-8');
-      console.log(`\nListing successfully written to: ${outPath}`);
-    } else {
-      console.log(`\n${outputContent}`);
-    }
+    console.log(`\n${outputContent}`);
+
+    // Write output to file
+    const targetFile = args.output 
+      ? path.resolve(process.cwd(), args.output)
+      : path.resolve(process.cwd(), 'vintgen-listing.txt');
+    
+    fs.writeFileSync(targetFile, outputContent, 'utf-8');
+    console.log(`\n[✓] Annuncio salvato automaticamente in: ${path.basename(targetFile)}`);
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    console.error(`\nGeneration failed: ${errorMsg}`);
+    console.error(`\n[ERRORE] Generazione fallita: ${errorMsg}`);
     process.exitCode = 1; return;
   }
 }
 
 main().catch((err) => {
-  console.error('Unexpected CLI error:', err);
+  console.error('Errore imprevisto CLI:', err);
   process.exitCode = 1; return;
 });
