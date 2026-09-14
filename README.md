@@ -41,7 +41,7 @@ If you prefer using VintGen inside an AI coding assistant or web chat, copy thes
 | Android | Phone app | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-v1.0.0.apk`) | Android 8.0 or newer |
 | Windows (Installer) | Setup file with shortcut | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-Windows-Installer.exe`) | Windows 10 or 11 |
 | Windows (Portable) | Single file, no install | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-Windows-Portable.exe`) | Windows 10 or 11 |
-| Command Line (CLI) | Run with npx or npm | `npx vintgen` / `npm i -g vintgen` | Node.js 18+ |
+| Command Line (CLI) | Run with npx or npm | [npm Package](https://www.npmjs.com/package/vintgen) (`npx vintgen` / `npm i -g vintgen`) | Node.js 18+ |
 | AI Agent Skill | Use with coding assistants | [skills/vintgen/SKILL.md](skills/vintgen/SKILL.md) | Antigravity, Claude Code, Copilot |
 | Web Chat Prompt | Use with web AI chats | [skills/vintgen/prompts/web-instructions.md](skills/vintgen/prompts/web-instructions.md) | ChatGPT, Gemini, Claude |
 | Source Code | Clone and run locally | `git clone` from GitHub | Node.js 18+, npm |
@@ -65,6 +65,8 @@ Download from [GitHub Releases](https://github.com/Raele24/VintGen/releases/late
 - **Portable (`VintGen-Windows-Portable.exe`):** single file. Double-click to run without installing anything.
 
 ### 4. Command Line (CLI)
+View package on [npm](https://www.npmjs.com/package/vintgen) or read the [CLI User Guide](docs/cli-guide.md).
+
 Run directly without installing:
 ```bash
 npx vintgen
@@ -137,7 +139,23 @@ You can also set environment variables:
 - `OPENAI_API_KEY`
 - `ANTHROPIC_API_KEY`
 
+
 ---
+
+
+## Client-Side Image Enhancement & Background Removal
+
+VintGen includes in-browser photo optimization tools to prepare item photographs before AI analysis:
+
+- **Auto-Lighting & Contrast**: HTML5 Canvas processing that balances dynamic range, recovers underexposed shadow detail (revealing dark fabric seams, tags, and textures), and enhances color vibrancy.
+- **Client-Side Background Removal**: Isolates products onto clean transparent backgrounds using in-browser WebAssembly. Runs 100% locally on your device without sending images to third-party image processors.
+- **Per-Photo Tools Menu**:
+  - Click the three-dot options menu on any photo thumbnail to open its dedicated tools popover.
+  - `Auto-Light`: Toggles canvas lighting and exposure enhancement for that image.
+  - `Remove BG`: Toggles WebAssembly client-side background removal.
+  - `Revert`: Restores the unedited original photo at any time.
+- **Batch Action**:
+  - `Enhance All`: Brightens and balances lighting across all uploaded photos in a single pass.
 
 ---
 

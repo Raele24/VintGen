@@ -1,6 +1,7 @@
-# VintGen CLI User Guide
+﻿# VintGen CLI User Guide
 
 The `vintgen` CLI provides listing creation directly in your terminal from item photos.
+Published on [npm (vintgen)](https://www.npmjs.com/package/vintgen).
 
 ---
 

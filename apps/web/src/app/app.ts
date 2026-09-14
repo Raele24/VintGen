@@ -12,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { StorageService, SavedListingItem } from './core/storage.service';
 import { GeneratorService } from './core/generator.service';
 import { UpdateService } from './core/update.service';
+import { ImageProcessingService } from './core/image-processing.service';
 import { ListingInput, ItemCondition, ListingResult, PlatformId, PlatformAdapter, FormattedListing, PlatformRegistry } from '@vintgen/core';
 
 interface UploadedImage {
@@ -21,6 +22,13 @@ interface UploadedImage {
   mimeType: string;
   base64: string;
   previewUrl: string;
+  originalBase64?: string;
+  originalPreviewUrl?: string;
+  originalMimeType?: string;
+  isProcessing?: boolean;
+  processingStatus?: string;
+  isEnhanced?: boolean;
+  isCutout?: boolean;
 }
 
 export interface TourStep {
@@ -42,6 +50,7 @@ export class App {
   public storage = inject(StorageService);
   public generator = inject(GeneratorService);
   public updateService = inject(UpdateService);
+  public imageProcessor = inject(ImageProcessingService);
 
   // Form Inputs
   public uploadedImages = signal<UploadedImage[]>([]);
@@ -108,6 +117,9 @@ export class App {
 
   // Studio Engine Selector Dropdown
   public engineMenuOpen = signal<boolean>(false);
+
+  // Per-thumbnail action menu
+  public activeThumbMenuId = signal<string | null>(null);
   public tempOllamaEndpoint = signal<string>('http://localhost:11434');
   public tempOllamaModel = signal<string>('llama3.2-vision');
 
@@ -373,13 +385,21 @@ export class App {
       reader.onload = () => {
         const fullBase64 = reader.result as string;
         const cleanBase64 = fullBase64.replace(/^data:[a-zA-Z0-9/+-]+;base64,/, '');
+        const objUrl = URL.createObjectURL(file);
         const newImg: UploadedImage = {
           id: `img_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
           name: file.name,
           size: file.size,
           mimeType: file.type || 'image/jpeg',
           base64: cleanBase64,
-          previewUrl: URL.createObjectURL(file),
+          previewUrl: objUrl,
+          originalBase64: cleanBase64,
+          originalPreviewUrl: objUrl,
+          originalMimeType: file.type || 'image/jpeg',
+          isProcessing: false,
+          processingStatus: '',
+          isEnhanced: false,
+          isCutout: false,
         };
         this.uploadedImages.update((imgs) => [...imgs, newImg]);
       };
@@ -400,6 +420,118 @@ export class App {
    */
   public clearAllImages(): void {
     this.uploadedImages.set([]);
+  }
+
+  /**
+   * Automatically enhances lighting, contrast, and color vibrancy using canvas processing.
+   */
+  public async enhanceImage(id: string, event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    const img = this.uploadedImages().find((i) => i.id === id);
+    if (!img || img.isProcessing) return;
+
+    // Toggle: if already enhanced, remove the enhancement only (preserve cutout state)
+    if (img.isEnhanced) {
+      this.updateImageState(id, {
+        base64: img.originalBase64 || img.base64,
+        previewUrl: img.originalPreviewUrl || img.previewUrl,
+        mimeType: img.originalMimeType || img.mimeType,
+        isEnhanced: false,
+        // Do NOT touch isCutout — if No BG is active, keep it
+      });
+      return;
+    }
+
+    this.updateImageState(id, { isProcessing: true, processingStatus: 'Enhancing...' });
+    try {
+      const result = await this.imageProcessor.enhanceLighting(img.base64, img.mimeType);
+      this.updateImageState(id, {
+        base64: result.base64,
+        previewUrl: result.previewUrl,
+        mimeType: result.mimeType,
+        isEnhanced: true,
+        isProcessing: false,
+        processingStatus: '',
+      });
+    } catch (err: unknown) {
+      console.error('Enhance lighting error:', err);
+      this.updateImageState(id, { isProcessing: false, processingStatus: '' });
+    }
+  }
+
+  /**
+   * Enhances lighting and contrast across all uploaded images in sequence.
+   */
+  public async enhanceAllImages(): Promise<void> {
+    const images = this.uploadedImages().filter((i) => !i.isEnhanced && !i.isProcessing);
+    for (const img of images) {
+      await this.enhanceImage(img.id);
+    }
+  }
+
+  /**
+   * Removes background client-side using in-browser WebAssembly.
+   */
+  public async removeImageBackground(id: string, event?: Event): Promise<void> {
+    if (event) event.stopPropagation();
+    const img = this.uploadedImages().find((i) => i.id === id);
+    if (!img || img.isProcessing) return;
+
+    // Toggle: if already a cutout, remove the cutout only (preserve enhanced state)
+    if (img.isCutout) {
+      this.updateImageState(id, {
+        base64: img.originalBase64 || img.base64,
+        previewUrl: img.originalPreviewUrl || img.previewUrl,
+        mimeType: img.originalMimeType || img.mimeType,
+        isCutout: false,
+        // Do NOT touch isEnhanced — if Light is active, keep it
+      });
+      return;
+    }
+
+    this.updateImageState(id, { isProcessing: true, processingStatus: 'Isolating...' });
+    try {
+      const inputSource = img.previewUrl || `data:${img.mimeType};base64,${img.base64}`;
+      const result = await this.imageProcessor.removeBackground(inputSource, (pct, text) => {
+        this.updateImageState(id, { processingStatus: text });
+      });
+      this.updateImageState(id, {
+        base64: result.base64,
+        previewUrl: result.previewUrl,
+        mimeType: result.mimeType,
+        isCutout: true,
+        isProcessing: false,
+        processingStatus: '',
+      });
+    } catch (err: unknown) {
+      console.error('Background removal error:', err);
+      this.updateImageState(id, { isProcessing: false, processingStatus: '' });
+    }
+  }
+
+  /**
+   * Restores an image back to its original unedited photo.
+   */
+  public restoreOriginalImage(id: string, event?: Event): void {
+    if (event) event.stopPropagation();
+    const img = this.uploadedImages().find((i) => i.id === id);
+    if (!img || (!img.originalBase64 && !img.originalPreviewUrl)) return;
+
+    this.updateImageState(id, {
+      base64: img.originalBase64 || img.base64,
+      previewUrl: img.originalPreviewUrl || img.previewUrl,
+      mimeType: img.originalMimeType || img.mimeType,
+      isEnhanced: false,
+      isCutout: false,
+      isProcessing: false,
+      processingStatus: '',
+    });
+  }
+
+  private updateImageState(id: string, patch: Partial<UploadedImage>): void {
+    this.uploadedImages.update((list) =>
+      list.map((item) => (item.id === id ? { ...item, ...patch } : item))
+    );
   }
 
   /**
@@ -585,6 +717,16 @@ export class App {
 
   public closeEngineMenu(): void {
     this.engineMenuOpen.set(false);
+  }
+
+  public toggleThumbMenu(id: string, event: Event): void {
+    event.stopPropagation();
+    this.activeThumbMenuId.update((current) => (current === id ? null : id));
+  }
+
+  public closeThumbMenu(event?: Event): void {
+    if (event) event.stopPropagation();
+    this.activeThumbMenuId.set(null);
   }
 
   public selectEngine(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): void {
@@ -1186,8 +1328,17 @@ export class App {
     }
   }
 
+  @HostListener('document:click')
+  public onDocumentClick(): void {
+    this.activeThumbMenuId.set(null);
+  }
+
   @HostListener('window:keydown.escape')
   public onEscapeKey(): void {
+    if (this.activeThumbMenuId()) {
+      this.activeThumbMenuId.set(null);
+      return;
+    }
     if (this.showInstallModal()) {
       this.closeInstallModal();
       return;

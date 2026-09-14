@@ -57,3 +57,16 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+---
+
+## Features
+
+- **Multi-Provider AI Vision Engine**: Connects directly to Google Gemini, OpenAI, Anthropic Claude, or local Ollama using client-side API keys stored in local storage.
+- **Client-Side Image Pre-Processing**:
+  - **Auto-Lighting**: Fast HTML5 Canvas processing to improve dark or unevenly lit product photos.
+  - **Background Removal**: Client-side product cutout powered by in-browser WebAssembly.
+  - **Per-Image Action Menu**: Independent controls for each photo (Auto-Light, Remove BG, Revert) alongside batch Enhance All.
+- **Universal Multi-Platform Output**: Immediate previews and clipboard-ready formatting for Universal Markdown, Vinted, eBay (with 80-character title limit check), Depop (with 5-tag limit), Subito, and Wallapop.
+- **PWA and Offline Ready**: Installable as a Progressive Web App with local caching and local history.

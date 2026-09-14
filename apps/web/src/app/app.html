@@ -359,9 +359,15 @@
           <div class="panel-header">
             <h2 id="input-heading" class="panel-title">Photos & Details</h2>
             @if (uploadedImages().length > 0) {
-            <button type="button" class="btn-inline-subtle" (click)="clearAllImages()">
-              Clear all ({{ uploadedImages().length }})
-            </button>
+            <div class="photos-panel-actions">
+              <button type="button" class="btn-inline-accent" (click)="enhanceAllImages()"
+                title="Auto-enhance lighting & contrast for all photos">
+                Enhance All
+              </button>
+              <button type="button" class="btn-inline-subtle" (click)="clearAllImages()">
+                Clear all ({{ uploadedImages().length }})
+              </button>
+            </div>
             }
           </div>
 
@@ -391,12 +397,77 @@
           @if (uploadedImages().length > 0) {
           <div class="thumbnails-grid" aria-label="Uploaded photo previews">
             @for (img of uploadedImages(); track img.id; let idx = $index) {
-            <div class="thumb-card" [title]="img.name">
-              <img [src]="img.previewUrl" [alt]="'Photo ' + (idx + 1)" class="thumb-img" />
-              <button type="button" class="thumb-remove-btn" (click)="removeImage(img.id, $event)"
-                aria-label="Remove image">
-                &times;
-              </button>
+            <div class="thumb-item">
+              <div class="thumb-card" [class.processing]="img.isProcessing" [title]="img.name">
+                <img [src]="img.previewUrl" [alt]="'Photo ' + (idx + 1)" class="thumb-img" />
+
+                <!-- Processing overlay with spinner and status -->
+                @if (img.isProcessing) {
+                <div class="thumb-processing-overlay" role="status">
+                  <div class="thumb-spinner"></div>
+                  <span class="thumb-status-text">{{ img.processingStatus || 'Processing...' }}</span>
+                </div>
+                }
+
+                <!-- State badges (top-left) -->
+                <div class="thumb-badges">
+                  @if (img.isEnhanced) {
+                  <span class="thumb-badge badge-enhanced" title="Lighting enhanced">Light</span>
+                  }
+                  @if (img.isCutout) {
+                  <span class="thumb-badge badge-cutout" title="Background removed">Cutout</span>
+                  }
+                </div>
+
+                <!-- Delete button (top-right) -->
+                <button type="button" class="thumb-remove-btn" (click)="removeImage(img.id, $event)"
+                  aria-label="Remove image" title="Remove photo">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+
+                <!-- Three-dot menu trigger (bottom-right) -->
+                <button type="button" class="thumb-menu-btn"
+                  [class.open]="activeThumbMenuId() === img.id"
+                  [disabled]="img.isProcessing"
+                  (click)="toggleThumbMenu(img.id, $event)"
+                  aria-label="Image options" aria-haspopup="true" title="Photo options">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="5" r="2.2" />
+                    <circle cx="12" cy="12" r="2.2" />
+                    <circle cx="12" cy="19" r="2.2" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Action popover menu (renders below card without covering photo) -->
+              @if (activeThumbMenuId() === img.id) {
+              <div class="thumb-popover" (click)="$event.stopPropagation()">
+                <div class="thumb-popover-header">Photo Tools</div>
+                <button type="button" class="thumb-pop-item" [class.active]="img.isEnhanced"
+                  (click)="enhanceImage(img.id, $event)" title="Auto-enhance lighting & contrast">
+                  <span class="thumb-pop-label">Auto-Light</span>
+                  @if (img.isEnhanced) {
+                  <span class="thumb-pop-status">ON</span>
+                  }
+                </button>
+                <button type="button" class="thumb-pop-item" [class.active]="img.isCutout"
+                  (click)="removeImageBackground(img.id, $event)" title="Remove background with AI">
+                  <span class="thumb-pop-label">Remove BG</span>
+                  @if (img.isCutout) {
+                  <span class="thumb-pop-status">ON</span>
+                  }
+                </button>
+                @if (img.isEnhanced || img.isCutout) {
+                <button type="button" class="thumb-pop-item revert"
+                  (click)="restoreOriginalImage(img.id, $event)" title="Revert to unedited original">
+                  <span class="thumb-pop-label">Revert</span>
+                </button>
+                }
+              </div>
+              }
             </div>
             }
           </div>

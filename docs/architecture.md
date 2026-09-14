@@ -72,6 +72,11 @@ The project is structured as an npm workspace monorepo:
      - **OpenAI**: Uses Vision structured outputs with `gpt-4o-mini`.
      - **Anthropic Claude**: Uses Claude Messages API with images with `claude-3-5-sonnet`.
      - **Local Ollama**: Executes entirely on-device via local vision models (such as `llama3.2-vision`), requiring zero external network requests.
+2. **Client-Side Image Pre-Processing (Optional)**:
+   - Before submission to the vision model, users can run on-device photo optimizations:
+     - **Canvas Lighting Pass**: Normalizes exposure, balances contrast, and recovers shadow detail to make labels, textures, and details legible.
+     - **WebAssembly Background Removal**: Executes client-side foreground isolation via `@imgly/background-removal`. Runs 100% in the browser with zero external network requests.
+     - **Non-Destructive Image State**: The app preserves both original and modified base64 data in memory, allowing instant toggling and reversion.
 3. **Normalization**:
    - Extracted attributes are validated and mapped:
      - `brand`, `size`, `condition` (mapped to official marketplace conditions: `new_with_tags`, `new_without_tags`, `very_good`, `good`, `satisfactory`).

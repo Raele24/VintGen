@@ -485,25 +485,25 @@
 /* --- Thumbnails Strip --- */
 .thumbnails-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
   gap: 10px;
 
   @media (max-width: 640px) {
-    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
     gap: 8px;
   }
 }
 
 .thumb-card {
   position: relative;
-  height: 84px;
+  height: 100px;
   border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--border-default);
   background: #000;
 
   @media (max-width: 640px) {
-    height: 70px;
+    height: 100px;
   }
 
   .thumb-img {
@@ -528,8 +528,8 @@
     position: absolute;
     top: 4px;
     right: 4px;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.75);
     color: #fff;
@@ -4112,4 +4112,299 @@ body.modal-open {
   font-family: var(--font-mono);
   color: var(--text-muted);
   margin-left: 6px;
+}
+
+/* --- Photos Panel Actions & Thumbnails Enhancement --- */
+.photos-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-inline-accent {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--accent);
+    color: #ffffff;
+  }
+}
+
+/* --- Modern Thumbnail Item & Action Menu --- */
+.thumb-item {
+  position: relative;
+}
+
+.thumb-card {
+  position: relative;
+  height: 104px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  background: #0b0e14;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  @media (max-width: 640px) {
+    height: 90px;
+  }
+
+  .thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+/* Badges (Top-Left) */
+.thumb-badges {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.thumb-badge {
+  font-size: 8px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  padding: 2px 5px;
+  border-radius: 3px;
+  line-height: 1.1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+
+  &.badge-enhanced {
+    background: rgba(14, 165, 233, 0.92);
+    color: #ffffff;
+  }
+
+  &.badge-cutout {
+    background: rgba(139, 92, 246, 0.92);
+    color: #ffffff;
+  }
+}
+
+/* Delete Button (Top-Right) */
+.thumb-remove-btn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+  transition: all var(--transition-fast);
+  touch-action: manipulation;
+
+  &:hover {
+    background: var(--danger);
+    border-color: transparent;
+    transform: scale(1.08);
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+}
+
+/* Three-Dot Menu Button (Bottom-Right) */
+.thumb-menu-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+  transition: all var(--transition-fast);
+  touch-action: manipulation;
+
+  &:hover,
+  &.open {
+    background: var(--accent);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  &:active {
+    transform: scale(0.92);
+  }
+
+  svg {
+    pointer-events: none;
+  }
+}
+
+/* Processing Overlay */
+.thumb-processing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 6px;
+  z-index: 3;
+  backdrop-filter: blur(3px);
+
+  .thumb-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .thumb-status-text {
+    font-size: 8.5px;
+    font-family: var(--font-mono);
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.15;
+    font-weight: 500;
+  }
+}
+
+/* Action Popover Menu (renders below the card, never covering the photo) */
+.thumb-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 148px;
+  background: #11141b;
+  border: 1px solid var(--border-default);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 100;
+  backdrop-filter: blur(14px);
+  animation: popoverFadeIn 0.14s ease-out;
+
+  @media (max-width: 480px) {
+    left: 0;
+    transform: none;
+    min-width: 138px;
+  }
+}
+
+.thumb-popover-header {
+  font-size: 9.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 4px 6px 3px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 2px;
+}
+
+.thumb-pop-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-primary, #e2e8f0);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  touch-action: manipulation;
+  box-sizing: border-box;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &.active {
+    background: rgba(14, 165, 233, 0.15);
+    border-color: rgba(14, 165, 233, 0.35);
+    color: var(--accent, #38bdf8);
+  }
+
+  &.revert {
+    color: #f87171;
+
+    &:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  .thumb-pop-label {
+    flex: 1;
+    white-space: nowrap;
+  }
+
+  .thumb-pop-status {
+    font-size: 8px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #ffffff;
+    line-height: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
