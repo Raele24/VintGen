@@ -8,7 +8,7 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
     // When CAPACITOR_LIVE_URL is set (e.g. your deployed URL), the APK loads directly from the live web app for instant OTA updates.
     // If not set, it loads from local bundled assets with offline service worker.
-    url: process.env.CAPACITOR_LIVE_URL || undefined,
+    url: process.env.CAPACITOR_LIVE_URL || 'https://vintgen-ai.vercel.app',
     cleartext: false
   },
   android: {

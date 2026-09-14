@@ -12,7 +12,9 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "VintGen — AI Secondhand Listing Generator",
+        "url": "https://vintgen-ai.vercel.app",
         "width": 1280,
         "height": 850,
         "minWidth": 480,

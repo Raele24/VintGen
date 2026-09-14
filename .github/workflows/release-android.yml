@@ -49,6 +49,9 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Install NPM Dependencies
         run: npm ci
 
@@ -75,7 +78,7 @@ jobs:
       - name: Assemble Android Release APK
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon || (echo "Retrying gradle build..." && sleep 5 && ./gradlew assembleRelease --no-daemon)
 
       - name: Sign Release APK with Keystore
         run: |
