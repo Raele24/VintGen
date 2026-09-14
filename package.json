@@ -15,7 +15,9 @@
     "build": "npm run build:core && npm run build:cli && npm run build:web",
     "cli": "node packages/cli/bin/vintgen.js",
     "build:android": "npm run build:web && cap sync android",
-    "open:android": "cap open android"
+    "open:android": "cap open android",
+    "desktop:build": "npm run build:web && tauri build",
+    "desktop:dev": "tauri dev"
   },
   "keywords": [
     "vinted",
@@ -33,6 +35,7 @@
     "@capacitor/android": "^8.5.2",
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",
-    "@types/node": "^22.20.2"
+    "@types/node": "^22.20.2",
+    "@tauri-apps/cli": "^2.2.0"
   }
 }
