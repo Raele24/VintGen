@@ -1,4 +1,4 @@
-import {
+﻿import {
   Component,
   inject,
   signal,
@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { StorageService, SavedListingItem } from './core/storage.service';
 import { GeneratorService } from './core/generator.service';
 import { UpdateService } from './core/update.service';
-import { ListingInput, VintedCondition, ListingResult } from '@vintgen/core';
+import { ListingInput, ItemCondition, ListingResult } from '@vintgen/core';
 
 interface UploadedImage {
   id: string;
@@ -48,7 +48,7 @@ export class App {
   public titleHint = signal<string>('');
   public brandHint = signal<string>('');
   public notes = signal<string>('');
-  public conditionHint = signal<VintedCondition | ''>('');
+  public conditionHint = signal<ItemCondition | ''>('');
   public language = signal<'en' | 'it' | 'fr' | 'es' | 'de'>('en');
 
   // Drag-and-drop state
@@ -68,6 +68,14 @@ export class App {
   private sheetTouchStartY = 0;
   private sheetLastTouchY = 0;
   private sheetTouchStartTime = 0;
+
+  // Install Hub Apple Sheet Gestures & State
+  public installSheetTranslateY = signal<number>(0);
+  public isInstallSheetDragging = signal<boolean>(false);
+  public isInstallSheetDismissing = signal<boolean>(false);
+  private installSheetTouchStartY = 0;
+  private installSheetLastTouchY = 0;
+  private installSheetTouchStartTime = 0;
 
   public modalProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama' | null>('gemini');
 
@@ -92,12 +100,10 @@ export class App {
   public isMobileMenuOpen = signal<boolean>(false);
   public isIos = signal<boolean>(false);
   public isStandalone = signal<boolean>(false);
-  public showIosInstallModal = signal<boolean>(false);
+  public showInstallModal = signal<boolean>(false);
+  public activeInstallTab = signal<'windows' | 'android' | 'ios' | 'mac'>('windows');
 
-  public canInstall = computed(() => {
-    if (this.isStandalone() || this.isAppInstalled()) return false;
-    return !!this.deferredPrompt() || this.isIos();
-  });
+  public canInstall = computed(() => !this.isStandalone());
 
   @HostListener('window:beforeinstallprompt', ['$event'])
   public onBeforeInstallPrompt(e: Event): void {
@@ -132,19 +138,53 @@ export class App {
     }
   }
 
-  public openIosInstallModal(): void {
-    this.showIosInstallModal.set(true);
-  }
+  public detectPlatform(): 'windows' | 'android' | 'ios' | 'mac' {
+    if (typeof window === 'undefined') return 'windows';
+    const ua = navigator.userAgent || '';
+    const platform = (navigator as any).userAgentData?.platform || navigator.platform || '';
 
-  public closeIosInstallModal(): void {
-    this.showIosInstallModal.set(false);
-  }
-
-  public async installPwa(): Promise<void> {
-    if (this.isIos()) {
-      this.openIosInstallModal();
-      return;
+    if (/iPad|iPhone|iPod/.test(ua) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+      return 'ios';
     }
+    if (/android/i.test(ua)) {
+      return 'android';
+    }
+    if (/Mac/i.test(platform) || /macintosh|mac os x/i.test(ua)) {
+      return 'mac';
+    }
+    if (/Win/i.test(platform) || /windows/i.test(ua)) {
+      return 'windows';
+    }
+    return 'windows';
+  }
+
+  public openInstallModal(tab?: 'windows' | 'android' | 'ios' | 'mac'): void {
+    if (tab) {
+      this.activeInstallTab.set(tab);
+    } else {
+      this.activeInstallTab.set(this.detectPlatform());
+    }
+    this.installSheetTranslateY.set(0);
+    this.showInstallModal.set(true);
+  }
+
+  public closeInstallModal(): void {
+    if (this.isInstallSheetDismissing()) return;
+    this.isInstallSheetDismissing.set(true);
+    this.installSheetTranslateY.set(680);
+    setTimeout(() => {
+      this.showInstallModal.set(false);
+      this.installSheetTranslateY.set(0);
+      this.isInstallSheetDragging.set(false);
+      this.isInstallSheetDismissing.set(false);
+    }, 220);
+  }
+
+  public setInstallTab(tab: 'windows' | 'android' | 'ios' | 'mac'): void {
+    this.activeInstallTab.set(tab);
+  }
+
+  public async triggerPwaPrompt(): Promise<void> {
     const prompt = this.deferredPrompt();
     if (!prompt) return;
     prompt.prompt();
@@ -159,6 +199,18 @@ export class App {
     this.deferredPrompt.set(null);
   }
 
+  public openIosInstallModal(): void {
+    this.openInstallModal('ios');
+  }
+
+  public closeIosInstallModal(): void {
+    this.closeInstallModal();
+  }
+
+  public async installPwa(): Promise<void> {
+    this.openInstallModal();
+  }
+
   constructor() {
     this.initTheme();
     this.detectIosAndStandalone();
@@ -167,7 +219,7 @@ export class App {
         this.showKeyModal() ||
         this.isMobileMenuOpen() ||
         this.showTourConfirmModal() ||
-        this.showIosInstallModal();
+        this.showInstallModal();
 
       if (typeof document !== 'undefined') {
         if (isAnyModalOpen) {
@@ -237,8 +289,8 @@ export class App {
   public languageOptions = [
     { value: 'en', label: 'English (Default)' },
     { value: 'it', label: 'Italian (Italiano)' },
-    { value: 'fr', label: 'French (Français)' },
-    { value: 'es', label: 'Spanish (Español)' },
+    { value: 'fr', label: 'French (FranÃ§ais)' },
+    { value: 'es', label: 'Spanish (EspaÃ±ol)' },
     { value: 'de', label: 'German (Deutsch)' },
   ];
 
@@ -342,7 +394,7 @@ export class App {
       titleHint: this.titleHint().trim() || undefined,
       brandHint: this.brandHint().trim() || undefined,
       notes: this.notes().trim() || undefined,
-      conditionHint: (this.conditionHint() as VintedCondition) || undefined,
+      conditionHint: (this.conditionHint() as ItemCondition) || undefined,
       language: this.language(),
     };
 
@@ -385,7 +437,7 @@ export class App {
   }
 
   /**
-   * Copies the master bundle for Vinted.
+   * Copies the master bundle for online marketplaces.
    */
   public copyMasterBundle(): void {
     const bundle = this.generator.formattedListing()?.fullBundleText;
@@ -454,7 +506,7 @@ export class App {
       `**Brand**: ${listing.brand} | **Size**: ${listing.size} | **Condition**: ${listing.condition}`,
       `**Suggested Price**: €${listing.price.suggested.toFixed(2)} (Min: €${listing.price.min.toFixed(2)} - Max: €${listing.price.max.toFixed(2)})`,
       '',
-      '## Vinted Description',
+      '## Description',
       '```text',
       formatted.description,
       '```',
@@ -670,6 +722,108 @@ export class App {
     window.addEventListener('mouseup', onMouseUp);
   }
 
+  public onInstallBackdropClick(event: Event): void {
+    if (event.target === event.currentTarget) {
+      this.closeInstallModal();
+    }
+  }
+
+  public onInstallBackdropTouch(event: TouchEvent): void {
+    if (event.target === event.currentTarget) {
+      event.preventDefault();
+      this.closeInstallModal();
+    }
+  }
+
+  public onInstallSheetTouchStart(event: TouchEvent): void {
+    if (event.touches.length !== 1) return;
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, input, textarea, select, a')) return;
+    this.installSheetTouchStartY = event.touches[0].clientY;
+    this.installSheetLastTouchY = this.installSheetTouchStartY;
+    this.installSheetTouchStartTime = Date.now();
+    this.isInstallSheetDragging.set(true);
+  }
+
+  public onInstallSheetTouchMove(event: TouchEvent): void {
+    if (!this.isInstallSheetDragging() || this.isInstallSheetDismissing()) return;
+    const currentY = event.touches[0].clientY;
+    const deltaY = currentY - this.installSheetTouchStartY;
+
+    const target = event.target as HTMLElement | null;
+    const isHeaderOrGrabber = !!target?.closest('.sheet-grabber-area, .modal-header, .install-tabs-nav');
+    const modalBody = (event.currentTarget as HTMLElement)?.querySelector('.install-hub-body') as HTMLElement | null;
+    const isAtTop = modalBody ? modalBody.scrollTop <= 2 : true;
+
+    if (deltaY > 0 && (isHeaderOrGrabber || isAtTop)) {
+      this.installSheetLastTouchY = currentY;
+      const dampedY = deltaY < 120 ? deltaY : 120 + (deltaY - 120) * 0.65;
+      this.installSheetTranslateY.set(dampedY);
+      if (event.cancelable && deltaY > 8) {
+        event.preventDefault();
+      }
+    } else {
+      this.installSheetTranslateY.set(0);
+    }
+  }
+
+  public onInstallSheetTouchEnd(event: TouchEvent): void {
+    if (!this.isInstallSheetDragging() || this.isInstallSheetDismissing()) return;
+    this.isInstallSheetDragging.set(false);
+    const deltaY = this.installSheetLastTouchY - this.installSheetTouchStartY;
+    const elapsed = Date.now() - this.installSheetTouchStartTime;
+    const velocity = deltaY / Math.max(1, elapsed);
+
+    if (deltaY > 70 || (deltaY > 30 && velocity > 0.35)) {
+      this.closeInstallModal();
+    } else {
+      this.installSheetTranslateY.set(0);
+    }
+  }
+
+  public onInstallHeaderMouseDown(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('button, input, select, a, textarea')) return;
+    this.onInstallGrabberMouseDown(event);
+  }
+
+  public onInstallGrabberMouseDown(event: MouseEvent): void {
+    event.preventDefault();
+    const startY = event.clientY;
+    let lastY = startY;
+    const startTime = Date.now();
+    this.isInstallSheetDragging.set(true);
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const deltaY = moveEvent.clientY - startY;
+      if (deltaY > 0) {
+        lastY = moveEvent.clientY;
+        const dampedY = deltaY < 120 ? deltaY : 120 + (deltaY - 120) * 0.65;
+        this.installSheetTranslateY.set(dampedY);
+      } else {
+        this.installSheetTranslateY.set(0);
+      }
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      this.isInstallSheetDragging.set(false);
+      const deltaY = lastY - startY;
+      const elapsed = Date.now() - startTime;
+      const velocity = deltaY / Math.max(1, elapsed);
+
+      if (deltaY > 70 || (deltaY > 30 && velocity > 0.35)) {
+        this.closeInstallModal();
+      } else {
+        this.installSheetTranslateY.set(0);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }
+
   public toggleKeyVisibility(): void {
     this.keyInputType.update((curr) => (curr === 'password' ? 'text' : 'password'));
   }
@@ -864,7 +1018,7 @@ export class App {
     {
       targetSelector: '.output-panel',
       title: '5. Pricing, Hashtags & 1-Click Copy',
-      description: 'Review suggested pricing with negotiation range, 10-15 discoverability hashtags, and 1-click copy formatted descriptions or markdown tables for Vinted, eBay, or Subito.',
+      description: 'Review suggested pricing with negotiation range, 10-15 discoverability hashtags, and 1-click copy formatted descriptions or markdown tables for eBay, Subito, or international marketplaces.',
       placement: 'left',
     },
   ];
@@ -995,8 +1149,8 @@ export class App {
 
   @HostListener('window:keydown.escape')
   public onEscapeKey(): void {
-    if (this.showIosInstallModal()) {
-      this.closeIosInstallModal();
+    if (this.showInstallModal()) {
+      this.closeInstallModal();
       return;
     }
     if (this.isMobileMenuOpen()) {
@@ -1014,3 +1168,4 @@ export class App {
     }
   }
 }
+

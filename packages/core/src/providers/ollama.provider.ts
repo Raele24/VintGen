@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Ollama Local AI Provider (Llama 3.2 Vision, LLaVA, MiniCPM-V, etc.)
  *
  * Implements the AIProvider interface for locally hosted Ollama instances
@@ -11,9 +11,9 @@ import {
   ListingResult,
   PriceRecommendation,
   ProviderConfig,
-  VintedCondition,
+  ItemCondition,
 } from '../types';
-import { VINTED_SYSTEM_INSTRUCTION } from '../prompts';
+import { MARKETPLACE_SYSTEM_INSTRUCTION } from '../prompts';
 
 export class OllamaProvider implements AIProvider {
   public readonly id = 'ollama';
@@ -23,7 +23,7 @@ export class OllamaProvider implements AIProvider {
   public static readonly DEFAULT_MODEL = 'llama3.2-vision';
 
   /**
-   * Generates a Vinted listing using a local Ollama vision model.
+   * Generates a marketplace listing using a local Ollama vision model.
    */
   public async generateListing(
     input: ListingInput,
@@ -44,7 +44,7 @@ export class OllamaProvider implements AIProvider {
 
     // Build user prompt text
     const textParts: string[] = [
-      'Analyze the provided product photograph(s) and generate a complete, high-converting Vinted listing in strict JSON format matching the schema.',
+      'Analyze the provided photograph(s) and generate a complete, accurate secondhand marketplace listing in strict JSON format matching the schema.',
     ];
 
     if (input.titleHint) {
@@ -86,7 +86,7 @@ export class OllamaProvider implements AIProvider {
       messages: [
         {
           role: 'system',
-          content: VINTED_SYSTEM_INSTRUCTION,
+          content: MARKETPLACE_SYSTEM_INSTRUCTION,
         },
         {
           role: 'user',
@@ -242,7 +242,7 @@ export class OllamaProvider implements AIProvider {
       );
     }
 
-    const validConditions: VintedCondition[] = [
+    const validConditions: ItemCondition[] = [
       'new_with_tags',
       'new_without_tags',
       'very_good',
@@ -251,8 +251,8 @@ export class OllamaProvider implements AIProvider {
     ];
 
     const rawCond = String(parsed['condition'] || 'very_good').toLowerCase();
-    const condition: VintedCondition = validConditions.includes(rawCond as VintedCondition)
-      ? (rawCond as VintedCondition)
+    const condition: ItemCondition = validConditions.includes(rawCond as ItemCondition)
+      ? (rawCond as ItemCondition)
       : 'very_good';
 
     const rawPrice = parsed['price'] || {};
@@ -291,3 +291,4 @@ export class OllamaProvider implements AIProvider {
     };
   }
 }
+

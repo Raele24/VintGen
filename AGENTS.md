@@ -10,10 +10,14 @@ These rules are mandatory and must be strictly adhered to across all tasks, modi
    - Never use Italian for source code, variable names, comments, docstrings, documentation, commit messages, GitHub release notes, or pull requests unless explicitly instructed by the user for a localized end-user feature.
    - All repository assets and communications in artifacts/docs must be 100% English.
 
-3. **MULTI-PROVIDER NEUTRALITY (NEVER GEMINI-ONLY)**:
-   - Never document or implement AI provider setup as "Google Gemini only".
-   - VintGen supports multiple providers (Google Gemini, OpenAI, Anthropic Claude, and local offline Ollama).
-   - When documenting configuration or API keys, always present provider options neutrally (e.g. `vintgen config --key <KEY> --provider <gemini|openai|claude>` or offline with Ollama without an API key). If Gemini is mentioned, cite it purely as an example alongside OpenAI, Claude, and Ollama.
+3. **COMPLETE PROVIDER & MARKETPLACE NEUTRALITY (NO GEMINI-FIRST, NO VINTED-FIRST)**:
+   - **STRICT FORBIDDEN DIRECT REFERENCES**: Never use direct or exclusive references to "Gemini" or "Vinted" in code comments, docstrings, variable names, markdown export templates (such as `## Vinted Description`), or user-facing copy.
+   - **Code & Comments Policy**: Always use neutral terms:
+     - Use "AI vision model", "vision provider", or "selected AI engine" instead of "Gemini".
+     - Use "Item Description", "Marketplace Description", "secondhand listing", or "item condition" instead of "Vinted Description" or "Vinted listing".
+   - **Multi-Provider Neutrality**: VintGen supports Google Gemini, OpenAI, Anthropic Claude, and local offline Ollama. Treat all providers with equal standing across documentation, UI selectors, and code. Technical enum values like `'gemini' | 'openai' | 'claude' | 'ollama'` are permitted only where configuring or selecting providers.
+   - **Multi-Marketplace Neutrality**: VintGen generates listings for all online secondhand marketplaces (such as eBay, Vinted, Subito, Wallapop, Depop, etc.). Generated descriptions, copy buttons, and export files must always be universal marketplace listings.
+   - **The project brand name** is "VintGen". Outside of the brand name itself, avoid vendor-specific bias.
 
 4. **NO AUTOMATIC GIT PUSH OR COMMIT**:
    - Never run `git push` or `git commit` autonomously. All git staging, committing, and pushing must be executed by the user.

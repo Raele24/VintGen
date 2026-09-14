@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+﻿import { Injectable, signal } from '@angular/core';
 
 export interface ReleaseInfo {
   tag: string;
@@ -39,7 +39,7 @@ export class UpdateService {
     try {
       this.isChecking.set(true);
       const res = await fetch(
-        'https://api.github.com/repos/Raele24/VinStack/releases/latest',
+        'https://api.github.com/repos/Raele24/VintGen/releases/latest',
         { headers: { Accept: 'application/vnd.github.v3+json' } }
       );
 

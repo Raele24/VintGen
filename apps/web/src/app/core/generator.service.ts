@@ -1,10 +1,10 @@
-import { Injectable, inject, signal } from '@angular/core';
+﻿import { Injectable, inject, signal } from '@angular/core';
 import {
   VintGenEngine,
   ListingInput,
   ListingResult,
   FormattedListing,
-  VintedPlatform,
+  MarketplacePlatform,
 } from '@vintgen/core';
 import { StorageService } from './storage.service';
 
@@ -104,7 +104,7 @@ export class GeneratorService {
           }
         } else {
           this.error.set(
-            'Temporary rate limit reached. Please wait 30–60 seconds and try again!'
+            'Temporary rate limit reached. Please wait 30-60 seconds and try again.'
           );
         }
       } else if (provider === 'ollama') {
@@ -166,7 +166,7 @@ export class GeneratorService {
    */
   public selectHistoricalListing(result: ListingResult): void {
     this.currentListing.set(result);
-    this.formattedListing.set(VintedPlatform.format(result));
+    this.formattedListing.set(MarketplacePlatform.format(result));
     this.error.set(null);
   }
 
@@ -179,3 +179,4 @@ export class GeneratorService {
     this.error.set(null);
   }
 }
+

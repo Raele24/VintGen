@@ -1,4 +1,4 @@
-/**
+﻿/**
  * VintGen Command-Line Interface (CLI)
  * 
  * Automated, scriptable secondhand fashion listing generator
@@ -57,7 +57,7 @@ interface CliArgs {
   apiKey?: string;
   model?: string;
   language?: 'it' | 'en' | 'fr' | 'es' | 'de' | 'auto';
-  format: 'text' | 'json' | 'vinted';
+  format: 'text' | 'json' | 'markdown' | 'vinted';
   output?: string;
   help: boolean;
   version: boolean;
@@ -119,7 +119,7 @@ function parseArguments(args: string[]): CliArgs {
       i++;
       if (i < args.length) {
         const val = args[i].toLowerCase();
-        if (val === 'json' || val === 'vinted' || val === 'text') {
+        if (val === 'json' || val === 'markdown' || val === 'vinted' || val === 'text') {
           result.format = val;
         }
       }
@@ -149,7 +149,7 @@ function parseArguments(args: string[]): CliArgs {
 function printHelp(): void {
   console.log(`
 vintgen v${PACKAGE_VERSION}
-Open-Source AI Listing Generator for Vinted and Secondhand Reselling
+Open-Source AI Listing Generator for Secondhand Marketplaces
 
 USAGE:
   $ vintgen                                    (auto-detects images in current directory)
@@ -173,7 +173,7 @@ OPTIONS:
   -p, --provider <name> AI provider: gemini (default), openai, claude, ollama
   -m, --model <name>    Model name (e.g. gemini-2.5-flash, gpt-4o-mini, llama3.2-vision)
   -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434)
-  -f, --format <type>   Output format: text (default), json, vinted
+  -f, --format <type>   Output format: text (default), json, markdown
   -o, --output <file>   Write output to destination file (defaults to vintgen-listing.txt)
   -v, --version         Print CLI version
   -h, --help            Print help information
@@ -373,7 +373,11 @@ async function main(): Promise<void> {
     process.exitCode = 1; return;
   }
 
-  let providerDisplay = 'Google Gemini Vision AI';
+  let providerDisplay = 'AI Vision Model';
+  if (provider === 'claude') providerDisplay = 'Anthropic Claude';
+  else if (provider === 'openai') providerDisplay = 'OpenAI';
+  else if (provider === 'ollama') providerDisplay = 'Local Ollama';
+  else if (provider === 'gemini') providerDisplay = 'Google Gemini';
   if (provider === 'claude') providerDisplay = 'Anthropic Claude 3.5 Vision';
   else if (provider === 'openai') providerDisplay = 'OpenAI GPT-4o Vision';
   else if (provider === 'ollama') providerDisplay = `Local Ollama (${model || 'llama3.2-vision'})`;
@@ -399,7 +403,7 @@ async function main(): Promise<void> {
 
     if (args.format === 'json') {
       outputContent = JSON.stringify(raw, null, 2);
-    } else if (args.format === 'vinted') {
+    } else if (args.format === 'markdown' || args.format === 'vinted') {
       outputContent = formatted.fullBundleText;
     } else {
       outputContent = [
@@ -407,7 +411,7 @@ async function main(): Promise<void> {
         `  VINTGEN LISTING: ${raw.title}`,
         '============================================================',
         `Title:       ${raw.title}`,
-        `Price:       €${raw.price.suggested.toFixed(2)} (Range: €${raw.price.min.toFixed(2)} - €${raw.price.max.toFixed(2)})`,
+        `Price:       â‚¬${raw.price.suggested.toFixed(2)} (Range: â‚¬${raw.price.min.toFixed(2)} - â‚¬${raw.price.max.toFixed(2)})`,
         `Reasoning:   ${raw.price.reasoning}`,
         `Brand:       ${raw.brand}`,
         `Size:        ${raw.size}`,
@@ -443,3 +447,4 @@ main().catch((err) => {
   console.error('Unexpected CLI error:', err);
   process.exitCode = 1; return;
 });
+

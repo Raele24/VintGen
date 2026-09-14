@@ -10,9 +10,9 @@ import {
   ListingInput,
   ListingResult,
   ProviderConfig,
-  VintedCondition,
+  ItemCondition,
 } from '../types';
-import { VINTED_SYSTEM_INSTRUCTION } from '../prompts';
+import { MARKETPLACE_SYSTEM_INSTRUCTION } from '../prompts';
 
 export class ClaudeProvider implements AIProvider {
   public readonly id = 'claude';
@@ -53,7 +53,7 @@ export class ClaudeProvider implements AIProvider {
 
     // Build text instructions
     const textParts: string[] = [
-      'Generate a comprehensive, high-converting Vinted listing based on the provided photographs and hints.',
+      'Generate a comprehensive, accurate secondhand marketplace listing based on the provided photographs and hints.',
     ];
 
     if (input.titleHint) {
@@ -127,7 +127,7 @@ export class ClaudeProvider implements AIProvider {
       const requestBody: Record<string, unknown> = {
         model,
         max_tokens: 2048,
-        system: VINTED_SYSTEM_INSTRUCTION + schemaInstruction,
+        system: MARKETPLACE_SYSTEM_INSTRUCTION + schemaInstruction,
         messages: [
           {
             role: 'user',
@@ -193,7 +193,7 @@ export class ClaudeProvider implements AIProvider {
           category: String(parsedData.category || 'Secondhand Clothing'),
           brand: String(parsedData.brand || 'Vintage'),
           size: String(parsedData.size || 'One Size'),
-          condition: (parsedData.condition as VintedCondition) || 'very_good',
+          condition: (parsedData.condition as ItemCondition) || 'very_good',
           color: String(parsedData.color || ''),
           material: String(parsedData.material || ''),
           price: {
@@ -268,3 +268,4 @@ export class ClaudeProvider implements AIProvider {
     }
   }
 }
+

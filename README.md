@@ -19,15 +19,31 @@ You can use it with Google Gemini, OpenAI, Anthropic Claude, or run it 100% offl
 
 ---
 
+## Quick Links: AI Skills & Web Prompts
+
+If you prefer using VintGen inside an AI coding assistant or web chat, copy these ready-to-use files:
+
+- **AI Agent Skill (Antigravity, Claude Code, Copilot):**  
+  [Open skills/vintgen/SKILL.md](skills/vintgen/SKILL.md)  
+  *Copy this file to `.agents/skills/vintgen/SKILL.md` or `.claude/skills/vintgen/SKILL.md`.*
+
+- **Web Chat Instructions (ChatGPT, Gemini Gems, Claude):**  
+  [Open skills/vintgen/prompts/web-instructions.md](skills/vintgen/prompts/web-instructions.md)  
+  *Copy and paste the text block into Custom GPTs, Gemini Gems, or Claude Project instructions.*
+
+---
+
 ## How to Install and Use VintGen
 
 | Platform | How to run | Download or Link | Requirements |
 | :--- | :--- | :--- | :--- |
 | Web App | In your browser (no install) | [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app) | Any web browser |
-| Android | Phone app | [GitHub Releases](https://github.com/Raele24/VintGen/releases) (`VintGen-v1.0.0.apk`) | Android 8.0 or newer |
-| Windows (Installer) | Setup file with shortcut | [GitHub Releases](https://github.com/Raele24/VintGen/releases) (`VintGen-Windows-Installer.exe`) | Windows 10 or 11 |
-| Windows (Portable) | Single file, no install | [GitHub Releases](https://github.com/Raele24/VintGen/releases) (`VintGen-Windows-Portable.exe`) | Windows 10 or 11 |
+| Android | Phone app | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-v1.0.0.apk`) | Android 8.0 or newer |
+| Windows (Installer) | Setup file with shortcut | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-Windows-Installer.exe`) | Windows 10 or 11 |
+| Windows (Portable) | Single file, no install | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-Windows-Portable.exe`) | Windows 10 or 11 |
 | Command Line (CLI) | Run with npx or npm | `npx vintgen` / `npm i -g vintgen` | Node.js 18+ |
+| AI Agent Skill | Use with coding assistants | [skills/vintgen/SKILL.md](skills/vintgen/SKILL.md) | Antigravity, Claude Code, Copilot |
+| Web Chat Prompt | Use with web AI chats | [skills/vintgen/prompts/web-instructions.md](skills/vintgen/prompts/web-instructions.md) | ChatGPT, Gemini, Claude |
 | Source Code | Clone and run locally | `git clone` from GitHub | Node.js 18+, npm |
 
 ---
@@ -40,11 +56,11 @@ You can use it with Google Gemini, OpenAI, Anthropic Claude, or run it 100% offl
 - You can also add it to your phone home screen as an app.
 
 ### 2. Android App
-- Download `VintGen-v1.0.0.apk` from [GitHub Releases](https://github.com/Raele24/VintGen/releases).
+- Download `VintGen-v1.0.0.apk` from [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest).
 - Take photos with your phone camera directly inside the app.
 
 ### 3. Windows App
-Download from [GitHub Releases](https://github.com/Raele24/VintGen/releases):
+Download from [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest):
 - **Installer (`VintGen-Windows-Installer.exe`):** sets up the program and creates a desktop shortcut.
 - **Portable (`VintGen-Windows-Portable.exe`):** single file. Double-click to run without installing anything.
 
@@ -70,7 +86,11 @@ With seller notes and language:
 vintgen -n "Wool sweater, size L, good condition" -l en
 ```
 
-### 5. Run from Source Code
+### 5. AI Agent Skill & Prompts
+- **Google Antigravity / Claude Code / Copilot:** Place [skills/vintgen/SKILL.md](skills/vintgen/SKILL.md) into your agent skills directory.
+- **ChatGPT / Gemini Gems / Claude:** Copy the system prompt from [skills/vintgen/prompts/web-instructions.md](skills/vintgen/prompts/web-instructions.md) into your custom instructions.
+
+### 6. Run from Source Code
 ```bash
 git clone https://github.com/Raele24/VintGen.git
 cd VintGen
@@ -150,5 +170,3 @@ You can also set environment variables:
 ## License
 
 MIT License. See [LICENSE](LICENSE) for details.
-
-

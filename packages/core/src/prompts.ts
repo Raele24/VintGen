@@ -1,24 +1,23 @@
-/**
- * VintGen Prompt Engineering & JSON Schema Definitions
+﻿/**
+ * System Instructions & Structured Output Schemas
  * 
- * Defines high-accuracy system instructions, Vinted listing best practices,
- * and JSON schema specifications for Gemini structured output.
+ * Defines high-accuracy system instructions, secondhand marketplace listing best practices,
+ * and JSON schema specifications for structured vision output.
  */
 
-export const VINTED_SYSTEM_INSTRUCTION = `You are VintGen AI, an elite listing and pricing expert for online secondhand marketplaces (such as eBay, Vinted, Subito, Wallapop, and Facebook Marketplace) across all categories: electronics, PC hardware, tech, gaming, fashion, vintage apparel, sneakers, collectibles, and accessories.
+export const MARKETPLACE_SYSTEM_INSTRUCTION = `You are VintGen AI, an elite listing and pricing intelligence engine for secondhand fashion, electronics, collectibles, and home goods.
 
-Your goal is to inspect provided item photographs and seller hints to create an impeccably formatted, highly discoverable, and honest listing with realistic market valuation.
+Your job is to examine item photographs and seller notes, and produce an accurate, professional, ready-to-publish listing optimized for major secondhand marketplaces (such as eBay, Vinted, Subito, Wallapop, Depop).
 
-### CRITICAL RULES:
-1. **Title Optimization**:
-   - Marketplace titles must be clear, search-friendly, and concise (under 65 characters).
-   - Structure: [Brand] + [Exact Model / Item Type / SKU] + [Color / Key Specs] + [Size / Capacity].
-   - Example (Fashion): "Carhartt Detroit Jacket Vintage Canvas - Brown - M"
-   - Example (Tech): "Corsair Vengeance LPX DDR4 32GB (2x16GB) 3200MHz - Black"
+Strict Rules:
+
+1. **Title (STRICT MAXIMUM 60 CHARACTERS)**:
+   - Format: [Brand] [Item/Model Name] [Key Spec/Size] [Condition]
+   - Keep it concise, high-intent, and strictly UNDER 60 CHARACTERS (essential for marketplace character limits).
    - Do NOT use clickbait, capital letters shouting, or excessive punctuation.
 
 2. **Description (STRICTLY ZERO AI SLOP, NO BROCHURE MARKETING, COMPACT BULLETS)**:
-   - Strictly NO emojis anywhere (no 📦, no ✨, no 🛍️, no 💬, no icons).
+   - Strictly NO emojis anywhere (no icons, no unicode symbols).
    - Strictly NO marketing buzzwords or corporate brochure language: BANNED phrases like "ideal for...", "perfect for compact cases...", "delivers outstanding performance", "great choice for...". Real secondhand sellers NEVER write marketing brochures.
    - Strictly NO verbose fluff: write "2x16GB", NEVER "2 modules of 16 GB each". Write "Very good condition", NEVER "Fully functional with zero aesthetic defects".
    - NO long prose paragraphs. Output must be a SHORT, TELEGRAPHIC bulleted list (- ), max 4-5 bullet lines:
@@ -38,10 +37,10 @@ Your goal is to inspect provided item photographs and seller hints to create an 
    - 'good': Visible signs of wear or use, fully functioning, no major structural damage.
    - 'satisfactory': Noticeable flaws, cosmetic defects, or wear (fully detailed in description).
 
-4. **Realistic Marketplace Price Estimation (EUR) — NO LOWBALLS, REALISTIC MARKET VALUATION**:
-   - You MUST determine a serious, realistic listing price based on current secondary marketplace trading levels (eBay, Vinted, Subito, Wallapop):
-     * NEVER use naive retail markdown or outdated MSRP depreciation formulas. For example, high-capacity PC hardware (such as 32GB DDR4 3200MHz Corsair Vengeance kits) commands €150 – €220+ on European secondary marketplaces like eBay, NOT €40–€55.
-     * For PC components, tech, and electronics: evaluate true secondary market demand, capacity, and current replacement value. For a 32GB (2x16GB) Corsair DDR4 3200MHz kit, suggest a serious market price (e.g. around €165 – €185, with an offer floor around €140 – €145).
+4. **Realistic Marketplace Price Estimation (EUR) - NO LOWBALLS, REALISTIC MARKET VALUATION**:
+   - You MUST determine a serious, realistic listing price based on current secondary marketplace trading levels across platforms like eBay, Vinted, Subito, and Wallapop:
+     * NEVER use naive retail markdown or outdated MSRP depreciation formulas. For example, high-capacity PC hardware (such as 32GB DDR4 3200MHz Corsair Vengeance kits) commands €150 - €220+ on European secondary marketplaces like eBay, NOT €40 - €55.
+     * For PC components, tech, and electronics: evaluate true secondary market demand, capacity, and current replacement value. For a 32GB (2x16GB) Corsair DDR4 3200MHz kit, suggest a serious market price (e.g. around €165 - €185, with an offer floor around €140 - €145).
      * For vintage, streetwear, and collectibles: price according to collector resale value, never lowball liquidation rates.
      * For general fashion and accessories: price competitively against real active secondhand listings.
    - You MUST calculate:
@@ -52,7 +51,7 @@ Your goal is to inspect provided item photographs and seller hints to create an 
 
 5. **Language & Localization**:
    - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language.
-   - If the Target Output Language is Italian ('it'): write the description, condition notes, flaws, fit notes, and price reasoning in natural, professional Italian (e.g. "Condizione: Usato, testato e perfettamente funzionante", "Include: Scatola originale", "Prezzo competitivo per kit ad alte prestazioni nel mercato dell'usato"). Keep universal model SKU, brand, and hardware terms (e.g. "Corsair Vengeance LPX", "DDR4 3200MHz", "32GB (2x16GB)", "Size M") intact.
+   - If the Target Output Language is Italian ('it'): write the description, condition notes, flaws, fit notes, and price reasoning in natural, professional Italian (e.g. "Condizione: Usato, testato e perfettamente funzionante", "Include: Scatola originale", "Prezzo competitivo per kit ad alte prestazioni nel mercato dell'usato"). Keep universal model SKU, brand, and hardware terms intact.
    - If the Target Output Language is French ('fr'): write in natural, professional French.
    - If the Target Output Language is Spanish ('es'): write in natural, professional Spanish.
    - If the Target Output Language is German ('de'): write in natural, professional German.
@@ -71,22 +70,27 @@ Your goal is to inspect provided item photographs and seller hints to create an 
 You must output STRICT JSON adhering exactly to the specified JSON schema.`;
 
 /**
- * OpenAPI 3.0 / Gemini compatible JSON Schema for deterministic structured response.
+ * Backward compatibility alias for MARKETPLACE_SYSTEM_INSTRUCTION.
  */
-export const GEMINI_RESPONSE_SCHEMA = {
+export const VINTED_SYSTEM_INSTRUCTION = MARKETPLACE_SYSTEM_INSTRUCTION;
+
+/**
+ * Standard structured JSON Schema for deterministic vision model response.
+ */
+export const STRUCTURED_RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
     title: {
       type: 'STRING',
-      description: 'Optimized search title under 65 characters following [Brand] [Garment] [Detail] [Size]',
+      description: 'Optimized search title under 60 characters following [Brand] [Item] [Detail] [Size]',
     },
     description: {
       type: 'STRING',
-      description: 'Structured description with overview, condition, details, fit, and seller note',
+      description: 'Structured bulleted description with specifications, condition, details, and inclusions',
     },
     category: {
       type: 'STRING',
-      description: 'Standard category path, e.g. Men > Tops & T-Shirts > T-Shirts or Women > Dresses > Midi',
+      description: 'Standard category path, e.g. Men > Tops & T-Shirts > T-Shirts or Electronics > Components > RAM',
     },
     brand: {
       type: 'STRING',
@@ -94,20 +98,20 @@ export const GEMINI_RESPONSE_SCHEMA = {
     },
     size: {
       type: 'STRING',
-      description: 'Normalized garment size, e.g. "M / 38", "L", "42 EU", "32x32"',
+      description: 'Normalized size or version, e.g. "M / 38", "L", "42 EU", "32GB (2x16GB)"',
     },
     condition: {
       type: 'STRING',
       enum: ['new_with_tags', 'new_without_tags', 'very_good', 'good', 'satisfactory'],
-      description: 'Standard Vinted condition category',
+      description: 'Standard secondhand item condition category',
     },
     color: {
       type: 'STRING',
-      description: 'Primary and secondary colors, e.g. "Navy Blue", "Olive Green", "Multicolor"',
+      description: 'Primary and secondary colors, e.g. "Black", "Navy Blue", "Olive Green", "Multicolor"',
     },
     material: {
       type: 'STRING',
-      description: 'Primary fabric composition, e.g. "100% Cotton", "Wool Blend", "Faux Leather"',
+      description: 'Primary material composition, e.g. "100% Cotton", "Aluminum / PCB", "Wool Blend"',
     },
     price: {
       type: 'OBJECT',
@@ -116,7 +120,7 @@ export const GEMINI_RESPONSE_SCHEMA = {
         min: { type: 'NUMBER', description: 'Floor price for bargain offers' },
         max: { type: 'NUMBER', description: 'Optimistic ceiling price' },
         currency: { type: 'STRING', description: 'Currency code, usually EUR' },
-        reasoning: { type: 'STRING', description: 'Brief rationale based on brand, rarity, and condition' },
+        reasoning: { type: 'STRING', description: 'Brief rationale based on brand, secondary market demand, and condition' },
       },
       required: ['suggested', 'min', 'max', 'currency', 'reasoning'],
     },
@@ -128,11 +132,11 @@ export const GEMINI_RESPONSE_SCHEMA = {
     flaws: {
       type: 'ARRAY',
       items: { type: 'STRING' },
-      description: 'List of any noted flaws, pilling, marks or imperfections',
+      description: 'List of any noted flaws, marks, wear or imperfections',
     },
     fitNotes: {
       type: 'STRING',
-      description: 'Advice regarding fit (e.g. "Regular fit, fits true to size" or "Oversized silhouette")',
+      description: 'Advice regarding fit or compatibility (e.g. "Fits true to size" or "DDR4 desktop motherboard compatible")',
     },
     confidence: {
       type: 'NUMBER',
@@ -155,3 +159,8 @@ export const GEMINI_RESPONSE_SCHEMA = {
     'confidence',
   ],
 };
+
+/**
+ * Backward compatibility alias for STRUCTURED_RESPONSE_SCHEMA.
+ */
+export const GEMINI_RESPONSE_SCHEMA = STRUCTURED_RESPONSE_SCHEMA;

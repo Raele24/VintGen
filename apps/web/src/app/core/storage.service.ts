@@ -9,13 +9,10 @@ export interface SavedListingItem {
 }
 
 const STORAGE_KEY_API_KEY = 'vintgen_gemini_api_key';
-const STORAGE_KEY_MODEL = 'vintgen_gemini_model';
 const STORAGE_KEY_HISTORY = 'vintgen_saved_listings';
 const STORAGE_KEY_PROVIDER = 'vintgen_provider';
 const STORAGE_KEY_OPENAI_KEY = 'vintgen_openai_api_key';
-const STORAGE_KEY_OPENAI_MODEL = 'vintgen_openai_model';
 const STORAGE_KEY_CLAUDE_KEY = 'vintgen_claude_api_key';
-const STORAGE_KEY_CLAUDE_MODEL = 'vintgen_claude_model';
 const STORAGE_KEY_OLLAMA_ENDPOINT = 'vintgen_ollama_endpoint';
 const STORAGE_KEY_OLLAMA_MODEL = 'vintgen_ollama_model';
 const STORAGE_KEY_OLLAMA_KEY = 'vintgen_ollama_api_key';
@@ -24,11 +21,8 @@ const STORAGE_KEY_OLLAMA_KEY = 'vintgen_ollama_api_key';
   providedIn: 'root',
 })
 export class StorageService {
-  /** Reactive signal holding the currently stored Gemini API key */
+  /** Primary provider API key */
   public apiKey = signal<string>(this.loadApiKey());
-
-  /** Reactive signal holding the preferred model */
-  public selectedModel = signal<string>(this.loadModel());
 
   /** Selected AI provider */
   public selectedProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama'>(this.loadProvider());
@@ -36,7 +30,7 @@ export class StorageService {
   /** Ollama local endpoint URL */
   public ollamaEndpoint = signal<string>(this.loadOllamaEndpoint());
 
-  /** Ollama vision model */
+  /** Ollama vision model name */
   public ollamaModel = signal<string>(this.loadOllamaModel());
 
   /** Ollama optional API key/auth token */
@@ -45,23 +39,16 @@ export class StorageService {
   /** Claude API key */
   public claudeApiKey = signal<string>(this.loadClaudeKey());
 
-  /** Claude selected model */
-  public claudeModel = signal<string>(this.loadClaudeModel());
-
-  /** OpenAI API key (separate from Gemini) */
+  /** OpenAI API key */
   public openaiApiKey = signal<string>(this.loadOpenAIKey());
 
-  /** OpenAI selected model */
-  public openaiModel = signal<string>(this.loadOpenAIModel());
-
-  /** Reactive signal holding recent listing history */
+  /** Recent listing history */
   public history = signal<SavedListingItem[]>(this.loadHistory());
 
-  /** Computed boolean indicating whether an API key is configured */
   /** Whether the currently active provider has an API key configured */
   public hasApiKey = computed(() => {
     if (this.selectedProvider() === 'ollama') {
-      return true; // Local Ollama does not require an API key by default
+      return true;
     }
     if (this.selectedProvider() === 'claude') {
       return this.claudeApiKey().trim().length > 0;
@@ -72,7 +59,7 @@ export class StorageService {
     return this.apiKey().trim().length > 0;
   });
 
-  /** Returns the active API key for the selected provider */
+  /** Active API key for the selected provider */
   public activeApiKey = computed(() => {
     if (this.selectedProvider() === 'ollama') {
       return this.ollamaApiKey();
@@ -86,22 +73,16 @@ export class StorageService {
     return this.apiKey();
   });
 
-  /** Returns the active model for the selected provider */
+  /** Active model for the selected provider (configured for Ollama, defaults handled by provider) */
   public activeModel = computed(() => {
     if (this.selectedProvider() === 'ollama') {
       return this.ollamaModel();
     }
-    if (this.selectedProvider() === 'claude') {
-      return this.claudeModel();
-    }
-    if (this.selectedProvider() === 'openai') {
-      return this.openaiModel();
-    }
-    return this.selectedModel();
+    return undefined;
   });
 
   /**
-   * Sets and persists the Gemini API key in local storage.
+   * Sets and persists the primary provider API key in local storage.
    */
   public setApiKey(key: string): void {
     const cleanKey = key.trim();
@@ -122,18 +103,6 @@ export class StorageService {
    */
   public clearApiKey(): void {
     this.setApiKey('');
-  }
-
-  /**
-   * Sets and persists the selected model.
-   */
-  public setModel(model: string): void {
-    this.selectedModel.set(model);
-    try {
-      localStorage.setItem(STORAGE_KEY_MODEL, model);
-    } catch (e) {
-      console.warn('localStorage is unavailable', e);
-    }
   }
 
   /**
@@ -166,18 +135,6 @@ export class StorageService {
   }
 
   /**
-   * Sets and persists the OpenAI model.
-   */
-  public setOpenAIModel(model: string): void {
-    this.openaiModel.set(model);
-    try {
-      localStorage.setItem(STORAGE_KEY_OPENAI_MODEL, model);
-    } catch (e) {
-      console.warn('localStorage is unavailable', e);
-    }
-  }
-
-  /**
    * Clears the OpenAI API key.
    */
   public clearOpenAIKey(): void {
@@ -196,18 +153,6 @@ export class StorageService {
       } else {
         localStorage.removeItem(STORAGE_KEY_CLAUDE_KEY);
       }
-    } catch (e) {
-      console.warn('localStorage is unavailable', e);
-    }
-  }
-
-  /**
-   * Sets and persists the Claude model.
-   */
-  public setClaudeModel(model: string): void {
-    this.claudeModel.set(model);
-    try {
-      localStorage.setItem(STORAGE_KEY_CLAUDE_MODEL, model);
     } catch (e) {
       console.warn('localStorage is unavailable', e);
     }
@@ -270,8 +215,6 @@ export class StorageService {
     this.setOllamaKey('');
   }
 
-
-
   /**
    * Saves a generated listing to local history.
    */
@@ -315,18 +258,6 @@ export class StorageService {
       return localStorage.getItem(STORAGE_KEY_API_KEY) || '';
     } catch {
       return '';
-    }
-  }
-
-  private loadModel(): string {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_MODEL);
-      if (stored && stored !== 'gemini-2.5-flash') {
-        return stored;
-      }
-      return 'gemini-3.6-flash';
-    } catch {
-      return 'gemini-3.6-flash';
     }
   }
 
@@ -374,27 +305,11 @@ export class StorageService {
     }
   }
 
-  private loadClaudeModel(): string {
-    try {
-      return localStorage.getItem(STORAGE_KEY_CLAUDE_MODEL) || 'claude-3-5-haiku-20241022';
-    } catch {
-      return 'claude-3-5-haiku-20241022';
-    }
-  }
-
   private loadOpenAIKey(): string {
     try {
       return localStorage.getItem(STORAGE_KEY_OPENAI_KEY) || '';
     } catch {
       return '';
-    }
-  }
-
-  private loadOpenAIModel(): string {
-    try {
-      return localStorage.getItem(STORAGE_KEY_OPENAI_MODEL) || 'gpt-4o-mini';
-    } catch {
-      return 'gpt-4o-mini';
     }
   }
 

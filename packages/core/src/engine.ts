@@ -1,4 +1,4 @@
-/**
+﻿/**
  * VintGen Main Engine
  * 
  * Orchestrates multi-modal AI generation and platform adaptation.
@@ -11,14 +11,14 @@ import {
   ProviderConfig,
 } from './types';
 import { ProviderRegistry } from './providers/registry';
-import { VintedPlatform } from './platforms/vinted.platform';
+import { MarketplacePlatform } from './platforms/marketplace.platform';
 
 export class VintGenEngine {
   private registry = ProviderRegistry.getInstance();
 
   /**
    * Generates a structured listing using the selected AI provider.
-   * Defaults to Gemini if no providerId is provided in config.
+   * Resolves provider from config (defaults to 'gemini' if none configured).
    */
   public async generate(
     input: ListingInput,
@@ -28,7 +28,7 @@ export class VintGenEngine {
     const provider = this.registry.get(providerId);
 
     const rawResult = await provider.generateListing(input, config);
-    const formatted = VintedPlatform.format(rawResult);
+    const formatted = MarketplacePlatform.format(rawResult);
 
     return {
       raw: rawResult,

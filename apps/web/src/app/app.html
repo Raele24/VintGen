@@ -1,4 +1,4 @@
-<!-- VintGen Application Shell -->
+﻿<!-- VintGen Application Shell -->
 <div class="app-layout">
   <!-- Navigation Bar -->
   <header class="navbar" role="banner">
@@ -52,7 +52,7 @@
 
         <!-- 2. PWA Install Action Pill (Desktop Only) -->
         @if (canInstall()) {
-        <button type="button" id="btn-install-pwa" class="btn-install-pwa nav-desktop-only" (click)="installPwa()"
+        <button type="button" id="btn-install-pwa" class="btn-install-pwa nav-desktop-only" (click)="openInstallModal()"
           title="Install VintGen App" aria-label="Install VintGen App">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round" stroke-linejoin="round">
@@ -231,7 +231,7 @@
           }
 
           @if (canInstall()) {
-          <button type="button" class="drawer-action-btn action-install" (click)="installPwa(); closeMobileMenu()">
+          <button type="button" class="drawer-action-btn action-install" (click)="openInstallModal(); closeMobileMenu()">
             <div class="drawer-btn-icon">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -762,7 +762,7 @@
           <!-- Generated Listing Display Deck -->
           @if (!generator.isGenerating() && generator.currentListing(); as listing) {
           <div class="listing-deck">
-            <!-- Vinted Table Card -->
+            <!-- Marketplace Table Card -->
             <div class="vinted-table-card">
               <div class="table-card-header">
                 <div class="table-header-title">
@@ -797,16 +797,13 @@
                     <div class="search-links-group">
                       <a [href]="getEbaySearchUrl(listing)" target="_blank" rel="noopener noreferrer"
                         class="link-chip chip-highlight" title="Inspect live listings on eBay">
-                        eBay Live ↗
-                      </a>
+                        eBay Live</a>
                       <a [href]="getVintedSearchUrl(listing)" target="_blank" rel="noopener noreferrer"
                         class="link-chip" title="Inspect live listings on Vinted">
-                        Vinted Live ↗
-                      </a>
+                        Vinted Live</a>
                       <a [href]="getSubitoSearchUrl(listing)" target="_blank" rel="noopener noreferrer"
                         class="link-chip" title="Inspect live listings on Subito">
-                        Subito Live ↗
-                      </a>
+                        Subito Live</a>
                     </div>
                   </div>
                   <div class="row-action"></div>
@@ -962,7 +959,7 @@
           [title]="selectedHistoryId() === item.id ? 'Click to deselect and close preview' : 'Click to preview'">
           <div class="history-card-top">
             <span class="badge-mono">{{ item.result.brand }}</span>
-            <span class="history-price">�{{ item.result.price.suggested.toFixed(2) }}</span>
+            <span class="history-price">ï¿½{{ item.result.price.suggested.toFixed(2) }}</span>
           </div>
           <div class="history-card-title">{{ item.result.title }}</div>
           @if (selectedHistoryId() === item.id) {
@@ -1591,7 +1588,7 @@
         </button>
         }
         <button type="button" class="btn-tour-primary" (click)="nextTourStep()">
-          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour ✓' : 'Next →' }}
+          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour âœ“' : 'Next â†’' }}
         </button>
       </div>
     </div>
@@ -1599,22 +1596,40 @@
 </div>
 }
 
-<!-- iOS PWA Installation Guide Modal -->
-@if (showIosInstallModal()) {
-  <div class="modal-backdrop" (click)="closeIosInstallModal()" role="dialog" aria-modal="true" aria-labelledby="ios-install-title">
-    <div class="modal-card ios-install-modal-card" (click)="$event.stopPropagation()">
-      <div class="modal-header">
+<!-- Smart Multi-Platform Installation Hub Modal (Apple Sheet PC & Mobile) -->
+@if (showInstallModal()) {
+  <div class="modal-backdrop"
+       (click)="onInstallBackdropClick($event)"
+       (touchend)="onInstallBackdropTouch($event)"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="install-modal-title">
+    <div class="modal-card modal-apple-sheet install-hub-modal-card"
+         [style.transform]="installSheetTranslateY() > 0 ? 'translateY(' + installSheetTranslateY() + 'px)' : null"
+         [style.transition]="isInstallSheetDragging() ? 'none' : 'transform 0.28s cubic-bezier(0.32, 0.72, 0, 1)'"
+         (click)="$event.stopPropagation()"
+         (touchstart)="onInstallSheetTouchStart($event)"
+         (touchmove)="onInstallSheetTouchMove($event)"
+         (touchend)="onInstallSheetTouchEnd($event)">
+      <!-- Apple Sheet Grabber Pill Handle -->
+      <div class="sheet-grabber-area" (mousedown)="onInstallGrabberMouseDown($event)">
+        <div class="sheet-grabber-pill"></div>
+      </div>
+
+      <div class="modal-header" (mousedown)="onInstallHeaderMouseDown($event)">
         <div class="modal-header-content">
-          <div class="ios-install-badge">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.01-2.85-.92.04-2.04.62-2.7 1.39-.58.67-1.09 1.74-1.04 2.78 1.03.08 2.1-.57 2.73-1.32z"/>
+          <div class="install-platform-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            <span>iPhone / iPad Installation</span>
+            <span>Get VintGen</span>
           </div>
-          <h3 id="ios-install-title" class="modal-title">Install VintGen on iOS</h3>
-          <span class="modal-subtitle">Add to your Home Screen for full-screen standalone use</span>
+          <h3 id="install-modal-title" class="modal-title">Install VintGen</h3>
+          <span class="modal-subtitle">Choose your platform or run directly in your browser</span>
         </div>
-        <button type="button" class="modal-close-btn" (click)="closeIosInstallModal()" aria-label="Close dialog">
+        <button type="button" class="modal-close-btn" (click)="closeInstallModal()" aria-label="Close dialog">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -1622,49 +1637,298 @@
         </button>
       </div>
 
-      <div class="modal-body ios-instructions-body">
-        <div class="ios-step-card">
-          <div class="ios-step-num">1</div>
-          <div class="ios-step-text">
-            <span class="ios-step-heading">Tap the Share Button</span>
-            <p class="ios-step-detail">In Safari's bottom toolbar, tap the <strong>Share</strong> button.</p>
-            <div class="ios-step-icon-row">
-              <div class="ios-icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-                  <polyline points="16 6 12 2 8 6"></polyline>
-                  <line x1="12" y1="2" x2="12" y2="15"></line>
-                </svg>
-              </div>
-              <span class="ios-icon-label">Share button (bottom of Safari)</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="ios-step-card">
-          <div class="ios-step-num">2</div>
-          <div class="ios-step-text">
-            <span class="ios-step-heading">Select "Add to Home Screen"</span>
-            <p class="ios-step-detail">Scroll down the menu sheet and tap <strong>Add to Home Screen</strong>.</p>
-            <div class="ios-step-icon-row">
-              <div class="ios-icon-box">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="12" y1="8" x2="12" y2="16"></line>
-                  <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-              </div>
-              <span class="ios-icon-label">"Add to Home Screen" option</span>
-            </div>
-          </div>
-        </div>
+      <!-- Platform Navigation Tabs -->
+      <div class="install-tabs-nav" role="tablist">
+        <button type="button" class="install-tab-btn" [class.active]="activeInstallTab() === 'windows'" (click)="setInstallTab('windows')" role="tab" [attr.aria-selected]="activeInstallTab() === 'windows'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+          </svg>
+          <span>Windows</span>
+        </button>
+        <button type="button" class="install-tab-btn" [class.active]="activeInstallTab() === 'android'" (click)="setInstallTab('android')" role="tab" [attr.aria-selected]="activeInstallTab() === 'android'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4483.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.4111 13.8533 8.081 12 8.081c-1.8534 0-3.5902.3301-5.1368.8687L4.8409 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3433-4.1021-2.689-7.5743-6.1185-9.4396"/>
+          </svg>
+          <span>Android</span>
+        </button>
+        <button type="button" class="install-tab-btn" [class.active]="activeInstallTab() === 'ios'" (click)="setInstallTab('ios')" role="tab" [attr.aria-selected]="activeInstallTab() === 'ios'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.01-2.85-.92.04-2.04.62-2.7 1.39-.58.67-1.09 1.74-1.04 2.78 1.03.08 2.1-.57 2.73-1.32z"/>
+          </svg>
+          <span>iPhone</span>
+        </button>
+        <button type="button" class="install-tab-btn" [class.active]="activeInstallTab() === 'mac'" (click)="setInstallTab('mac')" role="tab" [attr.aria-selected]="activeInstallTab() === 'mac'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="2" y1="20" x2="22" y2="20"></line>
+          </svg>
+          <span>Mac</span>
+        </button>
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn-primary-action w-full" (click)="closeIosInstallModal()">
-          Got it!
+      <!-- Tab Content Area -->
+      <div class="modal-body install-hub-body">
+
+        <!-- 1. WINDOWS TAB -->
+        @if (activeInstallTab() === 'windows') {
+          <div class="install-panel">
+            <div class="install-choice-card primary-choice">
+              <div class="install-choice-info">
+                <span class="choice-tag">Recommended for Windows</span>
+                <h4 class="choice-title">Windows Installer (.exe)</h4>
+                <p class="choice-desc">Desktop app with start menu, desktop shortcuts, and fast performance.</p>
+              </div>
+              <a href="https://github.com/Raele24/VintGen/releases/latest/download/VintGen-Windows-Installer.exe" target="_blank" rel="noopener noreferrer" class="btn-primary-action install-action-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download Installer (.exe)</span>
+              </a>
+            </div>
+
+            <div class="install-choice-card">
+              <div class="install-choice-info">
+                <h4 class="choice-title">Windows Portable (.exe)</h4>
+                <p class="choice-desc">Single file executable. Double-click to run without installing anything.</p>
+              </div>
+              <a href="https://github.com/Raele24/VintGen/releases/latest/download/VintGen-Windows-Portable.exe" target="_blank" rel="noopener noreferrer" class="btn-secondary-action install-action-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download Portable (.exe)</span>
+              </a>
+            </div>
+
+            <div class="install-choice-card">
+              <div class="install-choice-info">
+                <h4 class="choice-title">Web App (PWA)</h4>
+                <p class="choice-desc">Install directly from Chrome or Edge into your system.</p>
+              </div>
+              @if (deferredPrompt()) {
+                <button type="button" class="btn-secondary-action install-action-btn" (click)="triggerPwaPrompt()">
+                  <span>Install in Browser</span>
+                </button>
+              } @else {
+                <span class="choice-hint-badge">Click the install icon in your address bar</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- 2. ANDROID TAB -->
+        @if (activeInstallTab() === 'android') {
+          <div class="install-panel">
+            <div class="install-choice-card primary-choice">
+              <div class="install-choice-info">
+                <span class="choice-tag">Native Android App</span>
+                <h4 class="choice-title">Android Package (.apk)</h4>
+                <p class="choice-desc">Native Android app with in-app camera capture and live updates.</p>
+              </div>
+              <a href="https://github.com/Raele24/VintGen/releases/latest/download/VintGen-latest.apk" target="_blank" rel="noopener noreferrer" class="btn-primary-action install-action-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>Download Android APK</span>
+              </a>
+            </div>
+
+            <div class="install-choice-card">
+              <div class="install-choice-info">
+                <h4 class="choice-title">Web App (PWA)</h4>
+                <p class="choice-desc">Add VintGen directly to your home screen from your browser.</p>
+              </div>
+              @if (deferredPrompt()) {
+                <button type="button" class="btn-secondary-action install-action-btn" (click)="triggerPwaPrompt()">
+                  <span>Add to Home Screen</span>
+                </button>
+              } @else {
+                <span class="choice-hint-badge">Browser menu (three dots) -> Add to Home screen</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- 3. IPHONE / IPAD (iOS) TAB -->
+        @if (activeInstallTab() === 'ios') {
+          <div class="install-panel">
+            <div class="ios-step-card">
+              <div class="ios-step-num">1</div>
+              <div class="ios-step-text">
+                <span class="ios-step-heading">Tap the Share Button</span>
+                <p class="ios-step-detail">In Safari's bottom toolbar, tap the <strong>Share</strong> button.</p>
+                <div class="ios-step-icon-row">
+                  <div class="ios-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                      <polyline points="16 6 12 2 8 6"></polyline>
+                      <line x1="12" y1="2" x2="12" y2="15"></line>
+                    </svg>
+                  </div>
+                  <span class="ios-icon-label">Share button (bottom of Safari)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ios-step-card">
+              <div class="ios-step-num">2</div>
+              <div class="ios-step-text">
+                <span class="ios-step-heading">Select "Add to Home Screen"</span>
+                <p class="ios-step-detail">Scroll down the menu sheet and tap <strong>Add to Home Screen</strong>.</p>
+                <div class="ios-step-icon-row">
+                  <div class="ios-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="12" y1="8" x2="12" y2="16"></line>
+                      <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                  </div>
+                  <span class="ios-icon-label">"Add to Home Screen" option</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- 4. MAC (macOS) TAB -->
+        @if (activeInstallTab() === 'mac') {
+          <div class="install-panel">
+            <div class="ios-step-card">
+              <div class="ios-step-num">1</div>
+              <div class="ios-step-text">
+                <span class="ios-step-heading">Safari: Add to Dock</span>
+                <p class="ios-step-detail">In Safari (macOS Sonoma or newer), click <strong>File</strong> in the top menu bar, then choose <strong>Add to Dock</strong>.</p>
+                <span class="choice-hint-badge">Launches in its own clean window directly from your Dock</span>
+              </div>
+            </div>
+
+            <div class="ios-step-card">
+              <div class="ios-step-num">2</div>
+              <div class="ios-step-text">
+                <span class="ios-step-heading">Chrome, Brave or Edge: Install App</span>
+                <p class="ios-step-detail">Click the <strong>Install</strong> icon in the address bar (or click <strong>Menu</strong> -> <strong>Save and Share</strong> -> <strong>Install VintGen</strong>).</p>
+                <span class="choice-hint-badge">Runs as an independent desktop app from Applications</span>
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+
+      <div class="modal-footer install-hub-footer">
+        <a href="https://github.com/Raele24/VintGen/releases" target="_blank" rel="noopener noreferrer" class="install-footer-link">
+          <span>All releases on GitHub</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+        <button type="button" class="btn-primary-action" (click)="closeInstallModal()">
+          Close
         </button>
       </div>
     </div>
   </div>
-  }
+}
+
+@if (showTourConfirmModal()) {
+<div class="modal-backdrop modal-backdrop-center" (click)="cancelTourConfirm()" role="dialog" aria-modal="true" aria-labelledby="tour-confirm-title">
+  <div class="modal-card tour-confirm-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="tour-confirm-header-left">
+        <div class="tour-confirm-icon-pill">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </div>
+        <h3 id="tour-confirm-title" class="modal-title">Start guided tour?</h3>
+      </div>
+      <button type="button" class="modal-close-btn" (click)="cancelTourConfirm()" aria-label="Close dialog">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-footer">
+      <div class="modal-footer-left"></div>
+      <div class="modal-footer-right">
+        <button type="button" id="btn-tour-cancel" class="btn-ghost" (click)="cancelTourConfirm()">
+          Cancel
+        </button>
+        <button type="button" id="btn-tour-confirm-yes" class="btn-primary" (click)="confirmAndStartTour()">
+          Start tour
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Interactive Step-by-Step Tour Overlay (Rendered outside app-layout to eliminate zoom distortion) -->
+@if (isTourActive()) {
+<div class="tour-overlay-root" role="dialog" aria-modal="true" aria-label="VintGen Interactive Guide">
+  <!-- Clickable backdrop to close tour -->
+  <div class="tour-backdrop-dismiss" (click)="endTour()"></div>
+
+  <!-- Glowing Blue Spotlight Box over target element -->
+  <div class="tour-spotlight-box" [style.top]="tourSpotlightStyle().top"
+    [style.left]="tourSpotlightStyle().left" [style.width]="tourSpotlightStyle().width"
+    [style.height]="tourSpotlightStyle().height" [style.border-radius]="tourSpotlightStyle().borderRadius">
+    <div class="tour-spotlight-pulse"></div>
+  </div>
+
+  <!-- Floating Popover Card -->
+  <div class="tour-popover-card" [style.top]="tourPopoverStyle().top" [style.left]="tourPopoverStyle().left">
+    <div class="tour-card-header">
+      <div class="tour-step-badge">
+        <span class="tour-step-indicator-dot"></span>
+        <span>STEP {{ currentTourStep() + 1 }} OF {{ tourSteps.length }}</span>
+      </div>
+      <button type="button" class="btn-tour-close" (click)="endTour()" title="Close guide" aria-label="Close guide">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="tour-card-body">
+      <h4 class="tour-title">{{ tourSteps[currentTourStep()].title }}</h4>
+      <p class="tour-description">{{ tourSteps[currentTourStep()].description }}</p>
+    </div>
+
+    <div class="tour-card-footer">
+      <div class="tour-dots">
+        @for (step of tourSteps; track $index) {
+        <span class="tour-dot" [class.active]="$index === currentTourStep()"></span>
+        }
+      </div>
+      <div class="tour-btn-group">
+        @if (currentTourStep() > 0) {
+        <button type="button" class="btn-tour-secondary" (click)="prevTourStep()">
+          Previous
+        </button>
+        }
+        <button type="button" class="btn-tour-primary" (click)="nextTourStep()">
+          {{ currentTourStep() === tourSteps.length - 1 ? 'Finish tour âœ“' : 'Next â†’' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+

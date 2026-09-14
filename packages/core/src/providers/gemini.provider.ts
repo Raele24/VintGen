@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Gemini AI Provider Implementation
  * 
  * Interacts directly with the Google Gemini REST API (v1beta).
@@ -11,9 +11,9 @@ import {
   ListingInput,
   ListingResult,
   ProviderConfig,
-  VintedCondition,
+  ItemCondition,
 } from '../types';
-import { GEMINI_RESPONSE_SCHEMA, VINTED_SYSTEM_INSTRUCTION } from '../prompts';
+import { STRUCTURED_RESPONSE_SCHEMA, MARKETPLACE_SYSTEM_INSTRUCTION } from '../prompts';
 
 export class GeminiProvider implements AIProvider {
   public readonly id = 'gemini';
@@ -23,7 +23,7 @@ export class GeminiProvider implements AIProvider {
   public static readonly DEFAULT_MODEL = 'gemini-3.6-flash';
 
   /**
-   * Generates a structured Vinted listing using Gemini Multimodal Vision API.
+   * Generates a structured marketplace listing using the vision model.
    */
   public async generateListing(
     input: ListingInput,
@@ -35,7 +35,7 @@ export class GeminiProvider implements AIProvider {
 
     // Assemble user text content with hints
     const textPromptParts: string[] = [
-      'Generate a comprehensive, high-converting Vinted listing based on the provided photographs and hints.',
+      'Generate a comprehensive, accurate secondhand marketplace listing based on the provided photographs and hints.',
     ];
 
     if (input.titleHint) {
@@ -53,8 +53,8 @@ export class GeminiProvider implements AIProvider {
     const languageNames: Record<string, string> = {
       it: 'Italian (Italiano)',
       en: 'English',
-      fr: 'French (Français)',
-      es: 'Spanish (Español)',
+      fr: 'French (FranÃ§ais)',
+      es: 'Spanish (EspaÃ±ol)',
       de: 'German (Deutsch)',
     };
     const targetLangName = (input.language && languageNames[input.language]) || (input.language ? input.language.toUpperCase() : 'English');
@@ -85,7 +85,7 @@ export class GeminiProvider implements AIProvider {
 
     const requestBody = {
       system_instruction: {
-        parts: [{ text: VINTED_SYSTEM_INSTRUCTION }],
+        parts: [{ text: MARKETPLACE_SYSTEM_INSTRUCTION }],
       },
       contents: [
         {
@@ -95,7 +95,7 @@ export class GeminiProvider implements AIProvider {
       ],
       generationConfig: {
         response_mime_type: 'application/json',
-        response_schema: GEMINI_RESPONSE_SCHEMA,
+        response_schema: STRUCTURED_RESPONSE_SCHEMA,
         temperature: 0.2,
       },
     };
@@ -173,7 +173,7 @@ export class GeminiProvider implements AIProvider {
           category: String(parsedData.category || 'Secondhand Clothing'),
           brand: String(parsedData.brand || 'Vintage'),
           size: String(parsedData.size || 'One Size'),
-          condition: (parsedData.condition as VintedCondition) || 'very_good',
+          condition: (parsedData.condition as ItemCondition) || 'very_good',
           color: String(parsedData.color || ''),
           material: String(parsedData.material || ''),
           price: {
@@ -261,3 +261,4 @@ export class GeminiProvider implements AIProvider {
     return { success: false, message: 'None of the tested Gemini models are reachable with this key.' };
   }
 }
+

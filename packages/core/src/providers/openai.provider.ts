@@ -1,4 +1,4 @@
-/**
+﻿/**
  * OpenAI Provider (GPT-4o / GPT-4o-mini with Vision)
  *
  * Implements the AIProvider interface for OpenAI's Chat Completions API
@@ -10,9 +10,9 @@ import {
   ListingInput,
   ListingResult,
   ProviderConfig,
-  VintedCondition,
+  ItemCondition,
 } from '../types';
-import { VINTED_SYSTEM_INSTRUCTION } from '../prompts';
+import { MARKETPLACE_SYSTEM_INSTRUCTION } from '../prompts';
 
 export class OpenAIProvider implements AIProvider {
   public readonly id = 'openai';
@@ -31,7 +31,7 @@ export class OpenAIProvider implements AIProvider {
     const userContent: Array<Record<string, unknown>> = [];
 
     const textParts: string[] = [
-      'Generate a comprehensive, high-converting Vinted listing based on the provided photographs and hints.',
+      'Generate a comprehensive, accurate secondhand marketplace listing based on the provided photographs and hints.',
     ];
 
     if (input.titleHint) {
@@ -49,8 +49,8 @@ export class OpenAIProvider implements AIProvider {
     const languageNames: Record<string, string> = {
       it: 'Italian (Italiano)',
       en: 'English',
-      fr: 'French (Français)',
-      es: 'Spanish (Español)',
+      fr: 'French (FranÃ§ais)',
+      es: 'Spanish (EspaÃ±ol)',
       de: 'German (Deutsch)',
     };
     const targetLangName = (input.language && languageNames[input.language]) || (input.language ? input.language.toUpperCase() : 'English');
@@ -103,7 +103,7 @@ export class OpenAIProvider implements AIProvider {
       messages: [
         {
           role: 'system',
-          content: VINTED_SYSTEM_INSTRUCTION + schemaInstruction,
+          content: MARKETPLACE_SYSTEM_INSTRUCTION + schemaInstruction,
         },
         {
           role: 'user',
@@ -182,7 +182,7 @@ export class OpenAIProvider implements AIProvider {
           category: String(parsedData.category || 'Secondhand Clothing'),
           brand: String(parsedData.brand || 'Vintage'),
           size: String(parsedData.size || 'One Size'),
-          condition: (parsedData.condition as VintedCondition) || 'very_good',
+          condition: (parsedData.condition as ItemCondition) || 'very_good',
           color: String(parsedData.color || ''),
           material: String(parsedData.material || ''),
           price: {
@@ -261,3 +261,4 @@ export class OpenAIProvider implements AIProvider {
     }
   }
 }
+
