@@ -68,6 +68,18 @@
         navigator.serviceWorker.register('/sw.js')
           .then((registration) => {
             console.log('[VintGen PWA] Service Worker registered with scope:', registration.scope);
+            // Periodic update check every 45 minutes
+            setInterval(() => { registration.update(); }, 45 * 60 * 1000);
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    window.dispatchEvent(new CustomEvent('vintgen-update-ready'));
+                  }
+                });
+              }
+            });
           })
           .catch((error) => {
             console.warn('[VintGen PWA] Service Worker registration failed:', error);

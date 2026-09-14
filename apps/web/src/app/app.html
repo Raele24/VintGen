@@ -196,6 +196,40 @@
       <div class="drawer-group">
         <div class="drawer-group-title">Menu & Actions</div>
         <div class="drawer-actions-list">
+          @if (updateService.hasNativeUpdate()) {
+          <div class="drawer-update-banner">
+            <div class="drawer-update-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            </div>
+            <div class="drawer-update-content">
+              <span class="drawer-update-title">Update v{{ updateService.latestRelease()?.version }}</span>
+              <span class="drawer-update-sub">New release available</span>
+            </div>
+            <button type="button" class="btn-update-chip" (click)="updateService.downloadLatestApk()">
+              Download
+            </button>
+          </div>
+          } @else if (updateService.isWebUpdateReady()) {
+          <div class="drawer-update-banner">
+            <div class="drawer-update-icon live">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+            </div>
+            <div class="drawer-update-content">
+              <span class="drawer-update-title">Live Update Ready</span>
+              <span class="drawer-update-sub">Reload to apply</span>
+            </div>
+            <button type="button" class="btn-update-chip" (click)="updateService.reloadForUpdate()">
+              Reload
+            </button>
+          </div>
+          }
+
           @if (canInstall()) {
           <button type="button" class="drawer-action-btn action-install" (click)="installPwa(); closeMobileMenu()">
             <div class="drawer-btn-icon">
@@ -287,6 +321,17 @@
 
   <!-- Main Content Layout -->
   <main class="main-body container" role="main">
+    
+  <!-- Floating Live Update Notification -->
+  @if (updateService.isWebUpdateReady()) {
+  <div class="live-update-floating-pill" (click)="updateService.reloadForUpdate()" role="status">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+    </svg>
+    <span>New version available &bull; Tap to update</span>
+  </div>
+  }
+
     <!-- Clean Minimalist Header -->
     <section class="workspace-header">
       <div class="workspace-title-group">

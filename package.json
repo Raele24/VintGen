@@ -13,7 +13,9 @@
     "build:cli": "npm --workspace=packages/cli run build",
     "build:web": "npm run build:core && npm --workspace=apps/web run build",
     "build": "npm run build:core && npm run build:cli && npm run build:web",
-    "cli": "node packages/cli/bin/vintgen.js"
+    "cli": "node packages/cli/bin/vintgen.js",
+    "build:android": "npm run build:web && cap sync android",
+    "open:android": "cap open android"
   },
   "keywords": [
     "vinted",
@@ -28,6 +30,9 @@
   "author": "VintStack Contributors",
   "license": "MIT",
   "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@types/node": "^22.20.2"
   }
 }

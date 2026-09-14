@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StorageService, SavedListingItem } from './core/storage.service';
 import { GeneratorService } from './core/generator.service';
+import { UpdateService } from './core/update.service';
 import { ListingInput, VintedCondition, ListingResult } from '@vintgen/core';
 
 interface UploadedImage {
@@ -40,6 +41,7 @@ export interface TourStep {
 export class App {
   public storage = inject(StorageService);
   public generator = inject(GeneratorService);
+  public updateService = inject(UpdateService);
 
   // Form Inputs
   public uploadedImages = signal<UploadedImage[]>([]);

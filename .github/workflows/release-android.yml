@@ -1,0 +1,149 @@
+name: Build & Release Android APK
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag override (optional)'
+        required: false
+        default: ''
+      live_url:
+        description: 'Live Web URL for Instant OTA Updates (optional, leave blank for offline bundle)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-apk:
+    name: Build & Sign Android Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Build Core Engine and Angular Web App
+        run: npm run build:web
+
+      - name: Configure Live Server URL (if provided)
+        if: ${{ inputs.live_url != '' }}
+        run: |
+          echo "Injecting Live Server URL: ${{ inputs.live_url }}"
+          node -e "
+            const fs = require('fs');
+            let conf = fs.readFileSync('capacitor.config.ts', 'utf8');
+            conf = conf.replace(/url:\s*process\.env\.CAPACITOR_LIVE_URL\s*\|\|\s*undefined/, 'url: "${{ inputs.live_url }}"');
+            fs.writeFileSync('capacitor.config.ts', conf, 'utf8');
+          "
+
+      - name: Sync Capacitor Android Project
+        run: npx cap sync android
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: chmod +x android/gradlew
+
+      - name: Assemble Android Release APK
+        run: |
+          cd android
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Sign Release APK with Keystore
+        run: |
+          # Generate reproducible self-signed release keystore
+          keytool -genkeypair -v \
+            -keystore release.keystore \
+            -alias vintgen \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass vintgen123 \
+            -keypass vintgen123 \
+            -dname "CN=VintGen, OU=App, O=VintGen, L=Rome, ST=Italy, C=IT"
+          
+          # Locate built unsigned APK
+          UNSIGNED_APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          echo "Located APK: $UNSIGNED_APK"
+          
+          # Find latest build tools
+          BUILD_TOOLS_DIR=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -n 1)
+          echo "Using Android Build Tools: $BUILD_TOOLS_DIR"
+          
+          # ZipAlign and Sign
+          $BUILD_TOOLS_DIR/zipalign -v -p 4 "$UNSIGNED_APK" VintGen-aligned.apk
+          $BUILD_TOOLS_DIR/apksigner sign \
+            --ks release.keystore \
+            --ks-pass pass:vintgen123 \
+            --ks-key-alias vintgen \
+            --key-pass pass:vintgen123 \
+            --out VintGen-signed.apk \
+            VintGen-aligned.apk
+          
+          # Verify APK signature
+          $BUILD_TOOLS_DIR/apksigner verify --verbose VintGen-signed.apk
+
+      - name: Determine Version Tag Automatically
+        id: vars
+        run: |
+          # 1. If manually specified in workflow_dispatch
+          if [ -n "${{ inputs.version_tag }}" ]; then
+            TAG="${{ inputs.version_tag }}"
+          # 2. If triggered by a git tag (e.g. v1.0.0)
+          elif echo "${{ github.ref }}" | grep -q "refs/tags/"; then
+            TAG="${{ github.ref_name }}"
+          # 3. If standard push to main branch: read version from package.json automatically!
+          else
+            PKG_VER=$(node -p "require('./package.json').version")
+            TAG="v${PKG_VER}"
+          fi
+          
+          echo "TAG_NAME=$TAG" >> $GITHUB_OUTPUT
+          cp VintGen-signed.apk "VintGen-${TAG}.apk"
+          cp VintGen-signed.apk "VintGen-latest.apk"
+          echo "Created final APKs: VintGen-${TAG}.apk and VintGen-latest.apk"
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VintGen-APK
+          path: VintGen-*.apk
+
+      - name: Publish or Update GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: VintGen ${{ steps.vars.outputs.TAG_NAME }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            VintGen-*.apk

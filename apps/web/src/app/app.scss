@@ -3644,3 +3644,115 @@ body.modal-open {
   overscroll-behavior: contain !important;
   -webkit-overflow-scrolling: touch;
 }
+
+/* --- Live Update Banners & Floating Pill --- */
+.drawer-update-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(14, 165, 233, 0.08);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  margin-bottom: 6px;
+
+  .drawer-update-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(14, 165, 233, 0.15);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &.live {
+      color: #10b981;
+      background: rgba(16, 185, 129, 0.15);
+    }
+  }
+
+  .drawer-update-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1;
+    min-width: 0;
+
+    .drawer-update-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .drawer-update-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+  }
+
+  .btn-update-chip {
+    padding: 5px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity var(--transition-fast);
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+.live-update-floating-pill {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-surface-elevated, #27272a);
+  border: 1px solid var(--border-focus, #0ea5e9);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  cursor: pointer;
+  animation: floatingPillSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--transition-fast);
+
+  &:hover {
+    transform: translateX(-50%) translateY(-2px);
+  }
+
+  svg {
+    stroke: var(--color-primary);
+    animation: rotateSlow 4s linear infinite;
+  }
+}
+
+@keyframes floatingPillSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
