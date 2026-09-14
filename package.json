@@ -17,7 +17,8 @@
     "build:android": "npm run build:web && cap sync android",
     "open:android": "cap open android",
     "desktop:build": "npm run build:web && tauri build",
-    "desktop:dev": "tauri dev"
+    "desktop:dev": "tauri dev",
+    "publish:cli": "npm run build:cli && npm --workspace=packages/cli publish --access public"
   },
   "keywords": [
     "vinted",
@@ -35,7 +36,8 @@
     "@capacitor/android": "^8.5.2",
     "@capacitor/cli": "^8.5.2",
     "@capacitor/core": "^8.5.2",
+    "@tauri-apps/cli": "^2.2.0",
     "@types/node": "^22.20.2",
-    "@tauri-apps/cli": "^2.2.0"
+    "esbuild": "^0.28.2"
   }
 }

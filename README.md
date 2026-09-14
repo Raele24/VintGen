@@ -1,112 +1,188 @@
-# VintGen
+﻿# VintGen
 
-> **Open-Source AI Listing Generator for Vinted & Secondhand Fashion**  
-> Multimodal Vision &bull; Fair Market Pricing &bull; Pure BYOK Privacy &bull; Zero AI Slop
+> Open-Source AI Listing Generator for Vinted and Secondhand Reselling.  
+> Multimodal Vision AI, Market Valuation, Multi-Provider BYOK Architecture.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/vintgen.svg)](https://www.npmjs.com/package/vintgen)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Angular 21](https://img.shields.io/badge/Angular-21-red.svg)](https://angular.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
+[![Web App](https://img.shields.io/badge/Web_App-Live-success.svg)](https://vintgen-ai.vercel.app)
 
 ---
 
 ## Overview
 
-**VintGen** turns raw clothing and accessory photographs into high-converting, search-optimized listings for **Vinted** in seconds.
+VintGen transforms clothing and accessory photographs into complete, search-optimized listings for online marketplaces (such as Vinted, eBay, Depop, Subito, and Wallapop) in seconds.
 
-Built for privacy-conscious resellers, developers, and vintage enthusiasts, VintGen operates on a **strict Bring Your Own Key (BYOK)** model powered by Google Gemini Multimodal Vision.
+Powered by Multimodal Vision AI, VintGen inspects garment details, identifies brand tags, detects fabric composition, spots micro-flaws, and computes fair secondary-market valuations with recommended pricing corridors.
 
-### Three Delivery Channels:
-1. **Web Studio (`apps/web`)**: Modern Angular 21 application with direct client-to-API communication (no proxy, 100% private in your browser).
-2. **Terminal CLI (`packages/cli`)**: Scriptable command-line tool for local processing and batch workflows (`npx vintgen`).
-3. **Agent Skill (`skills/vintgen`)**: Standardized agent skill for Google Antigravity, Claude Code, GitHub Copilot, and Gemini Gems.
+VintGen is fully open-source and operates on a strict Bring Your Own Key (BYOK) model with multi-provider support: Google Gemini, OpenAI, Anthropic Claude, and 100% offline local models via Ollama.
 
 ---
 
-## Key Features
+## Delivery Channels & Installation Index
 
-- **Multimodal Garment Inspection**: Identifies brand logos, wash tags, fabric composition, silhouette cuts, and micro-flaws from photos.
-- **Search-Optimized Titles**: Generates concise, high-CTR titles (under 65 chars) structured for Vinted's search algorithm.
-- **Fair-Market Resale Valuation**: Calculates recommended price, minimum negotiation floor, and high ceiling based on brand and condition.
-- **Honest Flaw Disclosure**: Discloses visible wear, marks, or alterations to maintain 5-star seller ratings and prevent dispute returns.
-- **Vinted Taxonomy Mapping**: Accurately maps items to standard condition levels (`new_with_tags`, `very_good`, `good`, etc.).
-- **One-Click Clipboard Export**: Copy title, specs, description, or the entire bundle directly into the Vinted mobile or web app.
-- **Zero AI Slop**: Clean, architectural, dark-themed UI. No cartoonish emojis, no rainbow gradient backgrounds, strict typographic hierarchy.
+VintGen is distributed across multiple platforms to fit different selling workflows:
+
+| Platform | Channel | Distribution | Requirements |
+| :--- | :--- | :--- | :--- |
+| Web App & PWA | Cloud / Instant | https://vintgen-ai.vercel.app | Any modern web browser |
+| Android | Native Mobile App | GitHub Releases (`VintGen-v1.0.0.apk`) | Android 8.0+ |
+| Windows (Installer) | Desktop Application | GitHub Releases (`VintGen-Windows-Installer.exe`) | Windows 10 / 11 |
+| Windows (Portable) | Standalone Executable | GitHub Releases (`VintGen-Windows-Portable.exe`) | Windows 10 / 11 |
+| Terminal CLI | Developer Tool (npm) | `npx vintgen` / `npm i -g vintgen` | Node.js 18+ |
+| Self-Hosted | Source Code | `git clone` from GitHub | Node.js 18+, npm |
 
 ---
 
-## Quick Start
+## Platform Details
 
-### 1. Prerequisites
-- [Node.js 18+](https://nodejs.org/)
-- A free Google Gemini API Key from [Google AI Studio](https://aistudio.google.com/app/apikey)
+### 1. Web App & Progressive Web App (PWA)
+- Live URL: [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app)
+- Instant access with zero setup or installation.
+- Fully installable on iOS and Android home screens as an offline-capable PWA.
+- All AI processing executes directly client-side via your browser; your API keys and images are never sent through intermediate proxy servers.
 
-### 2. Clone & Install Dependencies
+### 2. Android Mobile Application
+- Download: [GitHub Releases](https://github.com/Raele24/VintGen/releases) -> `VintGen-v1.0.0.apk`
+- Features direct camera capture to snap clothing photos and generate listings on the go.
+- Includes automated Over-The-Air (OTA) synchronization to keep the client updated with the latest improvements.
+
+### 3. Windows Desktop Application
+- Built with Tauri v2 for ultra-fast startup and minimal resource usage.
+- Two distribution formats available on [GitHub Releases](https://github.com/Raele24/VintGen/releases):
+  - **Installer (`VintGen-Windows-Installer.exe`):** Standard NSIS installer that configures shortcuts and start menu entries.
+  - **Portable (`VintGen-Windows-Portable.exe`):** Standalone executable that runs immediately without installation or admin rights.
+
+### 4. Terminal CLI (`vintgen`)
+Ideal for power resellers, batch processing, and script automation.
+
+Run immediately without installation:
 ```bash
-git clone https://github.com/vintgen/vintgen.git
-cd vintgen
+npx vintgen
+```
+
+Or install globally:
+```bash
+npm install -g vintgen
+```
+
+Automatic directory scan workflow:
+Place photos of an item inside a folder, open your terminal in that folder, and run:
+```bash
+vintgen
+```
+
+Generate listing with seller notes and target language:
+```bash
+vintgen -n "Pure wool coat, size L, 1990s vintage, minor button defect" -l en
+```
+
+### 5. Self-Hosted & Local Development
+Clone the repository and run the development environment locally:
+```bash
+git clone https://github.com/Raele24/VintGen.git
+cd VintGen
 npm install
 ```
 
-### 3. Launch the Web Studio
+Start the Web Studio on `http://localhost:4200`:
 ```bash
 npm run web
 ```
-Navigate to `http://localhost:4200` in your browser. Configure your free Gemini API Key in the top right, upload clothing photos, and generate!
 
-### 4. Run via Terminal CLI
+Build the CLI binary:
 ```bash
-export GEMINI_API_KEY="AIzaSy..."
-
-# Generate a listing from clothing photos
-npm run cli -- --images ./jacket_front.jpg,./jacket_tag.jpg --notes "Size L, 100% Cotton"
+npm run build:cli
 ```
 
 ---
 
-## Repository Structure
+## Supported AI Providers (BYOK)
+
+VintGen does not lock you into a single vendor. You can configure any of the following providers:
+
+| Provider | Provider ID | Recommended Model | API Key Source |
+| :--- | :--- | :--- | :--- |
+| Google Gemini | `gemini` | `gemini-2.5-flash` | Google AI Studio |
+| OpenAI | `openai` | `gpt-4o-mini` | OpenAI Platform |
+| Anthropic Claude | `claude` | `claude-3-5-sonnet` | Anthropic Console |
+| Ollama (Local) | `ollama` | `llama3.2-vision` | Local (No key required) |
+
+### Configuring Providers
+
+#### In Web & Desktop Apps:
+Click on the **API Settings** button in the navigation header to select your provider, enter your key, or specify a custom local Ollama endpoint.
+
+#### In the Terminal CLI:
+Use the `config` command to persist your settings:
+```bash
+# Set key for Google Gemini (default provider)
+vintgen config --provider gemini --key <YOUR_API_KEY>
+
+# Set key for OpenAI
+vintgen config --provider openai --key <YOUR_API_KEY>
+
+# Set key for Anthropic Claude
+vintgen config --provider claude --key <YOUR_API_KEY>
+
+# Enable local Ollama (offline, zero API key)
+vintgen config --provider ollama
+```
+
+You can also provide API keys through environment variables:
+- `GEMINI_API_KEY`
+- `OPENAI_API_KEY`
+- `ANTHROPIC_API_KEY`
+
+---
+
+## CLI Options Reference
+
+| Option | Shorthand | Description |
+| :--- | :--- | :--- |
+| `--images <paths>` | `-i` | Comma-separated list of image files (auto-scans folder if omitted) |
+| `--notes <text>` | `-n` | Seller notes (material, fit, provenance, flaws) |
+| `--title <text>` | `-t` | Preliminary or rough item title |
+| `--brand <brand>` | `-b` | Brand hint or override |
+| `--lang <code>` | `-l` | Listing output language: `en` (default), `it`, `fr`, `es`, `de` |
+| `--provider <name>` | `-p` | AI provider: `gemini`, `openai`, `claude`, `ollama` |
+| `--key <key>` | `-k` | API key (overrides saved configuration and environment variables) |
+| `--model <name>` | `-m` | Model name override |
+| `--endpoint <url>` | `-e` | Custom endpoint for Ollama (default: `http://localhost:11434`) |
+| `--format <type>` | `-f` | Output format: `text` (default), `json`, or `vinted` |
+| `--output <path>` | `-o` | Destination file for the generated listing (default: `vintgen-listing.txt`) |
+| `--help` | `-h` | Display command-line usage information |
+| `--version` | `-v` | Display installed version |
+
+---
+
+## Repository Architecture
 
 ```
-vintgen/
+VintGen/
 ├── apps/
-│   └── web/                 # Angular 21 Standalone Web Studio (Signals + SCSS)
+│   └── web/                 # Angular 21 Standalone Studio (Signals + SCSS)
 ├── packages/
-│   ├── core/                # Shared AI Engine, JSON Schemas & Platform Adapters
-│   └── cli/                 # Terminal CLI binary (vintgen executable)
-├── skills/
-│   └── vintgen/           # Agent Skill (SKILL.md) & Prompt Templates
-├── docs/                    # Architectural & Developer Guides
-│   ├── architecture.md      # System data flow and package decoupling
-│   ├── byok-security.md     # Private key isolation documentation
-│   ├── cli-guide.md         # Full CLI flag and piping manual
-│   ├── skills-integration.md# Antigravity, Claude Code & Copilot setup
-│   └── adding-providers.md  # How to add Ollama, OpenAI, or Claude
-├── package.json             # Root workspace orchestration
-└── README.md
+│   ├── core/                # Shared AI Provider adapters & schemas
+│   └── cli/                 # Published npm CLI package (vintgen)
+├── src-tauri/               # Tauri v2 Windows Desktop integration
+├── android/                 # Android Capacitor project
+├── docs/                    # Architecture and development manuals
+└── README.md                # Project documentation
 ```
 
 ---
 
-## Security & Privacy (BYOK)
+## Privacy & Security
 
-VintGen contains **zero telemetry proxies** and **zero data-logging servers**:
-- In the **Web Studio**, your API key is stored exclusively in your browser's local storage and sent directly to Google's official endpoints via client-side `fetch`.
-- In the **CLI**, the key remains in-memory for the duration of the command.
-- Your photos and listings are never stored on external databases or sold to third parties.
-
-For more information, see [docs/byok-security.md](docs/byok-security.md).
-
----
-
-## AI Agent Integration
-
-Want your AI assistant to generate Vinted listings for you?
-
-- **Google Antigravity**: Place `skills/vintgen/SKILL.md` inside `.agents/skills/vintgen/SKILL.md`.
-- **Gemini Gems / ChatGPT**: Copy the prompt template from `skills/vintgen/prompts/web-instructions.md`.
+- **Strict BYOK:** Your API keys remain on your device (stored in local browser storage or CLI configuration file).
+- **Direct Requests:** Network calls go straight from your client machine to the selected AI provider.
+- **Zero Intermediaries:** There are no backend proxy servers, tracking telemetry, or remote databases collecting your photos or listings.
 
 ---
 
 ## License
 
-MIT License &copy; 2026 VintGen Contributors.
+Distributed under the MIT License. See [LICENSE](LICENSE) for details.

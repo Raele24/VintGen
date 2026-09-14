@@ -1,21 +1,45 @@
 {
   "name": "vintgen",
-  "version": "1.0.0",
-  "description": "Command-line interface for VintGen — AI Listing Generator for Vinted & Secondhand Fashion",
+  "version": "1.0.1",
+  "description": "Open-Source AI Listing Generator for Vinted & Secondhand Reselling",
   "bin": {
-    "vintgen": "./bin/vintgen.js"
+    "vintgen": "bin/vintgen.js"
   },
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/index.js",
     "start": "node ./bin/vintgen.js"
-  },
-  "dependencies": {
-    "@vintgen/core": "*"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "files": [
+    "bin",
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Raele24/VintGen.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://vintgen-ai.vercel.app",
+  "bugs": {
+    "url": "https://github.com/Raele24/VintGen/issues"
+  },
+  "keywords": [
+    "vinted",
+    "secondhand",
+    "reselling",
+    "listing-generator",
+    "gemini",
+    "vision-ai",
+    "cli"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
 }

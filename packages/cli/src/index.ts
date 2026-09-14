@@ -63,7 +63,7 @@ interface CliArgs {
   version: boolean;
 }
 
-const PACKAGE_VERSION = '1.0.0';
+const PACKAGE_VERSION = '1.0.1';
 
 /**
  * Parses raw command-line arguments into structured configuration.
@@ -149,37 +149,39 @@ function parseArguments(args: string[]): CliArgs {
 function printHelp(): void {
   console.log(`
 vintgen v${PACKAGE_VERSION}
-Open-Source AI Listing Generator for Vinted & Secondhand Reselling
+Open-Source AI Listing Generator for Vinted and Secondhand Reselling
 
 USAGE:
   $ vintgen                                    (auto-detects images in current directory)
   $ vintgen -n "Size M, 100% silk, excellent"  (with seller notes)
   $ vintgen -i front.jpg,tag.jpg               (manual image paths)
-  $ vintgen set-key <api-key>                  (save API key permanently in user config)
+  $ vintgen config --key <key> --provider <name> (save key and provider in ~/.vintgen/config.json)
 
 COMMANDS:
   generate              Generate listing (default)
   set-key <key>         Save API key permanently (~/.vintgen/config.json)
-  config                View or update configuration
-  test-key              Test connection to AI provider
+  config                View or update configuration (--key, --provider, --model, --lang)
+  test-key              Test connection to configured AI provider
 
 OPTIONS:
-  -i, --images <paths>  Comma-separated image paths (scans folder if omitted)
+  -i, --images <paths>  Comma-separated image paths (scans directory if omitted)
   -n, --notes <text>    Seller notes (condition details, fabric, fit, flaws)
   -t, --title <text>    Tentative or rough item title
   -b, --brand <brand>   Brand hint or confirmation
-  -l, --lang <code>     Listing language: en, it, fr, es, de (default: en)
-  -k, --key <key>       API key (defaults to config or $GEMINI_API_KEY)
+  -l, --lang <code>     Listing language: en (default), it, fr, es, de
+  -k, --key <key>       API key (defaults to config, or GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY)
   -p, --provider <name> AI provider: gemini (default), openai, claude, ollama
   -m, --model <name>    Model name (e.g. gemini-2.5-flash, gpt-4o-mini, llama3.2-vision)
   -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434)
   -f, --format <type>   Output format: text (default), json, vinted
-  -o, --output <file>   Write output to a destination file (defaults to vintgen-listing.txt)
+  -o, --output <file>   Write output to destination file (defaults to vintgen-listing.txt)
   -v, --version         Print CLI version
   -h, --help            Print help information
 
 EXAMPLES:
-  $ vintgen set-key AIzaSy...
+  $ vintgen config --provider gemini --key <YOUR_KEY>
+  $ vintgen config --provider openai --key <YOUR_KEY>
+  $ vintgen config --provider ollama
   $ cd path/to/jacket_photos
   $ vintgen
   $ vintgen -n "Vintage 90s Ralph Lauren polo" -l it
@@ -336,7 +338,7 @@ async function main(): Promise<void> {
     const autoFound = findImagesInDir(process.cwd());
     if (autoFound.length > 0) {
       resolvedImagePaths = autoFound;
-      console.log(`\n[*] Auto-detected ${autoFound.length} image(s) in current directory:`);
+      console.log(`Auto-detected ${autoFound.length} image(s) in current directory:`);
       autoFound.forEach((f) => console.log(`    - ${path.basename(f)}`));
     }
   }
@@ -429,7 +431,7 @@ async function main(): Promise<void> {
       : path.resolve(process.cwd(), 'vintgen-listing.txt');
     
     fs.writeFileSync(targetFile, outputContent, 'utf-8');
-    console.log(`\n[✓] Listing successfully saved to: ${path.basename(targetFile)}`);
+    console.log(`Listing successfully saved to: ${path.basename(targetFile)}`);
   } catch (err: unknown) {
     const errorMsg = err instanceof Error ? err.message : String(err);
     console.error(`\nGeneration failed: ${errorMsg}`);

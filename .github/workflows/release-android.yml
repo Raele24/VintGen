@@ -132,6 +132,8 @@ jobs:
           echo "TAG_NAME=$TAG" >> $GITHUB_OUTPUT
           cp VintGen-signed.apk "VintGen-${TAG}.apk"
           cp VintGen-signed.apk "VintGen-latest.apk"
+          # Clean up intermediate temporary files so they are not uploaded
+          rm -f VintGen-aligned.apk VintGen-signed.apk
           echo "Created final APKs: VintGen-${TAG}.apk and VintGen-latest.apk"
 
       - name: Upload APK as Workflow Artifact
@@ -147,6 +149,18 @@ jobs:
           name: VintGen ${{ steps.vars.outputs.TAG_NAME }}
           draft: false
           prerelease: false
-          generate_release_notes: true
+          generate_release_notes: false
+          body: |
+            ### Download VintGen ${{ steps.vars.outputs.TAG_NAME }}
+
+            | Platform | File | Description |
+            | :--- | :--- | :--- |
+            | **Android** | `VintGen-${{ steps.vars.outputs.TAG_NAME }}.apk` | Native Android application package |
+            | **Windows (Installer)** | `VintGen-Windows-Installer.exe` | Windows setup wizard with Desktop & Start shortcuts |
+            | **Windows (Portable)** | `VintGen-Windows-Portable.exe` | Standalone executable, no installation required |
+
+            ---
+            **Web App & PWA:** [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app)
+            **CLI Tool (npm):** `npx vintgen` or `npm install -g vintgen`
           files: |
             VintGen-*.apk

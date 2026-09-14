@@ -1,87 +1,99 @@
-# VintStack CLI User Guide
+﻿# VintGen CLI User Guide
 
-The `vintstack` CLI brings automated AI listing generation straight into your terminal, ideal for power resellers, script automation, and bulk inventory workflows.
+The `vintgen` CLI provides automated multimodal AI listing generation directly from your terminal. Designed for resellers, script automation, and bulk inventory workflows.
 
 ---
 
 ## 1. Quick Start
 
-Ensure you have your Google Gemini API key:
+Run directly without installation via `npx`:
 
 ```bash
-export GEMINI_API_KEY="AIzaSyYourActualKeyHere"
+npx vintgen
 ```
 
-Run directly without installing via `npx`:
+Or install globally:
 
 ```bash
-npx vintstack --images ./jacket_front.jpg,./jacket_label.jpg --notes "Size L, 100% Wool"
-```
-
-Or run locally within this workspace:
-
-```bash
-npm run cli -- --images ./jacket_front.jpg --lang it
+npm install -g vintgen
 ```
 
 ---
 
-## 2. Command Reference
+## 2. Provider Setup
+
+VintGen supports multi-provider Bring Your Own Key (BYOK) configurations:
+
+```bash
+# Google Gemini (default)
+vintgen config --provider gemini --key <YOUR_KEY>
+
+# OpenAI
+vintgen config --provider openai --key <YOUR_KEY>
+
+# Anthropic Claude
+vintgen config --provider claude --key <YOUR_KEY>
+
+# Local Ollama (offline, zero API key)
+vintgen config --provider ollama
+```
+
+You can also export environment variables:
+- `GEMINI_API_KEY`
+- `OPENAI_API_KEY`
+- `ANTHROPIC_API_KEY`
+
+---
+
+## 3. Command Reference
 
 ### Basic Syntax
 ```bash
-vintstack [command] [options]
+vintgen [options]
 ```
-
-### Commands
-| Command | Description |
-|---|---|
-| `generate` | Analyze images/notes and generate a Vinted listing (default). |
-| `test-key` | Test connection to Gemini API with your current key. |
 
 ### Options
 | Flag | Short | Default | Description |
-|---|---|---|---|
-| `--images` | `-i` | — | Comma-separated list of image paths (`.jpg`, `.png`, `.webp`). |
-| `--title` | `-t` | — | Tentative or rough title hint. |
-| `--notes` | `-n` | — | Seller notes (fabric composition, flaws, fit, provenance). |
-| `--brand` | `-b` | — | Brand hint. |
-| `--key` | `-k` | `$GEMINI_API_KEY` | Google Gemini API Key. |
-| `--model` | `-m` | `gemini-2.5-flash` | Model identifier. |
-| `--lang` | `-l` | `it` | Target language (`it`, `en`, `fr`, `es`, `de`). |
+| :--- | :--- | :--- | :--- |
+| `--images` | `-i` | (auto) | Comma-separated list of image paths (.jpg, .png, .webp, .heic). Scans folder if omitted. |
+| `--notes` | `-n` | none | Seller notes (fabric composition, flaws, fit, provenance). |
+| `--title` | `-t` | none | Tentative or rough title hint. |
+| `--brand` | `-b` | none | Brand hint or override. |
+| `--lang` | `-l` | `en` | Target language (`en`, `it`, `fr`, `es`, `de`). |
+| `--provider` | `-p` | `gemini` | AI provider (`gemini`, `openai`, `claude`, `ollama`). |
+| `--key` | `-k` | none | API key override. |
+| `--model` | `-m` | auto | Model identifier override. |
+| `--endpoint` | `-e` | `http://localhost:11434` | Ollama endpoint URL. |
 | `--format` | `-f` | `text` | Output format: `text`, `json`, or `vinted`. |
-| `--output` | `-o` | — | Write output to a designated file. |
-| `--version` | `-v` | — | Print CLI version. |
-| `--help` | `-h` | — | Print help menu. |
+| `--output` | `-o` | `vintgen-listing.txt` | Custom output file destination. |
+| `--version` | `-v` | none | Print CLI version. |
+| `--help` | `-h` | none | Print help menu. |
 
 ---
 
-## 3. Practical Examples
+## 4. Usage Examples
 
-### 1. Test Key Connection
+### 1. Automatic Folder Scan
+Navigate to any directory with clothing photos:
 ```bash
-vintstack test-key --key "AIzaSy..."
+cd /path/to/photos
+vintgen
 ```
 
-### 2. Multi-image Analysis with Flaw Disclosure
+### 2. Multi-image Analysis with Seller Notes
 ```bash
-vintstack \
-  --images ./sneakers_profile.jpg,./sneakers_sole.jpg,./sneakers_box.jpg \
-  --notes "Minor scuff on the left heel, worn twice, includes original box" \
-  --lang it
+vintgen \
+  -i ./front.jpg,./label.jpg,./cuff.jpg \
+  -n "Vintage 1990s wool overcoat, size 48, missing bottom button" \
+  -l it
 ```
 
-### 3. Output Machine-Readable JSON for Scripts
+### 3. Machine-Readable JSON Export
 ```bash
-vintstack \
-  --images ./hoodie.jpg \
-  --format json \
-  --output ./listing_output.json
+vintgen -i ./item.jpg -f json -o ./listing.json
 ```
 
-### 4. Copy-Ready Vinted Description Only
+### 4. Vinted-Formatted Description Only
 ```bash
-vintstack \
-  --images ./dress.jpg \
-  --format vinted
+vintgen -i ./item.jpg -f vinted
 ```

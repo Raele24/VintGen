@@ -73,7 +73,6 @@ jobs:
           if ($nsisExe) {
             Write-Host "Found NSIS Installer: $($nsisExe.FullName)"
             Copy-Item $nsisExe.FullName "VintGen-Windows-Installer.exe"
-            Copy-Item $nsisExe.FullName "VintGen-Windows-Installer-$TAG.exe"
           } else {
             Write-Error "NSIS installer not found!"
           }
@@ -83,7 +82,6 @@ jobs:
           if (Test-Path $portableExe) {
             Write-Host "Found Portable Binary: $portableExe"
             Copy-Item $portableExe "VintGen-Windows-Portable.exe"
-            Copy-Item $portableExe "VintGen-Windows-Portable-$TAG.exe"
           } else {
             Write-Error "Portable binary not found!"
           }
@@ -104,6 +102,18 @@ jobs:
           name: VintGen ${{ steps.vars.outputs.TAG_NAME }}
           draft: false
           prerelease: false
-          generate_release_notes: true
+          generate_release_notes: false
+          body: |
+            ### Download VintGen ${{ steps.vars.outputs.TAG_NAME }}
+
+            | Platform | File | Description |
+            | :--- | :--- | :--- |
+            | **Android** | `VintGen-${{ steps.vars.outputs.TAG_NAME }}.apk` | Native Android application package |
+            | **Windows (Installer)** | `VintGen-Windows-Installer.exe` | Windows setup wizard with Desktop & Start shortcuts |
+            | **Windows (Portable)** | `VintGen-Windows-Portable.exe` | Standalone executable, no installation required |
+
+            ---
+            **Web App & PWA:** [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app)
+            **CLI Tool (npm):** `npx vintgen` or `npm install -g vintgen`
           files: |
             VintGen-Windows-*.exe

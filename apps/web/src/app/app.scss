@@ -2689,9 +2689,28 @@
   }
 }
 
-/* --- Tour Confirmation Modal Specifics --- */
+/* --- Tour Confirmation Modal Specifics (Centered Modal) --- */
+.modal-backdrop.modal-backdrop-center,
+.modal-backdrop:has(.tour-confirm-card) {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+}
+
 .tour-confirm-card {
-  max-width: 360px;
+  max-width: 380px;
+  width: 100%;
+  border-radius: 16px !important;
+  border: 1px solid var(--border-default) !important;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+  animation: modalCenterPop 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin: auto !important;
+
+  @media (max-width: 640px) {
+    max-width: 350px;
+    border-radius: 16px !important;
+    margin: auto !important;
+  }
 
   .modal-header {
     padding: 16px 18px 8px;
@@ -2730,6 +2749,17 @@
   .modal-footer {
     padding: 10px 18px 16px;
     border-top: none;
+  }
+}
+
+@keyframes modalCenterPop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
