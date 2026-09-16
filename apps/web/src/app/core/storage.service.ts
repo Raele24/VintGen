@@ -200,7 +200,7 @@ export class StorageService {
     return this.apiKey();
   });
 
-  /** Active model for the selected provider (configured for Ollama, defaults handled by provider) */
+  /** Active model for the selected provider (configured for Ollama, defaults handled dynamically by provider) */
   public activeModel = computed(() => {
     if (this.selectedProvider() === 'ollama') {
       return this.ollamaModel();

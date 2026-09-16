@@ -216,7 +216,7 @@ export class GeminiProvider implements AIProvider {
         const validModels = (data.models || []).filter((m) =>
           this.isValidVisionModel(m)
         );
-        const selected = this.pickVisionModel(validModels);
+        const selected = config.model?.trim() || this.pickVisionModel(validModels);
         return {
           success: true,
           message: selected
@@ -257,7 +257,10 @@ export class GeminiProvider implements AIProvider {
       name.includes('aqa') ||
       name.includes('audio') ||
       name.includes('tts') ||
-      name.includes('imagen')
+      name.includes('imagen') ||
+      name.endsWith('-image') ||
+      name.includes('preview-image') ||
+      name.includes('image-preview')
     ) {
       return false;
     }
@@ -274,32 +277,46 @@ export class GeminiProvider implements AIProvider {
   }
 
   /**
-   * Selects the optimal multimodal vision model from available candidates.
+   * Extracts the numeric version of a model from its name identifier.
+   */
+  private extractModelVersion(name: string): number {
+    const match = name.match(/gemini-(\d+(?:\.\d+)?)/i);
+    return match ? parseFloat(match[1]) : 0;
+  }
+
+  /**
+   * Selects the optimal multimodal vision model from available candidates,
+   * prioritizing higher semantic versions, flash models, and stable releases.
    */
   private pickVisionModel(models: Array<{ name: string }>): string | null {
     const modelNames = models.map((m) => m.name.replace(/^models\//, ''));
     if (modelNames.length === 0) return null;
 
-    // Separate flash models
-    const flashModels = modelNames.filter((name) => name.toLowerCase().includes('flash'));
+    const sorted = [...modelNames].sort((a, b) => {
+      const vA = this.extractModelVersion(a);
+      const vB = this.extractModelVersion(b);
+      if (vB !== vA) {
+        return vB - vA; // Highest version first
+      }
 
-    // Prefer stable (non-experimental) flash models
-    const stableFlash = [...flashModels]
-      .reverse()
-      .find((name) => !name.toLowerCase().includes('exp'));
-    if (stableFlash) return stableFlash;
+      // If identical version, prioritize flash variants for fast listings
+      const aIsFlash = a.toLowerCase().includes('flash') ? 1 : 0;
+      const bIsFlash = b.toLowerCase().includes('flash') ? 1 : 0;
+      if (bIsFlash !== aIsFlash) {
+        return bIsFlash - aIsFlash;
+      }
 
-    // Fallback to any flash model
-    const anyFlash = [...flashModels].reverse()[0];
-    if (anyFlash) return anyFlash;
+      // Prioritize stable over experimental/preview
+      const aIsExp = (a.toLowerCase().includes('exp') || a.toLowerCase().includes('preview')) ? 1 : 0;
+      const bIsExp = (b.toLowerCase().includes('exp') || b.toLowerCase().includes('preview')) ? 1 : 0;
+      if (aIsExp !== bIsExp) {
+        return aIsExp - bIsExp;
+      }
 
-    // Fallback to stable general models
-    const stableGeneral = [...modelNames]
-      .reverse()
-      .find((name) => !name.toLowerCase().includes('exp'));
-    if (stableGeneral) return stableGeneral;
+      return a.localeCompare(b);
+    });
 
-    return modelNames[modelNames.length - 1];
+    return sorted[0] || null;
   }
 
   /**
