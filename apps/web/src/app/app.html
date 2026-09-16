@@ -1138,6 +1138,49 @@
       </div>
 
       <div class="modal-body">
+        <!-- Credential Storage & Privacy Mode Selector -->
+        <div class="credential-privacy-banner">
+          <div class="privacy-banner-top">
+            <div class="privacy-banner-meta">
+              <span class="privacy-status-dot" [class.encrypted]="storage.storageMode() === 'encrypted'"></span>
+              <span class="privacy-banner-label">Credential Storage Mode</span>
+            </div>
+            <span class="privacy-banner-tag" [class.encrypted]="storage.storageMode() === 'encrypted'">
+              {{ storage.storageMode() === 'session' ? 'In-Memory Only' : 'Device AES-256' }}
+            </span>
+          </div>
+
+          <div class="privacy-segmented-toggle" role="radiogroup" aria-label="Credential Storage Mode">
+            <button type="button"
+                    class="seg-pill"
+                    [class.active]="storage.storageMode() === 'session'"
+                    (click)="setStorageMode('session')"
+                    role="radio"
+                    [attr.aria-checked]="storage.storageMode() === 'session'">
+              <div class="seg-pill-content">
+                <span class="seg-title">Session-Only</span>
+                <span class="seg-subtitle">RAM (Wiped on close)</span>
+              </div>
+            </button>
+            <button type="button"
+                    class="seg-pill"
+                    [class.active]="storage.storageMode() === 'encrypted'"
+                    (click)="setStorageMode('encrypted')"
+                    role="radio"
+                    [attr.aria-checked]="storage.storageMode() === 'encrypted'">
+              <div class="seg-pill-content">
+                <span class="seg-title">Encrypted Storage</span>
+                <span class="seg-subtitle">Device (AES-GCM-256)</span>
+              </div>
+            </button>
+          </div>
+          <p class="privacy-banner-desc">
+            {{ storage.storageMode() === 'session'
+                ? 'High Privacy: API keys reside strictly in volatile browser RAM and are completely erased when you close this window.'
+                : 'Persistent: API keys are encrypted with WebCrypto AES-GCM-256 before saving to this device.' }}
+          </p>
+        </div>
+
         <div class="provider-hub-list">
 
           <!-- 1. Google Gemini Card -->
@@ -1595,27 +1638,6 @@
               </div>
             </div>
             }
-          </div>
-        </div>
-
-        <!-- Security & Credential Persistence Panel -->
-        <div class="storage-security-panel">
-          <div class="security-panel-title">Credential Storage &amp; Privacy Mode</div>
-          <div class="security-mode-options">
-            <label class="mode-option" [class.selected]="storage.storageMode() === 'session'">
-              <input type="radio" name="storageMode" value="session" [checked]="storage.storageMode() === 'session'" (change)="setStorageMode('session')" />
-              <div class="mode-text">
-                <span class="mode-label">Session-Only Memory (Recommended)</span>
-                <span class="mode-hint">Keys reside strictly in volatile runtime memory. Never written to disk or localStorage. Discarded when window closes.</span>
-              </div>
-            </label>
-            <label class="mode-option" [class.selected]="storage.storageMode() === 'encrypted'">
-              <input type="radio" name="storageMode" value="encrypted" [checked]="storage.storageMode() === 'encrypted'" (change)="setStorageMode('encrypted')" />
-              <div class="mode-text">
-                <span class="mode-label">Encrypted Device Storage</span>
-                <span class="mode-hint">Keys are encrypted with WebCrypto AES-GCM-256 before persisting to device storage.</span>
-              </div>
-            </label>
           </div>
         </div>
       </div>

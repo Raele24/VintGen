@@ -206,18 +206,24 @@ export class GeminiProvider implements AIProvider {
       const res = await fetch(testUrl, { method: 'GET' });
       if (res.ok) {
         const data = (await res.json()) as {
-          models?: Array<{ name: string; supportedGenerationMethods?: string[] }>;
+          models?: Array<{
+            name: string;
+            supportedGenerationMethods?: string[];
+            thinking?: boolean;
+            supportedInputModalities?: string[];
+          }>;
         };
-        const count =
-          data.models?.filter((m) =>
-            m.supportedGenerationMethods?.includes('generateContent')
-          ).length || 0;
+        const validModels = (data.models || []).filter((m) =>
+          this.isValidVisionModel(m)
+        );
+        const selected = this.pickVisionModel(validModels);
         return {
           success: true,
-          message:
-            count > 0
-              ? `Connected successfully. ${count} content models available.`
-              : 'Connected successfully.',
+          message: selected
+            ? `Connected. Active vision engine: ${selected}`
+            : validModels.length > 0
+            ? `Connected. ${validModels.length} vision models available.`
+            : 'Connected successfully.',
         };
       }
       const errorJson = await res.json().catch(() => null);
@@ -230,7 +236,74 @@ export class GeminiProvider implements AIProvider {
   }
 
   /**
-   * Discovers an active model supporting generateContent for the provided API key.
+   * Evaluates whether a model entry supports multimodal vision generation.
+   */
+  private isValidVisionModel(m: {
+    name?: string;
+    supportedGenerationMethods?: string[];
+    thinking?: boolean;
+    supportedInputModalities?: string[];
+  }): boolean {
+    const name = (m.name || '').toLowerCase();
+    const supportsGenerate = m.supportedGenerationMethods?.includes('generateContent');
+    if (!supportsGenerate) return false;
+
+    // Reject text-only thinking models
+    if (m.thinking === true || name.includes('thinking')) return false;
+
+    // Reject embeddings, verification/answer, audio, tts, and image generation models
+    if (
+      name.includes('embed') ||
+      name.includes('aqa') ||
+      name.includes('audio') ||
+      name.includes('tts') ||
+      name.includes('imagen')
+    ) {
+      return false;
+    }
+
+    // If API declares supported input modalities, verify image support
+    if (Array.isArray(m.supportedInputModalities) && m.supportedInputModalities.length > 0) {
+      const hasImage = m.supportedInputModalities.some((mod) =>
+        mod.toLowerCase().includes('image')
+      );
+      if (!hasImage) return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Selects the optimal multimodal vision model from available candidates.
+   */
+  private pickVisionModel(models: Array<{ name: string }>): string | null {
+    const modelNames = models.map((m) => m.name.replace(/^models\//, ''));
+    if (modelNames.length === 0) return null;
+
+    // Separate flash models
+    const flashModels = modelNames.filter((name) => name.toLowerCase().includes('flash'));
+
+    // Prefer stable (non-experimental) flash models
+    const stableFlash = [...flashModels]
+      .reverse()
+      .find((name) => !name.toLowerCase().includes('exp'));
+    if (stableFlash) return stableFlash;
+
+    // Fallback to any flash model
+    const anyFlash = [...flashModels].reverse()[0];
+    if (anyFlash) return anyFlash;
+
+    // Fallback to stable general models
+    const stableGeneral = [...modelNames]
+      .reverse()
+      .find((name) => !name.toLowerCase().includes('exp'));
+    if (stableGeneral) return stableGeneral;
+
+    return modelNames[modelNames.length - 1];
+  }
+
+  /**
+   * Discovers an active model supporting multimodal content generation for the provided API key.
    */
   private async discoverModel(baseUrl: string, apiKey: string): Promise<string> {
     const listUrl = `${baseUrl}/models?key=${encodeURIComponent(apiKey)}`;
@@ -238,25 +311,23 @@ export class GeminiProvider implements AIProvider {
       const res = await fetch(listUrl, { method: 'GET' });
       if (res.ok) {
         const data = (await res.json()) as {
-          models?: Array<{ name: string; supportedGenerationMethods?: string[] }>;
+          models?: Array<{
+            name: string;
+            supportedGenerationMethods?: string[];
+            thinking?: boolean;
+            supportedInputModalities?: string[];
+          }>;
         };
-        const contentModels = (data.models || [])
-          .filter((m) => m.supportedGenerationMethods?.includes('generateContent'))
-          .map((m) => m.name.replace(/^models\//, ''));
-
-        // Prefer latest flash model if available, otherwise latest content model
-        const flashModel = [...contentModels]
-          .reverse()
-          .find((name) => name.toLowerCase().includes('flash'));
-        if (flashModel) return flashModel;
-        if (contentModels.length > 0) return contentModels[contentModels.length - 1];
+        const validModels = (data.models || []).filter((m) => this.isValidVisionModel(m));
+        const selected = this.pickVisionModel(validModels);
+        if (selected) return selected;
       }
     } catch {
       // Fall through to error
     }
 
     throw new Error(
-      'Could not automatically determine an active Gemini model for this API key. Please specify a model in configuration or via --model.'
+      'Could not automatically determine an active multimodal Gemini model for this API key. Please specify a model in configuration or via --model.'
     );
   }
 }
