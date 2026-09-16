@@ -244,7 +244,12 @@ export class GeminiProvider implements AIProvider {
     thinking?: boolean;
     supportedInputModalities?: string[];
   }): boolean {
-    const name = (m.name || '').toLowerCase();
+    const rawName = (m.name || '').toLowerCase();
+    const name = rawName.replace(/^models\//, '');
+
+    // Must be a Gemini family model
+    if (!name.startsWith('gemini-')) return false;
+
     const supportsGenerate = m.supportedGenerationMethods?.includes('generateContent');
     if (!supportsGenerate) return false;
 
