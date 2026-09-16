@@ -36,7 +36,7 @@ async function deriveStorageKey(): Promise<CryptoKey> {
   const enc = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
-    enc.encode(originEntropy),
+    enc.encode(originEntropy) as unknown as BufferSource,
     { name: 'PBKDF2' },
     false,
     ['deriveKey']
@@ -45,7 +45,7 @@ async function deriveStorageKey(): Promise<CryptoKey> {
   return crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt,
+      salt: salt as unknown as BufferSource,
       iterations: 100000,
       hash: 'SHA-256',
     },
@@ -68,9 +68,9 @@ export async function encryptSecret(secret: string): Promise<string> {
     const encoded = new TextEncoder().encode(secret.trim());
 
     const ciphertextBuffer = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv },
+      { name: 'AES-GCM', iv: iv as unknown as BufferSource },
       key,
-      encoded
+      encoded as unknown as BufferSource
     );
 
     const ivBase64 = btoa(String.fromCharCode(...iv));
@@ -102,9 +102,9 @@ export async function decryptSecret(payload: string): Promise<string> {
     const key = await deriveStorageKey();
 
     const decryptedBuffer = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
+      { name: 'AES-GCM', iv: iv as unknown as BufferSource },
       key,
-      ciphertext
+      ciphertext as unknown as BufferSource
     );
 
     return new TextDecoder().decode(decryptedBuffer);
