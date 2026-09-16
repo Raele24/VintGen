@@ -126,13 +126,14 @@ export class GeminiProvider implements AIProvider {
       if (!response.ok) {
         const errorText = await response.text();
 
-        // If the dynamically discovered model failed due to unsupported modality or resource exhaustion with limit 0,
-        // retry once with the official dynamic alias
+        // If the dynamically discovered model failed due to unsupported modality, server overload (503),
+        // or resource exhaustion with limit 0, retry once with the official dynamic alias
         if (
           !config.model &&
           model !== 'gemini-flash-latest' &&
           (response.status === 404 ||
             response.status === 400 ||
+            response.status === 503 ||
             (response.status === 429 && errorText.includes('limit: 0')))
         ) {
           const fallbackEndpoint = `${baseUrl}/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(
@@ -152,6 +153,27 @@ export class GeminiProvider implements AIProvider {
             const fallbackRawText = fallbackCandidate?.content?.parts?.[0]?.text;
             if (fallbackRawText) {
               const parsedData = JSON.parse(fallbackRawText);
+              return this.sanitizeListingResult(parsedData);
+            }
+          }
+        }
+
+        // Handle transient 503 high demand spike with a brief backoff retry
+        if (response.status === 503) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          const retryResponse = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+          });
+          if (retryResponse.ok) {
+            const retryJson = await retryResponse.json();
+            const retryCandidate = retryJson.candidates?.[0];
+            const retryRawText = retryCandidate?.content?.parts?.[0]?.text;
+            if (retryRawText) {
+              const parsedData = JSON.parse(retryRawText);
               return this.sanitizeListingResult(parsedData);
             }
           }
