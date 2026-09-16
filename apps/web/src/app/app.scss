@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    VintGen Main Application Styles
    Architectural, Pure, Minimalist Design
    ========================================================================== */
@@ -3649,7 +3649,7 @@
 
 .modal-footer {
   display: flex !important;
-  justify-content: flex-end !important;
+  justify-content: space-between !important;
   flex-direction: row !important;
   align-items: center !important;
   padding: 12px 20px !important;
@@ -3657,8 +3657,82 @@
   background: var(--bg-surface) !important;
   flex-shrink: 0 !important;
 
+  .modal-footer-left {
+    margin-right: auto;
+  }
+
   .modal-footer-right {
     margin-left: auto !important;
+  }
+}
+
+/* --- Storage & Credential Security Panel --- */
+.storage-security-panel {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+
+  .security-panel-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .security-mode-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mode-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-surface);
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+
+    input[type="radio"] {
+      margin-top: 3px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    .mode-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+
+      .mode-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .mode-hint {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+    }
+
+    &.selected {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    &:hover:not(.selected) {
+      border-color: var(--border-default);
+    }
   }
 }
 

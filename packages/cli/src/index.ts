@@ -8,6 +8,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import * as readline from 'readline';
 import { VintGenEngine, ImageInput, ListingInput } from '@vintgen/core';
 
 interface CliConfig {
@@ -22,6 +23,67 @@ interface CliConfig {
 const CONFIG_DIR = path.join(os.homedir(), '.vintgen');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
 
+/**
+ * Redacts an API key for safe terminal display.
+ */
+function redactApiKey(key?: string): string {
+  if (!key) return '(not configured)';
+  if (key.length <= 8) return '****';
+  return `${key.slice(0, 4)}...${key.slice(-4)}`;
+}
+
+/**
+ * Reads an API key interactively without echoing it to the terminal.
+ */
+function promptMaskedInput(promptText: string): Promise<string> {
+  return new Promise((resolve) => {
+    if (!process.stdin.isTTY) {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+      });
+      rl.question(promptText, (ans) => {
+        rl.close();
+        resolve(ans.trim());
+      });
+      return;
+    }
+
+    process.stdout.write(promptText);
+    let input = '';
+
+    const onData = (char: Buffer) => {
+      const str = char.toString('utf-8');
+      for (const c of str) {
+        if (c === '\n' || c === '\r' || c === '\u0004') {
+          process.stdin.removeListener('data', onData);
+          if (process.stdin.isRaw) {
+            process.stdin.setRawMode(false);
+          }
+          process.stdin.pause();
+          process.stdout.write('\n');
+          resolve(input.trim());
+          return;
+        }
+        if (c === '\u0003') {
+          process.exit(1);
+        }
+        if (c === '\u0008' || c === '\x7f') {
+          if (input.length > 0) {
+            input = input.slice(0, -1);
+          }
+        } else {
+          input += c;
+        }
+      }
+    };
+
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+    process.stdin.on('data', onData);
+  });
+}
+
 function loadConfig(): CliConfig {
   try {
     if (fs.existsSync(CONFIG_FILE)) {
@@ -32,14 +94,24 @@ function loadConfig(): CliConfig {
   return {};
 }
 
+/**
+ * Saves configuration with strict POSIX owner-only permissions (0700 dir, 0600 file).
+ */
 function saveConfig(cfg: Partial<CliConfig>): void {
   try {
     if (!fs.existsSync(CONFIG_DIR)) {
-      fs.mkdirSync(CONFIG_DIR, { recursive: true });
+      fs.mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
+    } else {
+      try {
+        fs.chmodSync(CONFIG_DIR, 0o700);
+      } catch { }
     }
     const current = loadConfig();
     const merged = { ...current, ...cfg };
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), 'utf8');
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), { encoding: 'utf8', mode: 0o600 });
+    try {
+      fs.chmodSync(CONFIG_FILE, 0o600);
+    } catch { }
   } catch (err) {
     console.error('Failed to save configuration:', err);
   }
@@ -166,7 +238,7 @@ USAGE:
 
 COMMANDS:
   generate              Generate listing (default)
-  set-key <key>         Save API key permanently (~/.vintgen/config.json)
+  set-key [key]         Save API key permanently (run without args for masked input)
   config                View or update configuration (--key, --provider, --model, --lang)
   test-key              Test connection to configured AI provider
 
@@ -176,7 +248,7 @@ OPTIONS:
   -t, --title <text>    Tentative or rough item title
   -b, --brand <brand>   Brand hint or confirmation
   -l, --lang <code>     Listing language: en (default), it, fr, es, de
-  -k, --key <key>       API key (defaults to config, or GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY)
+  -k, --key <key>       API key (prefer environment variables to prevent shell history leaks)
   -p, --provider <name> AI provider: gemini (default), openai, claude, ollama
   -m, --model <name>    Model name (e.g. custom or provider-specific model)
   -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434)
@@ -185,6 +257,12 @@ OPTIONS:
   -o, --output <file>   Write output to destination file (defaults to vintgen-listing.txt)
   -v, --version         Print CLI version
   -h, --help            Print help information
+
+ENVIRONMENT VARIABLES (RECOMMENDED FOR SECURITY):
+  GEMINI_API_KEY        Google Gemini API Key
+  OPENAI_API_KEY        OpenAI API Key
+  ANTHROPIC_API_KEY     Anthropic Claude API Key
+  OLLAMA_HOST           Ollama host URL (default: http://localhost:11434)
 
 EXAMPLES:
   $ vintgen config --provider gemini --key <YOUR_KEY>
@@ -247,15 +325,24 @@ async function main(): Promise<void> {
     process.exitCode = 0; return;
   }
 
+  if (args.apiKey || (args.command === 'set-key' && args.commandArg && args.commandArg !== '-')) {
+    console.warn('\nSecurity advisory: Passing API keys as command line arguments can expose them in shell history and system process listings.');
+    console.warn('Recommended: Use environment variables (e.g. export GEMINI_API_KEY=...) or interactive input ("vintgen set-key").\n');
+  }
+
   // Handle set-key shortcut
   if (args.command === 'set-key') {
-    const keyToSave = args.commandArg || args.apiKey;
+    let keyToSave = args.commandArg || args.apiKey;
+    if (!keyToSave || keyToSave === '-') {
+      keyToSave = await promptMaskedInput('Enter API key (input hidden): ');
+    }
     if (!keyToSave) {
-      console.error('Error: Please specify the API key to save. Example: vintgen set-key <YOUR_KEY>');
+      console.error('Error: No API key provided.');
       process.exitCode = 1; return;
     }
-    saveConfig({ apiKey: keyToSave, provider: args.provider || 'gemini' });
-    console.log(`API Key successfully saved to ${CONFIG_FILE}`);
+    const targetProvider = args.provider || savedConfig.provider || 'gemini';
+    saveConfig({ apiKey: keyToSave, provider: targetProvider });
+    console.log(`API Key successfully saved for provider "${targetProvider}" to ${CONFIG_FILE} (permissions: 0600 owner only).`);
     console.log('You can now run "vintgen" in any folder without passing --key.');
     process.exitCode = 0; return;
   }
@@ -271,10 +358,14 @@ async function main(): Promise<void> {
       if (args.endpoint) updates.endpoint = args.endpoint;
       if (args.platform) updates.platform = args.platform;
       saveConfig(updates);
-      console.log(`Configuration updated in ${CONFIG_FILE}:`, loadConfig());
+      const current = loadConfig();
+      const safeDisplay = { ...current, apiKey: redactApiKey(current.apiKey) };
+      console.log(`Configuration updated in ${CONFIG_FILE} (permissions: 0600):`, safeDisplay);
     } else {
-      console.log('Current configuration:', savedConfig);
-      console.log(`Config file: ${CONFIG_FILE}`);
+      const safeDisplay = { ...savedConfig, apiKey: redactApiKey(savedConfig.apiKey) };
+      console.log('Current configuration:', safeDisplay);
+      console.log(`Config file: ${CONFIG_FILE} (permissions: 0600 owner only)`);
+      console.log('Environment variables: GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY');
     }
     process.exitCode = 0; return;
   }

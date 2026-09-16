@@ -34,23 +34,23 @@ npm install -g vintgen
 
 ## Setting Up Your AI Provider
 
-Choose your preferred AI provider or run 100% offline with Ollama:
+### Recommended: Environment Variables (Highest Security)
+Avoid shell history and process table exposure by setting environment variables:
 
 ```bash
-# Example: Google Gemini
-vintgen config --provider gemini --key <YOUR_KEY>
-
-# Example: OpenAI
-vintgen config --provider openai --key <YOUR_KEY>
-
-# Example: Anthropic Claude
-vintgen config --provider claude --key <YOUR_KEY>
-
-# Example: local Ollama (runs offline on your PC, no key needed)
-vintgen config --provider ollama
+export GEMINI_API_KEY="<YOUR_KEY>"
+export OPENAI_API_KEY="<YOUR_KEY>"
+export ANTHROPIC_API_KEY="<YOUR_KEY>"
 ```
 
-You can also pass keys using environment variables (`GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`) or the `-k, --key` flag.
+### Workstation Persistence (Masked Prompt, 0600 Permissions)
+```bash
+# Prompts for key with hidden terminal input
+vintgen set-key
+
+# Local Ollama (runs offline on your PC, no key needed)
+vintgen config --provider ollama
+```
 
 ---
 

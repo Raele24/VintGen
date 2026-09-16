@@ -1,4 +1,4 @@
-﻿# VintGen
+# VintGen
 
 > Create marketplace listings from item photos with AI.  
 > Works in your browser, on Android, Windows, and the terminal.
@@ -116,28 +116,24 @@ VintGen connects directly from your device to the AI provider you prefer:
 ### How to set your key
 
 #### In the Web, Windows, or Android App:
-Click the **API Settings** button in the top navigation bar to select your provider and enter your key.
+Click the **API Settings** button in the top navigation bar to select your provider and choose your storage mode:
+- **Session-Only Memory (Recommended)**: Credentials remain strictly in runtime memory and are cleared when the window closes.
+- **Encrypted Device Storage**: Credentials are encrypted at rest via WebCrypto AES-GCM-256.
 
 #### In the Command Line:
-Use the `config` command:
+For optimal security, use environment variables to avoid shell history and process table exposure:
 ```bash
-# Example: Google Gemini
-vintgen config --provider gemini --key <YOUR_KEY>
+# Recommended: Environment variables
+export GEMINI_API_KEY="<YOUR_KEY>"
+export OPENAI_API_KEY="<YOUR_KEY>"
+export ANTHROPIC_API_KEY="<YOUR_KEY>"
 
-# Example: OpenAI
-vintgen config --provider openai --key <YOUR_KEY>
+# Workstation persistence (interactive masked prompt, permissions: 0600)
+vintgen set-key
 
-# Example: Anthropic Claude
-vintgen config --provider claude --key <YOUR_KEY>
-
-# Example: local Ollama (offline, zero API key)
+# Local Ollama (offline, zero API key required)
 vintgen config --provider ollama
 ```
-
-You can also set environment variables:
-- `GEMINI_API_KEY`
-- `OPENAI_API_KEY`
-- `ANTHROPIC_API_KEY`
 
 
 ---

@@ -1,4 +1,4 @@
-﻿# VintGen CLI User Guide
+# VintGen CLI User Guide
 
 The `vintgen` CLI provides listing creation directly in your terminal from item photos.
 Published on [npm (vintgen)](https://www.npmjs.com/package/vintgen).
@@ -23,26 +23,27 @@ npm install -g vintgen
 
 ## 2. Provider Setup
 
-VintGen supports multi-provider Bring Your Own Key (BYOK) configurations:
+VintGen supports multi-provider Bring Your Own Key (BYOK) configurations and local offline models.
+
+### Recommended: Environment Variables (Highest Security)
+Environment variables prevent secrets from entering shell history (`~/.bash_history`, PowerShell PSReadLine) and process inspection tables (`ps aux`, Task Manager):
 
 ```bash
-# Example: Google Gemini
-vintgen config --provider gemini --key <YOUR_KEY>
-
-# Example: OpenAI
-vintgen config --provider openai --key <YOUR_KEY>
-
-# Example: Anthropic Claude
-vintgen config --provider claude --key <YOUR_KEY>
-
-# Example: Local Ollama (offline, zero API key)
-vintgen config --provider ollama
+export GEMINI_API_KEY="<YOUR_KEY>"
+export OPENAI_API_KEY="<YOUR_KEY>"
+export ANTHROPIC_API_KEY="<YOUR_KEY>"
 ```
 
-You can also export environment variables:
-- `GEMINI_API_KEY`
-- `OPENAI_API_KEY`
-- `ANTHROPIC_API_KEY`
+### Workstation Persistence (Interactive Masked Input)
+To persist credentials locally on your workstation, use `vintgen set-key` without arguments. It prompts for the key with muted terminal input and enforces POSIX `0600` permissions on `~/.vintgen/config.json`:
+
+```bash
+# Prompts for key with hidden input
+vintgen set-key
+
+# Local Ollama (100% offline, zero API key required)
+vintgen config --provider ollama
+```
 
 ---
 

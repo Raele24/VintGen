@@ -1,4 +1,4 @@
-﻿<!-- VintGen Application Shell -->
+<!-- VintGen Application Shell -->
 <div class="app-layout">
   <!-- Navigation Bar -->
   <header class="navbar" role="banner">
@@ -1595,10 +1595,41 @@
               </div>
             </div>
             }
-          </div></div>
+          </div>
+        </div>
+
+        <!-- Security & Credential Persistence Panel -->
+        <div class="storage-security-panel">
+          <div class="security-panel-title">Credential Storage &amp; Privacy Mode</div>
+          <div class="security-mode-options">
+            <label class="mode-option" [class.selected]="storage.storageMode() === 'session'">
+              <input type="radio" name="storageMode" value="session" [checked]="storage.storageMode() === 'session'" (change)="setStorageMode('session')" />
+              <div class="mode-text">
+                <span class="mode-label">Session-Only Memory (Recommended)</span>
+                <span class="mode-hint">Keys reside strictly in volatile runtime memory. Never written to disk or localStorage. Discarded when window closes.</span>
+              </div>
+            </label>
+            <label class="mode-option" [class.selected]="storage.storageMode() === 'encrypted'">
+              <input type="radio" name="storageMode" value="encrypted" [checked]="storage.storageMode() === 'encrypted'" (change)="setStorageMode('encrypted')" />
+              <div class="mode-text">
+                <span class="mode-label">Encrypted Device Storage</span>
+                <span class="mode-hint">Keys are encrypted with WebCrypto AES-GCM-256 before persisting to device storage.</span>
+              </div>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
+        <div class="modal-footer-left">
+          <button type="button" class="btn-danger-subtle btn-sm" (click)="purgeAllCredentials()" title="Immediately purge all keys from memory and disk">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Purge All Credentials</span>
+          </button>
+        </div>
         <div class="modal-footer-right">
           <button type="button" class="btn-modal-done" (click)="closeKeyModal()">
             Done

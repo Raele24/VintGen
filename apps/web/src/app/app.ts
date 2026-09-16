@@ -1,4 +1,4 @@
-﻿import {
+import {
   Component,
   inject,
   signal,
@@ -1111,6 +1111,19 @@ export class App {
     }
     this.keyTestResult.set(null);
     this.showKeyModal.set(false);
+  }
+
+  public purgeAllCredentials(): void {
+    this.storage.purgeAllCredentials();
+    this.tempApiKey.set('');
+    this.keyTestResult.set({
+      success: true,
+      message: 'All API keys have been purged from memory and storage.',
+    });
+  }
+
+  public setStorageMode(mode: 'session' | 'encrypted'): void {
+    this.storage.setStorageMode(mode);
   }
 
   // --- History & Reset Controls ---
