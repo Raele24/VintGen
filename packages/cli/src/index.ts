@@ -178,7 +178,7 @@ OPTIONS:
   -l, --lang <code>     Listing language: en (default), it, fr, es, de
   -k, --key <key>       API key (defaults to config, or GEMINI_API_KEY / OPENAI_API_KEY / ANTHROPIC_API_KEY)
   -p, --provider <name> AI provider: gemini (default), openai, claude, ollama
-  -m, --model <name>    Model name (e.g. gemini-2.5-flash, gpt-4o-mini, llama3.2-vision)
+  -m, --model <name>    Model name (e.g. custom or provider-specific model)
   -e, --endpoint <url>  Ollama endpoint URL (default: http://localhost:11434)
   -P, --platform <name> Target platform: universal (default), vinted, ebay, depop, subito, wallapop
   -f, --format <type>   Output format: text (default), json, markdown
@@ -382,11 +382,14 @@ async function main(): Promise<void> {
     process.exitCode = 1; return;
   }
 
-  let providerDisplay = 'AI Vision Model';
-  if (provider === 'claude') providerDisplay = `Anthropic Claude (${model || 'claude-3-5-sonnet-latest'})`;
-  else if (provider === 'openai') providerDisplay = `OpenAI (${model || 'gpt-4o-mini'})`;
-  else if (provider === 'ollama') providerDisplay = `Local Ollama (${model || 'llama3.2-vision'})`;
-  else if (provider === 'gemini') providerDisplay = `Google Gemini (${model || 'gemini-3.6-flash'})`;
+  const providerNames: Record<string, string> = {
+    claude: 'Anthropic Claude',
+    openai: 'OpenAI',
+    ollama: 'Local Ollama',
+    gemini: 'Google Gemini',
+  };
+  const baseProviderName = providerNames[provider] || 'AI Vision Model';
+  const providerDisplay = model ? `${baseProviderName} (${model})` : baseProviderName;
   console.log(`\nAnalyzing item with ${providerDisplay} (${imageInputs.length} image(s), language: ${language.toUpperCase()})...`);
 
   const listingInput: ListingInput = {

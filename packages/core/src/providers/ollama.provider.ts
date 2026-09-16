@@ -1,5 +1,5 @@
-﻿/**
- * Ollama Local AI Provider (Llama 3.2 Vision, LLaVA, MiniCPM-V, etc.)
+/**
+ * Ollama Local AI Provider
  *
  * Implements the AIProvider interface for locally hosted Ollama instances
  * with multi-modal vision support for private, offline listing generation.

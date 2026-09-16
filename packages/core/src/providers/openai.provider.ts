@@ -1,5 +1,5 @@
-﻿/**
- * OpenAI Provider (GPT-4o / GPT-4o-mini with Vision)
+/**
+ * OpenAI Provider
  *
  * Implements the AIProvider interface for OpenAI's Chat Completions API
  * with multimodal vision support for image-based listing generation.
@@ -16,7 +16,7 @@ import { MARKETPLACE_SYSTEM_INSTRUCTION } from '../prompts';
 
 export class OpenAIProvider implements AIProvider {
   public readonly id = 'openai';
-  public readonly name = 'OpenAI (GPT-4o)';
+  public readonly name = 'OpenAI (BYOK)';
 
   public static readonly DEFAULT_MODEL = 'gpt-4o-mini';
 
@@ -245,11 +245,11 @@ export class OpenAIProvider implements AIProvider {
       if (res.ok) {
         const data = await res.json();
         const models = data.data?.map((m: { id: string }) => m.id) || [];
-        const hasVision = models.some((m: string) => m.includes('gpt-4o'));
+        const hasVision = models.some((m: string) => m.includes('gpt') || m.includes('vision') || m.includes('4o'));
         if (hasVision) {
-          return { success: true, message: 'Connected successfully. GPT-4o Vision models available.' };
+          return { success: true, message: 'Connected successfully. Vision models available.' };
         }
-        return { success: true, message: 'Connected successfully. Note: GPT-4o models recommended for best results.' };
+        return { success: true, message: 'Connected successfully.' };
       }
 
       const errorJson = await res.json().catch(() => null);

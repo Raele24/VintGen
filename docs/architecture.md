@@ -1,4 +1,4 @@
-﻿# VintGen System Architecture
+# VintGen System Architecture
 
 VintGen is an open-source, modular toolkit engineered to automate high-converting listing creation for Vinted and secondhand fashion marketplaces.
 
@@ -20,14 +20,14 @@ graph TB
         ENG["VintGen Orchestrator"]
         REG["Provider Registry"]
         SCH["Listing Schemas & Prompts"]
-        PLT["Vinted Platform Adapter"]
+        PLT["Marketplace Platform Adapter"]
     end
 
     subgraph "Implemented AI Providers (BYOK)"
-        GEMINI["Google Gemini<br/>gemini-2.5-flash"]
-        OPENAI["OpenAI<br/>gpt-4o-mini"]
-        CLAUDE["Anthropic Claude<br/>claude-3-5-sonnet"]
-        OLLAMA["Local Ollama<br/>llama3.2-vision (Offline)"]
+        GEMINI["Google Gemini"]
+        OPENAI["OpenAI"]
+        CLAUDE["Anthropic Claude"]
+        OLLAMA["Local Ollama<br/>(Offline)"]
     end
 
     WEB --> ENG
@@ -68,9 +68,9 @@ The project is structured as an npm workspace monorepo:
    - The user provides one or more garment images (as files, local filesystem paths, or base64 strings) alongside optional seller notes (title, brand, condition, flaws, target language).
 2. **Photo Analysis**:
    - The core orchestrator forwards the images and structured instructions to the user-selected AI provider:
-     - **Google Gemini**: Uses native vision schemas with `gemini-2.5-flash`.
-     - **OpenAI**: Uses Vision structured outputs with `gpt-4o-mini`.
-     - **Anthropic Claude**: Uses Claude Messages API with images with `claude-3-5-sonnet`.
+     - **Google Gemini**: Uses native vision schemas via the Gemini API.
+     - **OpenAI**: Uses vision structured outputs.
+     - **Anthropic Claude**: Uses the Claude Messages API with multimodal vision.
      - **Local Ollama**: Executes entirely on-device via local vision models (such as `llama3.2-vision`), requiring zero external network requests.
 2. **Client-Side Image Pre-Processing (Optional)**:
    - Before submission to the vision model, users can run on-device photo optimizations:

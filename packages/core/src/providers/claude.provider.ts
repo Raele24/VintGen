@@ -1,5 +1,5 @@
-﻿/**
- * Anthropic Claude Provider (Claude 3.5 Sonnet / Haiku with Vision)
+/**
+ * Anthropic Claude Provider
  *
  * Implements the AIProvider interface for Anthropic's Messages API
  * with multimodal vision support for image-based listing generation.

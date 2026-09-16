@@ -1,4 +1,4 @@
-﻿# Adding Custom AI Providers
+# Adding Custom AI Providers
 
 VintGen is engineered with strict provider decoupling. Adding support for another AI provider requires zero changes to the web application UI or CLI command signatures.
 
@@ -8,12 +8,12 @@ VintGen is engineered with strict provider decoupling. Adding support for anothe
 
 The core engine (`@vintgen/core`) comes with four production providers already implemented:
 
-| Provider ID | Provider Class | Default Model | Network Type |
-| :--- | :--- | :--- | :--- |
-| `gemini` | `GeminiProvider` | `gemini-2.5-flash` | Cloud BYOK (Google AI Studio) |
-| `openai` | `OpenAIProvider` | `gpt-4o-mini` | Cloud BYOK (OpenAI Platform) |
-| `claude` | `ClaudeProvider` | `claude-3-5-sonnet` | Cloud BYOK (Anthropic Console) |
-| `ollama` | `OllamaProvider` | `llama3.2-vision` | Local Offline (No API key) |
+| Provider ID | Provider Class | Network Type |
+| :--- | :--- | :--- |
+| `gemini` | `GeminiProvider` | Cloud BYOK (Google AI Studio) |
+| `openai` | `OpenAIProvider` | Cloud BYOK (OpenAI Platform) |
+| `claude` | `ClaudeProvider` | Cloud BYOK (Anthropic Console) |
+| `ollama` | `OllamaProvider` | Local Offline (No API key) |
 
 All built-in providers are located in `packages/core/src/providers/`.
 
