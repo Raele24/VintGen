@@ -19,6 +19,7 @@ export class GeminiProvider implements AIProvider {
   public readonly id = 'gemini';
   public readonly name = 'Google Gemini (BYOK)';
   private cachedModelByKey = new Map<string, string>();
+  private cachedCandidatesByKey = new Map<string, string[]>();
 
   /**
    * Generates a structured marketplace listing using the vision model.
@@ -101,117 +102,102 @@ export class GeminiProvider implements AIProvider {
     const baseUrl =
       config.baseUrl || 'https://generativelanguage.googleapis.com/v1beta';
 
-    const model =
-      config.model?.trim() || (await this.discoverModel(baseUrl, config.apiKey.trim()));
+    const candidates = config.model?.trim()
+      ? [config.model.trim()]
+      : await this.getCandidateOrder(baseUrl, config.apiKey.trim());
 
-    const endpoint = `${baseUrl}/models/${model}:generateContent?key=${encodeURIComponent(
-      config.apiKey.trim()
-    )}`;
+    let lastError: Error | null = null;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), config.timeoutMs || 45000);
+    for (let i = 0; i < candidates.length; i++) {
+      const model = candidates[i];
+      const endpoint = `${baseUrl}/models/${model}:generateContent?key=${encodeURIComponent(
+        config.apiKey.trim()
+      )}`;
 
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), config.timeoutMs || 45000);
 
-      clearTimeout(timeout);
+      try {
+        let response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+          signal: controller.signal,
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
+        clearTimeout(timeout);
 
-        // If the dynamically discovered model failed due to unsupported modality, server overload (503),
-        // or resource exhaustion with limit 0, retry once with the official dynamic alias
-        if (
-          !config.model &&
-          model !== 'gemini-flash-latest' &&
-          (response.status === 404 ||
-            response.status === 400 ||
-            response.status === 503 ||
-            (response.status === 429 && errorText.includes('limit: 0')))
-        ) {
-          const fallbackEndpoint = `${baseUrl}/models/gemini-flash-latest:generateContent?key=${encodeURIComponent(
-            config.apiKey.trim()
-          )}`;
-          const fallbackResponse = await fetch(fallbackEndpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-          });
-          if (fallbackResponse.ok) {
-            this.cachedModelByKey.set(config.apiKey.trim(), 'gemini-flash-latest');
-            const fallbackJson = await fallbackResponse.json();
-            const fallbackCandidate = fallbackJson.candidates?.[0];
-            const fallbackRawText = fallbackCandidate?.content?.parts?.[0]?.text;
-            if (fallbackRawText) {
-              const parsedData = JSON.parse(fallbackRawText);
-              return this.sanitizeListingResult(parsedData);
-            }
-          }
-        }
-
-        // Handle transient 503 high demand spike with a brief backoff retry
-        if (response.status === 503) {
+        // If transient 503 spike occurs and this is the final candidate, attempt a 2-second backoff retry
+        if (response.status === 503 && i === candidates.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          const retryResponse = await fetch(endpoint, {
+          response = await fetch(endpoint, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(requestBody),
           });
-          if (retryResponse.ok) {
-            const retryJson = await retryResponse.json();
-            const retryCandidate = retryJson.candidates?.[0];
-            const retryRawText = retryCandidate?.content?.parts?.[0]?.text;
-            if (retryRawText) {
-              const parsedData = JSON.parse(retryRawText);
-              return this.sanitizeListingResult(parsedData);
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          let errorMessage = `AI vision model (${model}) responded with status ${response.status}`;
+          try {
+            const parsed = JSON.parse(errorText);
+            if (parsed.error?.message) {
+              errorMessage = `${errorMessage}: ${parsed.error.message}`;
             }
+          } catch {
+            errorMessage = `${errorMessage}: ${errorText.slice(0, 200)}`;
           }
-        }
 
-        let errorMessage = `Gemini API responded with status ${response.status}`;
-        try {
-          const parsed = JSON.parse(errorText);
-          if (parsed.error?.message) {
-            errorMessage = `${errorMessage}: ${parsed.error.message}`;
+          lastError = new Error(errorMessage);
+
+          // If current candidate failed due to capacity spike (503), not found (404), unsupported modality (400),
+          // or zero free-tier quota (429 with limit: 0), failover immediately to the next candidate model
+          const isFailoverStatus =
+            response.status === 503 ||
+            response.status === 404 ||
+            response.status === 400 ||
+            (response.status === 429 && errorText.includes('limit: 0'));
+
+          if (i < candidates.length - 1 && isFailoverStatus) {
+            continue;
           }
-        } catch {
-          errorMessage = `${errorMessage}: ${errorText.slice(0, 200)}`;
+
+          throw lastError;
         }
 
-        throw new Error(errorMessage);
-      }
+        const jsonResponse = await response.json();
+        const candidate = jsonResponse.candidates?.[0];
+        const rawText = candidate?.content?.parts?.[0]?.text;
 
-      const jsonResponse = await response.json();
-      const candidate = jsonResponse.candidates?.[0];
-      const rawText = candidate?.content?.parts?.[0]?.text;
-
-      if (!rawText) {
-        throw new Error('No content returned from Gemini model.');
-      }
-
-      const parsedData = JSON.parse(rawText);
-      return this.sanitizeListingResult(parsedData);
-    } catch (err: unknown) {
-      clearTimeout(timeout);
-      if (err instanceof Error) {
-        if (err.name === 'AbortError') {
-          throw new Error('Gemini API request timed out after 45s. Please check your connection.');
+        if (!rawText) {
+          throw new Error(`No content returned from AI vision model (${model}).`);
         }
-        throw err;
+
+        const parsedData = JSON.parse(rawText);
+        // Cache this successful candidate as the preferred model
+        this.cachedModelByKey.set(config.apiKey.trim(), model);
+        return this.sanitizeListingResult(parsedData);
+      } catch (err: unknown) {
+        clearTimeout(timeout);
+        if (err instanceof Error && err.name === 'AbortError') {
+          throw new Error('AI vision model request timed out after 45s. Please check your connection.');
+        }
+        if (i < candidates.length - 1 && lastError) {
+          continue;
+        }
+        if (err instanceof Error) {
+          throw err;
+        }
+        throw new Error(String(err));
       }
-      throw new Error(String(err));
     }
+
+    throw lastError || new Error('All candidate vision models failed to generate listing.');
   }
 
   /**
@@ -236,16 +222,19 @@ export class GeminiProvider implements AIProvider {
             name: string;
             supportedGenerationMethods?: string[];
             thinking?: boolean;
-            supportedInputModalities?: string[];
           }>;
         };
         const validModels = (data.models || []).filter((m) =>
           this.isValidVisionModel(m)
         );
+        const sorted = this.getSortedVisionModels(validModels);
+        if (sorted.length > 0) {
+          this.cachedCandidatesByKey.set(config.apiKey.trim(), sorted);
+        }
         const selected =
           config.model?.trim() ||
-          this.pickVisionModel(validModels) ||
-          'gemini-flash-latest';
+          sorted[0] ||
+          'gemini-2.0-flash';
         if (selected && !config.model?.trim()) {
           this.cachedModelByKey.set(config.apiKey.trim(), selected);
         }
@@ -341,51 +330,58 @@ export class GeminiProvider implements AIProvider {
   }
 
   /**
-   * Selects the optimal multimodal vision model from available candidates,
-   * prioritizing stable releases, higher semantic versions, and flash models.
+   * Sorts candidate vision models:
+   * 1. Stable releases over experimental/preview releases (avoiding zero-quota previews).
+   * 2. Flash engines over Pro engines (providing high rate limits, fast turnaround, and preventing 503 high demand spikes).
+   * 3. Higher semantic versions within the same tier.
    */
-  private pickVisionModel(models: Array<{ name: string }>): string | null {
+  private getSortedVisionModels(models: Array<{ name: string }>): string[] {
     const modelNames = models.map((m) => m.name.replace(/^models\//, ''));
-    if (modelNames.length === 0) return null;
+    if (modelNames.length === 0) return [];
 
-    const sorted = [...modelNames].sort((a, b) => {
-      // Prioritize stable over experimental/preview
+    return [...modelNames].sort((a, b) => {
+      // 1. Prioritize stable over experimental/preview
       const aIsExp =
         a.toLowerCase().includes('exp') || a.toLowerCase().includes('preview') ? 1 : 0;
       const bIsExp =
         b.toLowerCase().includes('exp') || b.toLowerCase().includes('preview') ? 1 : 0;
       if (aIsExp !== bIsExp) {
-        return aIsExp - bIsExp;
+        return aIsExp - bIsExp; // Stable (0) comes before experimental (1)
       }
 
+      // 2. Prioritize Flash models over Pro models for high free-tier capacity and zero 503 errors
+      const aIsFlash = a.toLowerCase().includes('flash') ? 1 : 0;
+      const bIsFlash = b.toLowerCase().includes('flash') ? 1 : 0;
+      if (bIsFlash !== aIsFlash) {
+        return bIsFlash - aIsFlash; // Flash (1) comes before Pro (0)
+      }
+
+      // 3. Prioritize higher semantic version
       const vA = this.extractModelVersion(a);
       const vB = this.extractModelVersion(b);
       if (vB !== vA) {
         return vB - vA; // Highest version first
       }
 
-      // If identical version, prioritize flash variants for fast listings
-      const aIsFlash = a.toLowerCase().includes('flash') ? 1 : 0;
-      const bIsFlash = b.toLowerCase().includes('flash') ? 1 : 0;
-      if (bIsFlash !== aIsFlash) {
-        return bIsFlash - aIsFlash;
-      }
-
       return a.localeCompare(b);
     });
+  }
 
+  /**
+   * Selects the optimal multimodal vision model from available candidates.
+   */
+  private pickVisionModel(models: Array<{ name: string }>): string | null {
+    const sorted = this.getSortedVisionModels(models);
     return sorted[0] || null;
   }
 
   /**
-   * Discovers an active model supporting multimodal content generation for the provided API key.
-   * If discovery encounters errors or no candidate, gracefully falls back to the dynamic latest alias.
+   * Discovers candidate models supporting multimodal vision generation for the provided API key.
    */
-  private async discoverModel(baseUrl: string, apiKey: string): Promise<string> {
-    const cached = this.cachedModelByKey.get(apiKey);
-    if (cached) return cached;
+  private async discoverModelCandidates(baseUrl: string, apiKey: string): Promise<string[]> {
+    const cached = this.cachedCandidatesByKey.get(apiKey);
+    if (cached && cached.length > 0) return cached;
 
-    const fallbackModel = 'gemini-flash-latest';
     const listUrl = `${baseUrl}/models?key=${encodeURIComponent(apiKey)}`;
     try {
       const res = await fetch(listUrl, { method: 'GET' });
@@ -398,18 +394,39 @@ export class GeminiProvider implements AIProvider {
           }>;
         };
         const validModels = (data.models || []).filter((m) => this.isValidVisionModel(m));
-        const selected = this.pickVisionModel(validModels);
-        if (selected) {
-          this.cachedModelByKey.set(apiKey, selected);
-          return selected;
+        const sorted = this.getSortedVisionModels(validModels);
+        if (sorted.length > 0) {
+          this.cachedCandidatesByKey.set(apiKey, sorted);
+          return sorted;
         }
       }
     } catch {
       // Fall through to fallback
     }
 
-    this.cachedModelByKey.set(apiKey, fallbackModel);
-    return fallbackModel;
+    const fallbackCandidates = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    this.cachedCandidatesByKey.set(apiKey, fallbackCandidates);
+    return fallbackCandidates;
+  }
+
+  /**
+   * Resolves the ordered candidate models to try, prioritizing the last known successful model if present.
+   */
+  private async getCandidateOrder(baseUrl: string, apiKey: string): Promise<string[]> {
+    const candidates = await this.discoverModelCandidates(baseUrl, apiKey);
+    const lastWorking = this.cachedModelByKey.get(apiKey);
+    if (lastWorking && candidates.includes(lastWorking)) {
+      return [lastWorking, ...candidates.filter((c) => c !== lastWorking)];
+    }
+    return candidates;
+  }
+
+  /**
+   * Discovers an active model supporting multimodal content generation for the provided API key.
+   */
+  private async discoverModel(baseUrl: string, apiKey: string): Promise<string> {
+    const candidates = await this.getCandidateOrder(baseUrl, apiKey);
+    return candidates[0] || 'gemini-2.0-flash';
   }
 }
 
