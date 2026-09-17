@@ -85,7 +85,12 @@ The project is structured as an npm workspace monorepo:
      - `hashtags`: High-traffic search tags for marketplace discovery.
 4. **Platform Adaptation**:
    - Formatted into clipboard-ready text blocks tailored to Vinted mobile and desktop interfaces.
-5. **Local Persistence**:
+5. **Dynamic Model Discovery & Multi-Candidate Failover**:
+   - Zero hardcoded model versions in source code.
+   - The provider queries the API at runtime (`GET /models`), extracts semantic versioning, and prioritizes lightweight, high-capacity Flash vision engines.
+   - If an active model experiences temporary server demand spikes (HTTP 503) or rate limits, the client automatically fails over to alternative candidate models in the pool.
+   - Confirmed working engines are remembered across sessions, ensuring direct execution on subsequent requests.
+6. **Local Persistence**:
    - History and API credentials remain strictly stored in local storage (`localStorage` in Web/Desktop/Android or `~/.vintgen/config.json` in CLI) without external telemetry.
 
 ---

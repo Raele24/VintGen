@@ -114,8 +114,10 @@ export class GeminiProvider implements AIProvider {
         config.apiKey.trim()
       )}`;
 
+      const candidateTimeoutMs =
+        candidates.length > 1 ? Math.min(config.timeoutMs || 45000, 15000) : config.timeoutMs || 45000;
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), config.timeoutMs || 45000);
+      const timeout = setTimeout(() => controller.abort(), candidateTimeoutMs);
 
       try {
         let response = await fetch(endpoint, {
@@ -181,8 +183,8 @@ export class GeminiProvider implements AIProvider {
         }
 
         const parsedData = JSON.parse(rawText);
-        // Cache this successful candidate as the preferred model
-        this.cachedModelByKey.set(config.apiKey.trim(), model);
+        // Cache this successful candidate as the preferred model in memory and session storage
+        this.setWorkingModel(config.apiKey.trim(), model);
         return this.sanitizeListingResult(parsedData);
       } catch (err: unknown) {
         clearTimeout(timeout);
@@ -240,9 +242,9 @@ export class GeminiProvider implements AIProvider {
         const selected =
           config.model?.trim() ||
           sorted[0] ||
-          'gemini-3.5-flash';
+          'gemini-flash-latest';
         if (selected && !config.model?.trim()) {
-          this.cachedModelByKey.set(config.apiKey.trim(), selected);
+          this.setWorkingModel(config.apiKey.trim(), selected);
         }
         return {
           success: true,
@@ -413,9 +415,36 @@ export class GeminiProvider implements AIProvider {
       // Fall through to fallback
     }
 
-    const fallbackCandidates = ['gemini-3.5-flash', 'gemini-3.1-flash', 'gemini-3.0-flash', 'gemini-flash-latest'];
+    const fallbackCandidates = ['gemini-flash-latest'];
     this.cachedCandidatesByKey.set(apiKey, fallbackCandidates);
     return fallbackCandidates;
+  }
+
+  /**
+   * Retrieves the last working model from memory or session storage.
+   */
+  private getWorkingModel(apiKey: string): string | null {
+    const keyHash = apiKey.slice(-6);
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        const stored = window.sessionStorage.getItem(`vg_engine_${keyHash}`);
+        if (stored) return stored;
+      }
+    } catch { }
+    return this.cachedModelByKey.get(apiKey) || null;
+  }
+
+  /**
+   * Stores the last confirmed working model in memory and session storage.
+   */
+  private setWorkingModel(apiKey: string, model: string): void {
+    this.cachedModelByKey.set(apiKey, model);
+    const keyHash = apiKey.slice(-6);
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.setItem(`vg_engine_${keyHash}`, model);
+      }
+    } catch { }
   }
 
   /**
@@ -423,7 +452,7 @@ export class GeminiProvider implements AIProvider {
    */
   private async getCandidateOrder(baseUrl: string, apiKey: string): Promise<string[]> {
     const candidates = await this.discoverModelCandidates(baseUrl, apiKey);
-    const lastWorking = this.cachedModelByKey.get(apiKey);
+    const lastWorking = this.getWorkingModel(apiKey);
     if (lastWorking && candidates.includes(lastWorking)) {
       return [lastWorking, ...candidates.filter((c) => c !== lastWorking)];
     }
@@ -435,7 +464,7 @@ export class GeminiProvider implements AIProvider {
    */
   private async discoverModel(baseUrl: string, apiKey: string): Promise<string> {
     const candidates = await this.getCandidateOrder(baseUrl, apiKey);
-    return candidates[0] || 'gemini-3.5-flash';
+    return candidates[0] || 'gemini-flash-latest';
   }
 }
 
