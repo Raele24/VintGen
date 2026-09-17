@@ -122,6 +122,7 @@ export class GeminiProvider implements AIProvider {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'x-goog-api-key': config.apiKey.trim(),
           },
           body: JSON.stringify(requestBody),
           signal: controller.signal,
@@ -136,6 +137,7 @@ export class GeminiProvider implements AIProvider {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'x-goog-api-key': config.apiKey.trim(),
             },
             body: JSON.stringify(requestBody),
           });
@@ -215,13 +217,17 @@ export class GeminiProvider implements AIProvider {
     const testUrl = `${baseUrl}/models?key=${encodeURIComponent(config.apiKey.trim())}`;
 
     try {
-      const res = await fetch(testUrl, { method: 'GET' });
+      const res = await fetch(testUrl, {
+        method: 'GET',
+        headers: {
+          'x-goog-api-key': config.apiKey.trim(),
+        },
+      });
       if (res.ok) {
         const data = (await res.json()) as {
           models?: Array<{
             name: string;
             supportedGenerationMethods?: string[];
-            thinking?: boolean;
           }>;
         };
         const validModels = (data.models || []).filter((m) =>
@@ -234,7 +240,7 @@ export class GeminiProvider implements AIProvider {
         const selected =
           config.model?.trim() ||
           sorted[0] ||
-          'gemini-2.0-flash';
+          'gemini-3.5-flash';
         if (selected && !config.model?.trim()) {
           this.cachedModelByKey.set(config.apiKey.trim(), selected);
         }
@@ -290,7 +296,6 @@ export class GeminiProvider implements AIProvider {
   private isValidVisionModel(m: {
     name?: string;
     supportedGenerationMethods?: string[];
-    thinking?: boolean;
   }): boolean {
     const rawName = (m.name || '').toLowerCase();
     const name = rawName.replace(/^models\//, '');
@@ -298,22 +303,22 @@ export class GeminiProvider implements AIProvider {
     // Must be a Gemini family model
     if (!name.startsWith('gemini-')) return false;
 
-    const supportsGenerate = m.supportedGenerationMethods?.includes('generateContent');
-    if (!supportsGenerate) return false;
+    // If API declares supported methods, ensure generateContent is supported
+    if (
+      Array.isArray(m.supportedGenerationMethods) &&
+      m.supportedGenerationMethods.length > 0 &&
+      !m.supportedGenerationMethods.includes('generateContent')
+    ) {
+      return false;
+    }
 
-    // Reject text-only thinking models
-    if (m.thinking === true || name.includes('thinking')) return false;
-
-    // Reject embeddings, verification/answer, audio, tts, and image generation models
+    // Reject non-vision models (embeddings, verification/aqa, audio, tts, and imagen image generation)
     if (
       name.includes('embed') ||
       name.includes('aqa') ||
       name.includes('audio') ||
       name.includes('tts') ||
-      name.includes('imagen') ||
-      name.endsWith('-image') ||
-      name.includes('preview-image') ||
-      name.includes('image-preview')
+      name.includes('imagen')
     ) {
       return false;
     }
@@ -384,13 +389,17 @@ export class GeminiProvider implements AIProvider {
 
     const listUrl = `${baseUrl}/models?key=${encodeURIComponent(apiKey)}`;
     try {
-      const res = await fetch(listUrl, { method: 'GET' });
+      const res = await fetch(listUrl, {
+        method: 'GET',
+        headers: {
+          'x-goog-api-key': apiKey,
+        },
+      });
       if (res.ok) {
         const data = (await res.json()) as {
           models?: Array<{
             name: string;
             supportedGenerationMethods?: string[];
-            thinking?: boolean;
           }>;
         };
         const validModels = (data.models || []).filter((m) => this.isValidVisionModel(m));
@@ -404,7 +413,7 @@ export class GeminiProvider implements AIProvider {
       // Fall through to fallback
     }
 
-    const fallbackCandidates = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    const fallbackCandidates = ['gemini-3.5-flash', 'gemini-3.1-flash', 'gemini-3.0-flash', 'gemini-flash-latest'];
     this.cachedCandidatesByKey.set(apiKey, fallbackCandidates);
     return fallbackCandidates;
   }
@@ -426,7 +435,7 @@ export class GeminiProvider implements AIProvider {
    */
   private async discoverModel(baseUrl: string, apiKey: string): Promise<string> {
     const candidates = await this.getCandidateOrder(baseUrl, apiKey);
-    return candidates[0] || 'gemini-2.0-flash';
+    return candidates[0] || 'gemini-3.5-flash';
   }
 }
 
