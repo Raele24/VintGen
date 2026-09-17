@@ -68,9 +68,30 @@ jobs:
           node -e "
             const fs = require('fs');
             let conf = fs.readFileSync('capacitor.config.ts', 'utf8');
-            conf = conf.replace(/url:\s*process\.env\.CAPACITOR_LIVE_URL\s*\|\|\s*undefined/, 'url: "${{ inputs.live_url }}"');
+            conf = conf.replace(/url:\s*process\.env\.CAPACITOR_LIVE_URL\s*\|\|.*/, 'url: \"${{ inputs.live_url }}\",');
             fs.writeFileSync('capacitor.config.ts', conf, 'utf8');
           "
+
+      - name: Determine Version Tag and Build Metadata
+        id: vars
+        run: |
+          # 1. If manually specified in workflow_dispatch
+          if [ -n "${{ inputs.version_tag }}" ]; then
+            TAG="${{ inputs.version_tag }}"
+          # 2. If triggered by a git tag (e.g. v1.0.0)
+          elif echo "${{ github.ref }}" | grep -q "refs/tags/"; then
+            TAG="${{ github.ref_name }}"
+          # 3. If standard push to main branch: read version from package.json automatically
+          else
+            PKG_VER=$(node -p "require('./package.json').version")
+            TAG="v${PKG_VER}"
+          fi
+          
+          RAW_VER=$(echo "$TAG" | sed 's/^v//')
+          echo "TAG_NAME=$TAG" >> $GITHUB_OUTPUT
+          echo "RAW_VERSION=$RAW_VER" >> $GITHUB_OUTPUT
+          echo "VERSION_CODE=${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "Resolved tag: $TAG, raw version: $RAW_VER, versionCode: ${{ github.run_number }}"
 
       - name: Sync Capacitor Android Project
         run: npx cap sync android
@@ -81,20 +102,31 @@ jobs:
       - name: Assemble Android Release APK
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon || (echo "Retrying gradle build..." && sleep 5 && ./gradlew assembleRelease --no-daemon)
+          ./gradlew assembleRelease -PversionCode=${{ steps.vars.outputs.VERSION_CODE }} -PversionName=${{ steps.vars.outputs.RAW_VERSION }} --no-daemon || (echo "Retrying gradle build..." && sleep 5 && ./gradlew assembleRelease -PversionCode=${{ steps.vars.outputs.VERSION_CODE }} -PversionName=${{ steps.vars.outputs.RAW_VERSION }} --no-daemon)
 
-      - name: Sign Release APK with Keystore
+      - name: Sign Release APK with Persistent Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
         run: |
-          # Generate reproducible self-signed release keystore
-          keytool -genkeypair -v \
-            -keystore release.keystore \
-            -alias vintgen \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -storepass vintgen123 \
-            -keypass vintgen123 \
-            -dname "CN=VintGen, OU=App, O=VintGen, L=Rome, ST=Italy, C=IT"
+          # Use repository persistent release keystore by default, or secret override if configured
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Using custom release keystore from secrets"
+            echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+          elif [ -f android/app/release.keystore ]; then
+            echo "Using permanent repository release keystore"
+            cp android/app/release.keystore release.keystore
+          else
+            echo "Fallback: generating keystore"
+            keytool -genkeypair -v \
+              -keystore release.keystore \
+              -alias vintgen \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass vintgen123 \
+              -keypass vintgen123 \
+              -dname "CN=VintGen, OU=App, O=VintGen, L=Rome, ST=Italy, C=IT"
+          fi
           
           # Locate built unsigned APK
           UNSIGNED_APK=$(find android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
@@ -117,26 +149,12 @@ jobs:
           # Verify APK signature
           $BUILD_TOOLS_DIR/apksigner verify --verbose VintGen-signed.apk
 
-      - name: Determine Version Tag Automatically
-        id: vars
+      - name: Package Release APKs
         run: |
-          # 1. If manually specified in workflow_dispatch
-          if [ -n "${{ inputs.version_tag }}" ]; then
-            TAG="${{ inputs.version_tag }}"
-          # 2. If triggered by a git tag (e.g. v1.0.0)
-          elif echo "${{ github.ref }}" | grep -q "refs/tags/"; then
-            TAG="${{ github.ref_name }}"
-          # 3. If standard push to main branch: read version from package.json automatically!
-          else
-            PKG_VER=$(node -p "require('./package.json').version")
-            TAG="v${PKG_VER}"
-          fi
-          
-          echo "TAG_NAME=$TAG" >> $GITHUB_OUTPUT
+          TAG="${{ steps.vars.outputs.TAG_NAME }}"
           cp VintGen-signed.apk "VintGen-${TAG}.apk"
           cp VintGen-signed.apk "VintGen-latest.apk"
-          # Clean up intermediate temporary files so they are not uploaded
-          rm -f VintGen-aligned.apk VintGen-signed.apk
+          rm -f VintGen-aligned.apk VintGen-signed.apk release.keystore
           echo "Created final APKs: VintGen-${TAG}.apk and VintGen-latest.apk"
 
       - name: Upload APK as Workflow Artifact

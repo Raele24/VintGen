@@ -1,4 +1,4 @@
-﻿import { Injectable, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export interface ReleaseInfo {
   tag: string;
@@ -14,7 +14,7 @@ export interface ReleaseInfo {
   providedIn: 'root',
 })
 export class UpdateService {
-  public readonly currentVersion = '1.0.0';
+  public readonly currentVersion = '1.0.1';
   public hasNativeUpdate = signal<boolean>(false);
   public isWebUpdateReady = signal<boolean>(false);
   public latestRelease = signal<ReleaseInfo | null>(null);

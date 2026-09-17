@@ -38,7 +38,7 @@ If you prefer using VintGen inside an AI coding assistant or web chat, copy thes
 | Platform | How to run | Download or Link | Requirements |
 | :--- | :--- | :--- | :--- |
 | Web App | In your browser (no install) | [https://vintgen-ai.vercel.app](https://vintgen-ai.vercel.app) | Any web browser |
-| Android | Phone app | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-v1.0.0.apk`) | Android 8.0 or newer |
+| Android | Phone app | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-latest.apk`) | Android 8.0 or newer |
 | Windows (Installer) | Setup file with shortcut | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-Windows-Installer.exe`) | Windows 10 or 11 |
 | Windows (Portable) | Single file, no install | [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest) (`VintGen-Windows-Portable.exe`) | Windows 10 or 11 |
 | Command Line (CLI) | Run with npx or npm | [npm Package](https://www.npmjs.com/package/vintgen) (`npx vintgen` / `npm i -g vintgen`) | Node.js 18+ |
@@ -56,7 +56,8 @@ If you prefer using VintGen inside an AI coding assistant or web chat, copy thes
 - You can also add it to your phone home screen as an app.
 
 ### 2. Android App
-- Download `VintGen-v1.0.0.apk` from [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest).
+- Download `VintGen-latest.apk` from [GitHub Releases](https://github.com/Raele24/VintGen/releases/latest).
+- Built with persistent release signing and auto-incrementing version codes, allowing seamless in-place updates.
 - Take photos with your phone camera directly inside the app.
 
 ### 3. Windows App

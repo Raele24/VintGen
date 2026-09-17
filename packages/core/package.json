@@ -1,6 +1,6 @@
 {
   "name": "@vintgen/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared generation engine, multi-modal AI schemas, and platform adapters for VintGen",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
