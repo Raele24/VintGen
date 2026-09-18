@@ -895,9 +895,13 @@
                   <div class="row-value">
                     <div class="search-links-group">
                       <a [href]="getEbaySearchUrl(listing)" target="_blank" rel="noopener noreferrer"
-                        class="link-chip chip-highlight" title="Inspect live listings on eBay"
+                        class="link-chip chip-highlight" title="Inspect active listings on eBay"
                         (click)="openExternal($event, getEbaySearchUrl(listing))">
                         eBay Live</a>
+                      <a [href]="getEbaySoldSearchUrl(listing)" target="_blank" rel="noopener noreferrer"
+                        class="link-chip" title="Inspect completed and sold listings on eBay"
+                        (click)="openExternal($event, getEbaySoldSearchUrl(listing))">
+                        eBay Sold</a>
                       <a [href]="getVintedSearchUrl(listing)" target="_blank" rel="noopener noreferrer"
                         class="link-chip" title="Inspect live listings on Vinted"
                         (click)="openExternal($event, getVintedSearchUrl(listing))">
@@ -925,15 +929,15 @@
                             (ngModelChange)="customPrice.set($event)" />
                         </div>
                         <div class="price-valuation-meta">
-                          @if (listing.price.min != null) {
+                          @if (effectiveFloor() != null) {
                           <span class="price-floor-badge"
                             title="Minimum suggested floor for offers / quick negotiation">
-                            Floor: &euro;{{ listing.price.min.toFixed(2) }}
+                            Floor: &euro;{{ effectiveFloor()!.toFixed(2) }}
                           </span>
                           }
-                          @if (listing.price.max != null && listing.price.max > listing.price.suggested) {
+                          @if (effectiveCeiling() != null && effectiveCeiling()! > effectivePrice()) {
                           <span class="price-ceiling-badge" title="Ceiling price for patient sellers">
-                            Ceiling: &euro;{{ listing.price.max.toFixed(2) }}
+                            Ceiling: &euro;{{ effectiveCeiling()!.toFixed(2) }}
                           </span>
                           }
                         </div>
@@ -941,11 +945,15 @@
                       @if (listing.price.reasoning) {
                       <div class="price-rationale">{{ listing.price.reasoning }}</div>
                       }
+                      <div class="price-verification-alert">
+                        <span class="alert-tag">Verify</span>
+                        <span>AI pricing is advisory and can make mistakes. Always check live market links before listing.</span>
+                      </div>
                     </div>
                   </div>
                   <div class="row-action">
                     <button type="button" class="btn-row-copy" [class.copied]="copiedTarget() === 'price'"
-                      (click)="copyToClipboard('EUR ' + (customPrice() || listing.price.suggested.toFixed(2)), 'price')"
+                      (click)="copyToClipboard('EUR ' + effectivePrice().toFixed(2), 'price')"
                       title="Copy price">
                       {{ copiedTarget() === 'price' ? 'Copied' : 'Copy' }}
                     </button>

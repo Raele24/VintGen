@@ -1709,6 +1709,34 @@
   margin-top: 2px;
 }
 
+.price-verification-alert {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  font-size: 11px;
+  color: #fcd34d;
+  line-height: 1.35;
+
+  .alert-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    flex-shrink: 0;
+  }
+}
+
 .condition-badge {
   display: inline-block;
   font-size: 12px;

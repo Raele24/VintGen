@@ -29,15 +29,17 @@ Activate this skill when:
    - Limit to 65 characters for search visibility.
    - Pattern: `[Brand] [Exact Model / Style] - [Key Material / Color] - [Size]`
 
-4. **Marketplace Pricing Engine (Secondary Market Valuation)**:
-   - Calculate a realistic listing price based on actual secondary market trading levels (eBay sold items, Vinted, Subito):
-     - Avoid naive retail depreciation; reflect actual market demand.
-     - For tech & storage (SSDs): Extract capacity (250GB/500GB/1TB/2TB/4TB) and interface (SATA vs NVMe PCIe 3.0/4.0). Benchmark 1TB NVMe PCIe 4.0 around €60-€80, 2TB around €120-€150, instead of generic lowballs.
-     - Provide a recommended listing price along with a negotiation floor and ceiling.
-   - Construct direct 1-click live search links using Brand and Model:
-     - eBay: `https://www.ebay.it/sch/i.html?_nkw=[Encoded+Query]`
-     - Vinted: `https://www.vinted.it/catalog?search_text=[Encoded+Query]`
-     - Subito: `https://www.subito.it/annunci-italia/vendita/usato/?q=[Encoded+Query]`
+4. **Marketplace Pricing Engine (Realistic Seller Asking Strategy)**:
+   - Calculate a realistic asking price representing what sellers actively list for on European secondary platforms (eBay, Subito, Vinted, Wallapop):
+     - Adopt a seller listing perspective with healthy asking margins, NOT bottom-dollar liquidation rates.
+     - 32GB (2x16GB) DDR4 RAM kits (Corsair Vengeance, G.Skill, Kingston): Benchmark at €115 - €145 asking price (€140 - €185 if brand new sealed).
+     - 16GB DDR4: Benchmark at €45 - €60.
+     - 500GB SSDs / M.2 SATA: Benchmark at €42 - €55 asking price. 1TB SSDs: €70 - €95.
+     - Provide a recommended listing price along with a 15-20% floor and ceiling.
+   - Construct clean 1-click live search links using clean Brand and Model (stripping condition and redundant terms):
+     - eBay: `https://www.ebay.it/sch/i.html?_nkw=[Clean+Query]`
+     - Vinted: `https://www.vinted.it/catalog?search_text=[Clean+Query]`
+     - Subito: `https://www.subito.it/annunci-italia/vendita/usato/?q=[Clean+Query]`
 
 5. **Output Format (Return Exclusively a Single Markdown Table)**:
    - Output MUST be strictly a single clean markdown table for immediate copying.

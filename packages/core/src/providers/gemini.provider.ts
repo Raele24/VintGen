@@ -20,6 +20,7 @@ export class GeminiProvider implements AIProvider {
   public readonly name = 'Google Gemini (BYOK)';
   private cachedModelByKey = new Map<string, string>();
   private cachedCandidatesByKey = new Map<string, string[]>();
+  private failedModelsInSession = new Set<string>();
 
   /**
    * Generates a structured marketplace listing using the vision model.
@@ -115,8 +116,11 @@ export class GeminiProvider implements AIProvider {
         config.apiKey.trim()
       )}`;
 
+      // Allow 12s per candidate for full multimodal vision encoding without premature timeouts
       const candidateTimeoutMs =
-        candidates.length > 1 ? Math.min(config.timeoutMs || 45000, 15000) : config.timeoutMs || 45000;
+        i < candidates.length - 1
+          ? 12000
+          : Math.min(config.timeoutMs || 25000, 25000);
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), candidateTimeoutMs);
 
@@ -133,21 +137,8 @@ export class GeminiProvider implements AIProvider {
 
         clearTimeout(timeout);
 
-        // If transient 503 spike occurs and this is the final candidate, attempt a 2-second backoff retry
-        if (response.status === 503 && i === candidates.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          response = await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-goog-api-key': config.apiKey.trim(),
-            },
-            body: JSON.stringify(requestBody),
-          });
-        }
-
         if (!response.ok) {
-          const errorText = await response.text();
+          const errorText = await response.text().catch(() => '');
           let errorMessage = `AI vision model (${model}) responded with status ${response.status}`;
           try {
             const parsed = JSON.parse(errorText);
@@ -155,20 +146,25 @@ export class GeminiProvider implements AIProvider {
               errorMessage = `${errorMessage}: ${parsed.error.message}`;
             }
           } catch {
-            errorMessage = `${errorMessage}: ${errorText.slice(0, 200)}`;
+            if (errorText) {
+              errorMessage = `${errorMessage}: ${errorText.slice(0, 200)}`;
+            }
           }
 
           lastError = new Error(errorMessage);
 
-          // If current candidate failed due to capacity spike (503), not found (404), unsupported modality (400),
-          // or zero free-tier quota (429 with limit: 0), failover immediately to the next candidate model
+          // Track congested models (503), rate-limited models (429), or modality errors (400)
+          this.failedModelsInSession.add(model);
+
           const isFailoverStatus =
             response.status === 503 ||
+            response.status === 429 ||
             response.status === 404 ||
             response.status === 400 ||
-            (response.status === 429 && errorText.includes('limit: 0'));
+            response.status >= 500;
 
           if (i < candidates.length - 1 && isFailoverStatus) {
+            console.warn(`[GeminiProvider] Candidate ${model} returned status ${response.status}, failing over immediately to candidate ${candidates[i + 1]}.`);
             continue;
           }
 
@@ -184,21 +180,34 @@ export class GeminiProvider implements AIProvider {
         }
 
         const parsedData = JSON.parse(rawText);
-        // Cache this successful candidate as the preferred model in memory and session storage
+        // Successful generation: remember this active model and unmark from failed pool
+        this.failedModelsInSession.delete(model);
         this.setWorkingModel(config.apiKey.trim(), model);
         return this.sanitizeListingResult(parsedData);
       } catch (err: unknown) {
         clearTimeout(timeout);
-        if (err instanceof Error && err.name === 'AbortError') {
-          throw new Error('AI vision model request timed out after 45s. Please check your connection.');
+        const isAbort = err instanceof Error && err.name === 'AbortError';
+        this.failedModelsInSession.add(model);
+
+        if (isAbort) {
+          lastError = new Error(
+            `AI vision model (${model}) timed out after ${candidateTimeoutMs / 1000}s due to high server load.`
+          );
+        } else if (err instanceof Error) {
+          lastError = err;
+        } else {
+          lastError = new Error(String(err));
         }
-        if (i < candidates.length - 1 && lastError) {
+
+        // If further candidates exist, failover immediately without throwing prematurely
+        if (i < candidates.length - 1) {
+          console.warn(
+            `[GeminiProvider] Candidate ${model} encountered ${isAbort ? 'timeout' : 'error'}, failing over immediately to candidate ${candidates[i + 1]}.`
+          );
           continue;
         }
-        if (err instanceof Error) {
-          throw err;
-        }
-        throw new Error(String(err));
+
+        throw lastError;
       }
     }
 
@@ -338,41 +347,82 @@ export class GeminiProvider implements AIProvider {
   }
 
   /**
-   * Sorts candidate vision models:
-   * 1. Stable releases over experimental/preview releases (avoiding zero-quota previews).
-   * 2. Flash engines over Pro engines (providing high rate limits, fast turnaround, and preventing 503 high demand spikes).
-   * 3. Higher semantic versions within the same tier.
+   * Evaluates the production stability and availability score of a vision model identifier.
+   * Prioritizes officially recommended GA stable flash models (such as gemini-3.5-flash and gemini-flash-latest)
+   * which have dedicated production clusters, over experimental or preview releases (3.8, 3.7, 3.6)
+   * that frequently suffer 503 capacity spikes.
+   * Completely filters out retired 2.5-flash models that return 404.
+   */
+  private getModelPriority(name: string): number {
+    const lower = name.toLowerCase();
+
+    // Completely disqualify retired models that Google returns 404 for new users
+    if (lower.includes('2.5-flash') || lower.includes('2.5')) {
+      return -1000;
+    }
+
+    // 1. Top Tier: Official GA stable recommendations with full cluster capacity
+    if (lower === 'gemini-3.5-flash' || lower.endsWith('/gemini-3.5-flash')) return 1000;
+    if (lower === 'gemini-flash-latest' || lower.endsWith('/gemini-flash-latest')) return 950;
+    if (lower.includes('3.5-flash-lite')) return 920;
+    if (lower.includes('3.5-flash')) return 900;
+
+    // 2. High-capacity mature LTS releases
+    if (lower === 'gemini-1.5-flash' || lower.includes('1.5-flash-latest')) return 800;
+    if (lower.includes('1.5-flash-8b')) return 780;
+    if (lower.includes('1.5-flash')) return 750;
+
+    // 3. Stable 2.0 releases (if available and not deprecated)
+    if (lower.includes('2.0-flash') && !lower.includes('exp') && !lower.includes('preview')) return 600;
+
+    // 4. Cutting-edge preview tiers (3.6, 3.7, 3.8) which experience heavy 503 load
+    if (lower.includes('flash')) {
+      const v = this.extractModelVersion(name);
+      return 300 + v;
+    }
+
+    return 100;
+  }
+
+  /**
+   * Sorts candidate vision models by production stability and cluster capacity.
    */
   private getSortedVisionModels(models: Array<{ name: string }>): string[] {
     const modelNames = models.map((m) => m.name.replace(/^models\//, ''));
     if (modelNames.length === 0) return [];
 
-    return [...modelNames].sort((a, b) => {
-      // 1. Prioritize stable over experimental/preview
-      const aIsExp =
-        a.toLowerCase().includes('exp') || a.toLowerCase().includes('preview') ? 1 : 0;
-      const bIsExp =
-        b.toLowerCase().includes('exp') || b.toLowerCase().includes('preview') ? 1 : 0;
-      if (aIsExp !== bIsExp) {
-        return aIsExp - bIsExp; // Stable (0) comes before experimental (1)
-      }
+    // Filter out deprecated models that return 404 and experimental/preview models
+    const activeModels = modelNames.filter((name) => {
+      const lower = name.toLowerCase();
+      if (lower.includes('2.5-flash') || lower.includes('2.5')) return false;
+      if (lower.includes('exp') || lower.includes('preview')) return false;
+      return true;
+    });
 
-      // 2. Prioritize Flash models over Pro models for high free-tier capacity and zero 503 errors
-      const aIsFlash = a.toLowerCase().includes('flash') ? 1 : 0;
-      const bIsFlash = b.toLowerCase().includes('flash') ? 1 : 0;
-      if (bIsFlash !== aIsFlash) {
-        return bIsFlash - aIsFlash; // Flash (1) comes before Pro (0)
-      }
+    const candidatePool = activeModels.length > 0 ? activeModels : modelNames;
 
-      // 3. Prioritize higher semantic version
-      const vA = this.extractModelVersion(a);
-      const vB = this.extractModelVersion(b);
-      if (vB !== vA) {
-        return vB - vA; // Highest version first
-      }
-
+    // Sort by model priority score descending
+    const sorted = [...candidatePool].sort((a, b) => {
+      const scoreA = this.getModelPriority(a);
+      const scoreB = this.getModelPriority(b);
+      if (scoreB !== scoreA) return scoreB - scoreA;
       return a.localeCompare(b);
     });
+
+    // Ensure rock-solid fallback aliases are present
+    const standardFallbacks = [
+      'gemini-3.5-flash',
+      'gemini-flash-latest',
+      'gemini-3.5-flash-lite',
+      'gemini-1.5-flash',
+    ];
+    for (const fb of standardFallbacks) {
+      if (!sorted.includes(fb) && modelNames.includes(fb)) {
+        sorted.push(fb);
+      }
+    }
+
+    return sorted;
   }
 
   /**
@@ -416,7 +466,7 @@ export class GeminiProvider implements AIProvider {
       // Fall through to fallback
     }
 
-    const fallbackCandidates = ['gemini-flash-latest'];
+    const fallbackCandidates = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-1.5-flash'];
     this.cachedCandidatesByKey.set(apiKey, fallbackCandidates);
     return fallbackCandidates;
   }
@@ -454,10 +504,27 @@ export class GeminiProvider implements AIProvider {
   private async getCandidateOrder(baseUrl: string, apiKey: string): Promise<string[]> {
     const candidates = await this.discoverModelCandidates(baseUrl, apiKey);
     const lastWorking = this.getWorkingModel(apiKey);
-    if (lastWorking && candidates.includes(lastWorking)) {
-      return [lastWorking, ...candidates.filter((c) => c !== lastWorking)];
+
+    let ordered = [...candidates];
+    if (lastWorking && ordered.includes(lastWorking) && !this.failedModelsInSession.has(lastWorking)) {
+      ordered = [lastWorking, ...ordered.filter((c) => c !== lastWorking)];
     }
-    return candidates;
+
+    // Demote any model that suffered an error or timeout in the active session
+    const healthy = ordered.filter((c) => !this.failedModelsInSession.has(c));
+    const congested = ordered.filter((c) => this.failedModelsInSession.has(c));
+    const sortedCandidates = [...healthy, ...congested];
+
+    // Ensure official GA stable endpoints are present
+    if (!sortedCandidates.includes('gemini-3.5-flash')) {
+      sortedCandidates.unshift('gemini-3.5-flash');
+    }
+    if (!sortedCandidates.includes('gemini-flash-latest')) {
+      sortedCandidates.splice(1, 0, 'gemini-flash-latest');
+    }
+
+    // Cap candidate pool to top 6 across stable and fallback tiers
+    return sortedCandidates.slice(0, 6);
   }
 
   /**

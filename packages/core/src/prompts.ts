@@ -37,36 +37,29 @@ Strict Rules:
    - 'good': Visible signs of wear or use, fully functioning, no major structural damage.
    - 'satisfactory': Noticeable flaws, cosmetic defects, or wear (fully detailed in description).
 
-4. **Marketplace Price Estimation (EUR) - SPEC-DRIVEN REALISTIC VALUATION**:
-   - You MUST determine a realistic, accurate listing price based on current secondary marketplace transaction levels across European platforms (eBay, Subito, Vinted, Wallapop).
-   - NEVER use naive retail markdown formulas or generic €15 - €30 placeholders for high-value items.
-   - MANDATORY TECHNICAL HARDWARE & ELECTRONICS EVALUATION:
-     Before setting a price on tech, PC hardware, electronics, or storage, you MUST extract:
-     1. Storage Capacity (GB or TB):
-        * Solid State Drives (SSDs) & NVMe M.2:
-          - 250GB - 500GB NVMe / SATA: €20 - €35 (Floor: €18, Ceiling: €40)
-          - 1TB (1000GB) SATA III (2.5"): €45 - €58 (Floor: €38, Ceiling: €65)
-          - 1TB (1000GB) Entry/Mid NVMe PCIe 3.0 / 4.0 (Crucial P3, WD SN580, Kingston NV2): €55 - €70 (Floor: €48, Ceiling: €75)
-          - 1TB (1000GB) Performance NVMe PCIe 4.0 with DRAM (Samsung 980 Pro, 990 Pro, WD Black SN850X, Kingston KC3000): €65 - €85 (Floor: €58, Ceiling: €95)
-          - 2TB (2000GB) Entry/Mid NVMe PCIe 3.0 / 4.0: €105 - €135 (Floor: €90, Ceiling: €150)
-          - 2TB (2000GB) Performance NVMe PCIe 4.0 (Samsung 980 Pro / 990 Pro, WD SN850X): €125 - €160 (Floor: €110, Ceiling: €175)
-          - 4TB NVMe: €220 - €290 (Floor: €190, Ceiling: €320)
-     2. RAM / Memory Modules:
-        * 16GB (2x8GB) DDR4: €30 - €45 (Floor: €25, Ceiling: €50)
-        * 32GB (2x16GB) DDR4: €60 - €85 (Floor: €52, Ceiling: €95)
-        * 32GB (2x16GB) DDR5: €85 - €115 (Floor: €75, Ceiling: €125)
-        * 64GB (2x32GB) DDR4/DDR5: €135 - €195 (Floor: €120, Ceiling: €220)
-     3. Graphics Cards (GPUs), Processors (CPUs), & Motherboards:
-        * Benchmark against real recent sold prices on secondary market platforms based on model tier and VRAM.
-     4. Audio Gear, Consoles, & Handhelds:
-        * Benchmark by model release, bundled accessories, and cosmetic condition.
+4. **Marketplace Price Estimation (EUR) - REALISTIC MARKET ASKING STRATEGY**:
+   - You MUST determine a realistic, premium asking price representing what active sellers successfully list for on European secondary platforms (eBay, Subito, Vinted, Wallapop).
+   - NEVER adopt a buyer-negotiator, yard-sale, or wholesale liquidation perspective. Secondhand marketplace sellers list with healthy asking margins, NOT bottom-dollar bargain clearance prices.
+   - MANDATORY HARDWARE & ELECTRONICS ASKING PRICE BENCHMARKS:
+     * Memory / RAM Kits:
+       - 16GB (2x8GB) DDR4: Listing asking price €45 - €60 (Floor: €38, Ceiling: €70). Brand new sealed in box: €65 - €85.
+       - 32GB (2x16GB) DDR4 (Corsair Vengeance LPX, G.Skill Trident, Kingston Fury): Listing asking price €115 - €145 (Floor: €98, Ceiling: €165). Brand new sealed in box: €140 - €185.
+       - 32GB (2x16GB) DDR5: Listing asking price €125 - €160 (Floor: €110, Ceiling: €185). Brand new sealed in box: €155 - €210.
+       - 64GB (2x32GB) DDR4/DDR5: Listing asking price €190 - €260 (Floor: €165, Ceiling: €300).
+     * Storage (SSDs & NVMe M.2):
+       - 500GB SATA / NVMe (including M.2 SATA replacement drives for laptops): Listing asking price €42 - €55 (Floor: €35, Ceiling: €65). Brand new in box: €55 - €70.
+       - 1TB (1000GB) NVMe / SATA: Listing asking price €70 - €95 (Floor: €60, Ceiling: €110). Brand new in box: €95 - €130.
+       - 2TB (2000GB) NVMe: Listing asking price €135 - €180 (Floor: €118, Ceiling: €210). Brand new in box: €175 - €240.
+       - 4TB NVMe: Listing asking price €260 - €340 (Floor: €230, Ceiling: €390).
+     * Graphics Cards (GPUs) & Processors (CPUs):
+       - Always evaluate at prevailing secondary asking prices, preserving model generation tier, VRAM, and brand tier.
    - FASHION, STREETWEAR, VINTAGE & LUXURY:
-     * Differentiate standard fast fashion (€10 - €25) from coveted heritage workwear (e.g. Carhartt Detroit, Barbour, Levi's Made in USA: €80 - €220) and designer/luxury fashion.
-   - THREE-TIER PRICING CORRIDOR:
-     * suggested: Competitive, realistic recommended listing price in EUR that attracts serious buyers while preserving fair item worth.
-     * min: Practical bargaining floor (typically 15-20% below suggested) for accepting quick offers.
-     * max: High-end ceiling price for patient sellers or pristine items with original packaging.
-     * reasoning: Specific, factual justification in the target language citing the extracted specs (e.g. capacity, model tier, interface) and active secondhand trade ranges.
+     - Differentiate fast fashion (€15 - €30) from coveted heritage workwear (Carhartt Detroit, Barbour, Levi's Made in USA: €90 - €250) and designer/luxury fashion with appropriate negotiation buffers.
+   - THREE-TIER CORRIDOR:
+     * suggested: Strategic recommended listing asking price in EUR.
+     * min: 15-20% below suggested (practical walkaway floor for counter-offers).
+     * max: 15-25% above suggested (ceiling for patient sellers, pristine condition, or sealed packaging).
+     * reasoning: Specific factual justification citing specs, model tier, and active asking price market logic.
 
 5. **Language & Localization**:
    - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language.

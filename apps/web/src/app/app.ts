@@ -134,6 +134,28 @@ export class App {
 
   // Custom User Set Price
   public customPrice = signal<string>('');
+  public effectivePrice = computed<number>(() => {
+    const raw = parseFloat(this.customPrice().trim());
+    if (!isNaN(raw) && raw > 0) return raw;
+    return this.generator.currentListing()?.price?.suggested ?? 0;
+  });
+
+  public effectiveFloor = computed<number | null>(() => {
+    const custom = parseFloat(this.customPrice().trim());
+    if (!isNaN(custom) && custom > 0) {
+      return Math.round(custom * 0.85);
+    }
+    return this.generator.currentListing()?.price?.min ?? null;
+  });
+
+  public effectiveCeiling = computed<number | null>(() => {
+    const custom = parseFloat(this.customPrice().trim());
+    if (!isNaN(custom) && custom > 0) {
+      return Math.round(custom * 1.18);
+    }
+    return this.generator.currentListing()?.price?.max ?? null;
+  });
+
   public selectedHistoryId = signal<string | null>(null);
 
   // Theme Management (Light / Dark)
@@ -652,20 +674,60 @@ export class App {
   }
 
   /**
+   * Cleans search query by removing condition qualifiers and duplicate brand names
+   * so marketplace search engines return exact, high-intent results.
+   */
+  public getCleanSearchQuery(listing: ListingResult): string {
+    let title = listing.title || '';
+
+    // Strip common condition qualifiers often appended to titles
+    const conditions = [
+      'new with tags', 'brand new', 'like new', 'very good', 'good', 'satisfactory', 'fair', 'poor',
+      'nuovo con cartellino', 'nuovo senza cartellino', 'ottime condizioni', 'ottimo', 'buone condizioni', 'buono', 'usato'
+    ];
+    for (const cond of conditions) {
+      const regex = new RegExp(`\\b${cond}\\b`, 'gi');
+      title = title.replace(regex, ' ');
+    }
+
+    const brand = (listing.brand || '').trim();
+    let query = title.trim();
+
+    // Avoid duplicating brand if brand name (or common abbreviations) is already present in title
+    if (brand && !brand.toLowerCase().includes('unbranded') && !brand.toLowerCase().includes('vintage')) {
+      const titleLower = title.toLowerCase();
+      const brandLower = brand.toLowerCase();
+      const isWdMatch = (brandLower === 'western digital' && /\bwd\b/i.test(titleLower));
+      const isAlreadyContained = titleLower.includes(brandLower) || isWdMatch;
+
+      if (!isAlreadyContained) {
+        query = `${brand} ${title}`.trim();
+      }
+    }
+
+    return query.replace(/\s+/g, ' ').trim();
+  }
+
+  /**
    * Generates live marketplace search URLs for real-time verification.
    */
   public getEbaySearchUrl(listing: ListingResult): string {
-    const q = encodeURIComponent(`${listing.brand} ${listing.title}`.trim());
+    const q = encodeURIComponent(this.getCleanSearchQuery(listing));
     return `https://www.ebay.it/sch/i.html?_nkw=${q}`;
   }
 
+  public getEbaySoldSearchUrl(listing: ListingResult): string {
+    const q = encodeURIComponent(this.getCleanSearchQuery(listing));
+    return `https://www.ebay.it/sch/i.html?_nkw=${q}&LH_Complete=1&LH_Sold=1`;
+  }
+
   public getVintedSearchUrl(listing: ListingResult): string {
-    const q = encodeURIComponent(`${listing.brand} ${listing.title}`.trim());
+    const q = encodeURIComponent(this.getCleanSearchQuery(listing));
     return `https://www.vinted.it/catalog?search_text=${q}`;
   }
 
   public getSubitoSearchUrl(listing: ListingResult): string {
-    const q = encodeURIComponent(`${listing.brand} ${listing.title}`.trim());
+    const q = encodeURIComponent(this.getCleanSearchQuery(listing));
     return `https://www.subito.it/annunci-italia/vendita/usato/?q=${q}`;
   }
 

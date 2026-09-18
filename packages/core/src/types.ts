@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VintGen Core Type Definitions
  * 
  * Provides types for multi-modal listing inputs, normalized listing outputs,
@@ -35,6 +35,8 @@ export interface ListingInput {
   language?: 'it' | 'en' | 'fr' | 'es' | 'de' | 'auto';
   /** Platform target (defaults to 'marketplace') */
   platform?: 'marketplace' | 'vinted' | 'depop' | 'ebay';
+  /** Optional seller target price in EUR */
+  targetPrice?: number;
 }
 
 /**

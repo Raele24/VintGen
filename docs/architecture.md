@@ -85,11 +85,12 @@ The project is structured as an npm workspace monorepo:
      - `hashtags`: High-traffic search tags for marketplace discovery.
 4. **Platform Adaptation**:
    - Formatted into clipboard-ready text blocks tailored to Vinted mobile and desktop interfaces.
-5. **Dynamic Model Discovery & Multi-Candidate Failover**:
+5. **Dynamic Model Discovery, Latency Reduction & Multi-Candidate Failover**:
    - Zero hardcoded model versions in source code.
    - The provider queries the API at runtime (`GET /models`), extracts semantic versioning, and prioritizes lightweight, high-capacity Flash vision engines.
-   - If an active model experiences temporary server demand spikes (HTTP 503) or rate limits, the client automatically fails over to alternative candidate models in the pool.
-   - Confirmed working engines are remembered across sessions, ensuring direct execution on subsequent requests.
+   - Fast candidate timeout (7s for non-final candidates) eliminates long stall periods when a model endpoint is congested.
+   - If an active model experiences temporary server demand spikes (HTTP 503), rate limits (429), or network timeouts, it is immediately demoted in session memory, and the orchestrator immediately fails over to the next candidate model in the pool.
+   - Confirmed working engines are remembered across sessions in memory and session storage, ensuring direct execution on subsequent requests.
 6. **Local Persistence**:
    - History and API credentials remain strictly stored in local storage (`localStorage` in Web/Desktop/Android or `~/.vintgen/config.json` in CLI) without external telemetry.
 
@@ -115,5 +116,21 @@ In WebView-based environments (such as Windows Desktop via Tauri v2 / WebView2 a
    - In regular browsers, safely falls back to standard `window.open(url, '_blank', 'noopener,noreferrer')`.
 2. **Global Navigation Interception**:
    - A global capturing click listener intercepts `<a>` elements targeting external origins or specifying `target="_blank"` within native or desktop containers, ensuring consistent hand-off to the operating system's default web browser.
+
+---
+
+## 6. Strategic Marketplace Pricing & Live Search Validation
+
+1. **Strategic Pricing Corridor**:
+   - The pricing engine calculates listing values with a built-in negotiation buffer (15-25%) rather than immediate liquidation clearing values.
+   - Hardware and component evaluation accounts for storage interface specifics (e.g. niche compatibility value of M.2 SATA replacement drives for legacy ultrabooks), model tiers, and RAM specifications.
+   - A three-tier corridor (`suggested`, `min` floor, `max` ceiling) equips sellers to field buyer counter-offers effectively.
+
+2. **Live Search Normalization**:
+   - Search queries sent to external marketplace search engines (eBay, Vinted, Subito) are automatically cleaned:
+     - Stripping condition qualifiers (`Very Good`, `Like New`, `Nuovo`, etc.) that cause search engines to return 0 exact results.
+     - Deduplicating brand tokens (e.g. preventing `Western Digital WD...`).
+   - Supports both active market searches and completed/sold searches (`eBay Sold`) for empirical transaction validation.
+
 
 
