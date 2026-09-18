@@ -13,6 +13,7 @@ import { StorageService, SavedListingItem } from './core/storage.service';
 import { GeneratorService } from './core/generator.service';
 import { UpdateService } from './core/update.service';
 import { ImageProcessingService } from './core/image-processing.service';
+import { ExternalLinkService } from './core/external-link.service';
 import { ListingInput, ItemCondition, ListingResult, PlatformId, PlatformAdapter, FormattedListing, PlatformRegistry } from '@vintgen/core';
 
 interface UploadedImage {
@@ -51,6 +52,11 @@ export class App {
   public generator = inject(GeneratorService);
   public updateService = inject(UpdateService);
   public imageProcessor = inject(ImageProcessingService);
+  public externalLinks = inject(ExternalLinkService);
+
+  public openExternal(event: Event, url: string): void {
+    this.externalLinks.open(url, event);
+  }
 
   // Form Inputs
   public uploadedImages = signal<UploadedImage[]>([]);

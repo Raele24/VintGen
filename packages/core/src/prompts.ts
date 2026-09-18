@@ -1,4 +1,4 @@
-﻿/**
+/**
  * System Instructions & Structured Output Schemas
  * 
  * Defines high-accuracy system instructions, secondhand marketplace listing best practices,
@@ -37,17 +37,36 @@ Strict Rules:
    - 'good': Visible signs of wear or use, fully functioning, no major structural damage.
    - 'satisfactory': Noticeable flaws, cosmetic defects, or wear (fully detailed in description).
 
-4. **Realistic Marketplace Price Estimation (EUR) - NO LOWBALLS, REALISTIC MARKET VALUATION**:
-   - You MUST determine a serious, realistic listing price based on current secondary marketplace trading levels across platforms like eBay, Vinted, Subito, and Wallapop:
-     * NEVER use naive retail markdown or outdated MSRP depreciation formulas. For example, high-capacity PC hardware (such as 32GB DDR4 3200MHz Corsair Vengeance kits) commands €150 - €220+ on European secondary marketplaces like eBay, NOT €40 - €55.
-     * For PC components, tech, and electronics: evaluate true secondary market demand, capacity, and current replacement value. For a 32GB (2x16GB) Corsair DDR4 3200MHz kit, suggest a serious market price (e.g. around €165 - €185, with an offer floor around €140 - €145).
-     * For vintage, streetwear, and collectibles: price according to collector resale value, never lowball liquidation rates.
-     * For general fashion and accessories: price competitively against real active secondhand listings.
-   - You MUST calculate:
-     * suggested: Serious, competitive recommended listing price in EUR.
-     * min: Sensible floor price for offers / quick negotiation.
-     * max: Ceiling price for patient sellers.
-     * reasoning: Factual rationale referencing active marketplace price ranges in the target language.
+4. **Marketplace Price Estimation (EUR) - SPEC-DRIVEN REALISTIC VALUATION**:
+   - You MUST determine a realistic, accurate listing price based on current secondary marketplace transaction levels across European platforms (eBay, Subito, Vinted, Wallapop).
+   - NEVER use naive retail markdown formulas or generic €15 - €30 placeholders for high-value items.
+   - MANDATORY TECHNICAL HARDWARE & ELECTRONICS EVALUATION:
+     Before setting a price on tech, PC hardware, electronics, or storage, you MUST extract:
+     1. Storage Capacity (GB or TB):
+        * Solid State Drives (SSDs) & NVMe M.2:
+          - 250GB - 500GB NVMe / SATA: €20 - €35 (Floor: €18, Ceiling: €40)
+          - 1TB (1000GB) SATA III (2.5"): €45 - €58 (Floor: €38, Ceiling: €65)
+          - 1TB (1000GB) Entry/Mid NVMe PCIe 3.0 / 4.0 (Crucial P3, WD SN580, Kingston NV2): €55 - €70 (Floor: €48, Ceiling: €75)
+          - 1TB (1000GB) Performance NVMe PCIe 4.0 with DRAM (Samsung 980 Pro, 990 Pro, WD Black SN850X, Kingston KC3000): €65 - €85 (Floor: €58, Ceiling: €95)
+          - 2TB (2000GB) Entry/Mid NVMe PCIe 3.0 / 4.0: €105 - €135 (Floor: €90, Ceiling: €150)
+          - 2TB (2000GB) Performance NVMe PCIe 4.0 (Samsung 980 Pro / 990 Pro, WD SN850X): €125 - €160 (Floor: €110, Ceiling: €175)
+          - 4TB NVMe: €220 - €290 (Floor: €190, Ceiling: €320)
+     2. RAM / Memory Modules:
+        * 16GB (2x8GB) DDR4: €30 - €45 (Floor: €25, Ceiling: €50)
+        * 32GB (2x16GB) DDR4: €60 - €85 (Floor: €52, Ceiling: €95)
+        * 32GB (2x16GB) DDR5: €85 - €115 (Floor: €75, Ceiling: €125)
+        * 64GB (2x32GB) DDR4/DDR5: €135 - €195 (Floor: €120, Ceiling: €220)
+     3. Graphics Cards (GPUs), Processors (CPUs), & Motherboards:
+        * Benchmark against real recent sold prices on secondary market platforms based on model tier and VRAM.
+     4. Audio Gear, Consoles, & Handhelds:
+        * Benchmark by model release, bundled accessories, and cosmetic condition.
+   - FASHION, STREETWEAR, VINTAGE & LUXURY:
+     * Differentiate standard fast fashion (€10 - €25) from coveted heritage workwear (e.g. Carhartt Detroit, Barbour, Levi's Made in USA: €80 - €220) and designer/luxury fashion.
+   - THREE-TIER PRICING CORRIDOR:
+     * suggested: Competitive, realistic recommended listing price in EUR that attracts serious buyers while preserving fair item worth.
+     * min: Practical bargaining floor (typically 15-20% below suggested) for accepting quick offers.
+     * max: High-end ceiling price for patient sellers or pristine items with original packaging.
+     * reasoning: Specific, factual justification in the target language citing the extracted specs (e.g. capacity, model tier, interface) and active secondhand trade ranges.
 
 5. **Language & Localization**:
    - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language.
@@ -116,11 +135,11 @@ export const STRUCTURED_RESPONSE_SCHEMA = {
     price: {
       type: 'OBJECT',
       properties: {
-        suggested: { type: 'NUMBER', description: 'Recommended listing price in EUR' },
-        min: { type: 'NUMBER', description: 'Floor price for bargain offers' },
-        max: { type: 'NUMBER', description: 'Optimistic ceiling price' },
+        suggested: { type: 'NUMBER', description: 'Realistic recommended listing price in EUR based on exact specs, capacity, and secondary market demand' },
+        min: { type: 'NUMBER', description: 'Floor price for bargain offers and quick counter-offers' },
+        max: { type: 'NUMBER', description: 'Ceiling price for patient sellers and pristine condition' },
         currency: { type: 'STRING', description: 'Currency code, usually EUR' },
-        reasoning: { type: 'STRING', description: 'Brief rationale based on brand, secondary market demand, and condition' },
+        reasoning: { type: 'STRING', description: 'Detailed factual rationale citing detected specs, capacity, and active secondhand market valuation' },
       },
       required: ['suggested', 'min', 'max', 'currency', 'reasoning'],
     },

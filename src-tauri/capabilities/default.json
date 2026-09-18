@@ -6,11 +6,14 @@
     "main"
   ],
   "permissions": [
-    "core:default"
+    "core:default",
+    "opener:default",
+    "opener:allow-default-urls"
   ],
   "remote": {
     "urls": [
-      "https://vintgen-ai.vercel.app*"
+      "https://vintgen-ai.vercel.app*",
+      "http://localhost:4200*"
     ]
   }
 }

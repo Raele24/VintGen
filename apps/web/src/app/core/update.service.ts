@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { ExternalLinkService } from './external-link.service';
 
 export interface ReleaseInfo {
   tag: string;
@@ -14,6 +15,7 @@ export interface ReleaseInfo {
   providedIn: 'root',
 })
 export class UpdateService {
+  private readonly externalLinks = inject(ExternalLinkService);
   public readonly currentVersion = '1.0.1';
   public hasNativeUpdate = signal<boolean>(false);
   public isWebUpdateReady = signal<boolean>(false);
@@ -92,7 +94,7 @@ export class UpdateService {
     if (!release || typeof window === 'undefined') return;
 
     const url = release.apkDownloadUrl || release.htmlUrl;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    this.externalLinks.open(url);
   }
 
   private compareSemver(v1: string, v2: string): number {

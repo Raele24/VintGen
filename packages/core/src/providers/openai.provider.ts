@@ -58,7 +58,8 @@ export class OpenAIProvider implements AIProvider {
     textParts.push(
       `TARGET OUTPUT LANGUAGE: ${targetLangName.toUpperCase()}\n` +
       `MANDATORY: You MUST generate all text fields (description bullets, title, flaws, condition notes, category, and price reasoning) entirely in ${targetLangName}. Do NOT output English if the target language is ${targetLangName}.\n` +
-      `HASHTAGS REQUIREMENT: You MUST generate 10 to 15 relevant search hashtags in the 'hashtags' array (brand, model line, technical specs, category, and community tags). Never provide only 1 or 2 tags.`
+      `HASHTAGS REQUIREMENT: You MUST generate 10 to 15 relevant search hashtags in the 'hashtags' array (brand, model line, technical specs, category, and community tags). Never provide only 1 or 2 tags.\n` +
+      `PRICE VALUATION REQUIREMENT: Accurately detect specifications, capacity (GB/TB), interface, and model tier from photos. Benchmark prices realistically to active European secondary marketplace levels (e.g. 1TB NVMe PCIe 4.0 SSDs trade around €60-€80 used, 2TB around €120-€150). Do NOT assign generic €15-€30 lowball defaults to electronics.`
     );
 
     textParts.push(

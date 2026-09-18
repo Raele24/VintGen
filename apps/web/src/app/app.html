@@ -895,13 +895,16 @@
                   <div class="row-value">
                     <div class="search-links-group">
                       <a [href]="getEbaySearchUrl(listing)" target="_blank" rel="noopener noreferrer"
-                        class="link-chip chip-highlight" title="Inspect live listings on eBay">
+                        class="link-chip chip-highlight" title="Inspect live listings on eBay"
+                        (click)="openExternal($event, getEbaySearchUrl(listing))">
                         eBay Live</a>
                       <a [href]="getVintedSearchUrl(listing)" target="_blank" rel="noopener noreferrer"
-                        class="link-chip" title="Inspect live listings on Vinted">
+                        class="link-chip" title="Inspect live listings on Vinted"
+                        (click)="openExternal($event, getVintedSearchUrl(listing))">
                         Vinted Live</a>
                       <a [href]="getSubitoSearchUrl(listing)" target="_blank" rel="noopener noreferrer"
-                        class="link-chip" title="Inspect live listings on Subito">
+                        class="link-chip" title="Inspect live listings on Subito"
+                        (click)="openExternal($event, getSubitoSearchUrl(listing))">
                         Subito Live</a>
                     </div>
                   </div>
@@ -1212,7 +1215,8 @@
               <div class="modal-field-group">
                 <div class="field-label-row">
                   <label for="gemini-key-input" class="field-label">Google Gemini API Key</label>
-                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key">
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="link-get-key"
+                    (click)="openExternal($event, 'https://aistudio.google.com/app/apikey')">
                     Get key &nearr;
                   </a>
                 </div>
@@ -1307,7 +1311,8 @@
               <div class="modal-field-group">
                 <div class="field-label-row">
                   <label for="openai-key-input" class="field-label">OpenAI API Key</label>
-                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="link-get-key">
+                  <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" class="link-get-key"
+                    (click)="openExternal($event, 'https://platform.openai.com/api-keys')">
                     Get key &nearr;
                   </a>
                 </div>
@@ -1401,7 +1406,8 @@
               <div class="modal-field-group">
                 <div class="field-label-row">
                   <label for="claude-key-input" class="field-label">Anthropic Claude API Key</label>
-                  <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" class="link-get-key">
+                  <a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener noreferrer" class="link-get-key"
+                    (click)="openExternal($event, 'https://console.anthropic.com/settings/keys')">
                     Get key &nearr;
                   </a>
                 </div>

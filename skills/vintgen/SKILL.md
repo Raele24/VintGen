@@ -1,4 +1,4 @@
-﻿---
+---
 name: vintgen
 description: Analyzes photographs or notes of secondhand items (clothing, accessories, vintage garments, electronics) to generate search-optimized listings and fair secondary market valuations for marketplaces (such as Vinted, eBay, Depop, Subito, and Wallapop).
 ---
@@ -32,6 +32,7 @@ Activate this skill when:
 4. **Marketplace Pricing Engine (Secondary Market Valuation)**:
    - Calculate a realistic listing price based on actual secondary market trading levels (eBay sold items, Vinted, Subito):
      - Avoid naive retail depreciation; reflect actual market demand.
+     - For tech & storage (SSDs): Extract capacity (250GB/500GB/1TB/2TB/4TB) and interface (SATA vs NVMe PCIe 3.0/4.0). Benchmark 1TB NVMe PCIe 4.0 around €60-€80, 2TB around €120-€150, instead of generic lowballs.
      - Provide a recommended listing price along with a negotiation floor and ceiling.
    - Construct direct 1-click live search links using Brand and Model:
      - eBay: `https://www.ebay.it/sch/i.html?_nkw=[Encoded+Query]`

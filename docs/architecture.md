@@ -101,4 +101,19 @@ The project is structured as an npm workspace monorepo:
 - **Architectural UI**: Dark zinc aesthetic, subtle borders, high-contrast monospace indicators, and micro-interactions.
 - **Strict BYOK Privacy**: Direct client-to-provider communications with zero telemetry or middleman servers across all four AI providers.
 
+---
+
+## 5. Cross-Platform External Link Handling
+
+In WebView-based environments (such as Windows Desktop via Tauri v2 / WebView2 and Android via Capacitor), default `target="_blank"` anchor behaviors and popup windows (`window.open`) can be blocked by default WebView policies:
+
+1. **Dedicated External Link Service (`ExternalLinkService`)**:
+   - Centralizes external URL navigation logic.
+   - Detects the runtime container (Tauri desktop, Capacitor native mobile, or standard browser).
+   - In Tauri desktop, delegates external link requests to `@tauri-apps/plugin-opener` and native OS browser dispatch (`opener:default` and `opener:allow-default-urls`).
+   - In Capacitor mobile, delegates to `window.open(url, '_system')`.
+   - In regular browsers, safely falls back to standard `window.open(url, '_blank', 'noopener,noreferrer')`.
+2. **Global Navigation Interception**:
+   - A global capturing click listener intercepts `<a>` elements targeting external origins or specifying `target="_blank"` within native or desktop containers, ensuring consistent hand-off to the operating system's default web browser.
+
 
