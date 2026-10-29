@@ -1,17 +1,22 @@
-/**
+﻿/**
  * VintGen Command-Line Interface (CLI)
- * 
+ *
  * Automated, scriptable secondhand fashion listing generator
- * using Multimodal Vision AI directly from your terminal.
+ * powered by @vintgen/core and openbyok/cli credential vault.
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as os from 'os';
-import * as readline from 'readline';
 import { VintGenEngine, ImageInput, ListingInput } from '@vintgen/core';
+import {
+  PosixFileVaultAdapter,
+  CliConfigData,
+  promptMaskedInput,
+  warnIfCliKeyExposed,
+} from 'openbyok/cli';
 
-interface CliConfig {
+interface CliConfig extends CliConfigData {
+  keys?: Record<string, string>;
   apiKey?: string;
   provider?: 'gemini' | 'openai' | 'claude' | 'ollama';
   model?: string;
@@ -20,102 +25,12 @@ interface CliConfig {
   platform?: 'universal' | 'vinted' | 'ebay' | 'depop' | 'subito' | 'wallapop';
 }
 
-const CONFIG_DIR = path.join(os.homedir(), '.vintgen');
-const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
+const posixVault = new PosixFileVaultAdapter({
+  configDirName: '.vintgen',
+  configFileName: 'config.json',
+});
 
-/**
- * Redacts an API key for safe terminal display.
- */
-function redactApiKey(key?: string): string {
-  if (!key) return '(not configured)';
-  if (key.length <= 8) return '****';
-  return `${key.slice(0, 4)}...${key.slice(-4)}`;
-}
-
-/**
- * Reads an API key interactively without echoing it to the terminal.
- */
-function promptMaskedInput(promptText: string): Promise<string> {
-  return new Promise((resolve) => {
-    if (!process.stdin.isTTY) {
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-      });
-      rl.question(promptText, (ans) => {
-        rl.close();
-        resolve(ans.trim());
-      });
-      return;
-    }
-
-    process.stdout.write(promptText);
-    let input = '';
-
-    const onData = (char: Buffer) => {
-      const str = char.toString('utf-8');
-      for (const c of str) {
-        if (c === '\n' || c === '\r' || c === '\u0004') {
-          process.stdin.removeListener('data', onData);
-          if (process.stdin.isRaw) {
-            process.stdin.setRawMode(false);
-          }
-          process.stdin.pause();
-          process.stdout.write('\n');
-          resolve(input.trim());
-          return;
-        }
-        if (c === '\u0003') {
-          process.exit(1);
-        }
-        if (c === '\u0008' || c === '\x7f') {
-          if (input.length > 0) {
-            input = input.slice(0, -1);
-          }
-        } else {
-          input += c;
-        }
-      }
-    };
-
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
-    process.stdin.on('data', onData);
-  });
-}
-
-function loadConfig(): CliConfig {
-  try {
-    if (fs.existsSync(CONFIG_FILE)) {
-      const raw = fs.readFileSync(CONFIG_FILE, 'utf8');
-      return JSON.parse(raw);
-    }
-  } catch { }
-  return {};
-}
-
-/**
- * Saves configuration with strict POSIX owner-only permissions (0700 dir, 0600 file).
- */
-function saveConfig(cfg: Partial<CliConfig>): void {
-  try {
-    if (!fs.existsSync(CONFIG_DIR)) {
-      fs.mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
-    } else {
-      try {
-        fs.chmodSync(CONFIG_DIR, 0o700);
-      } catch { }
-    }
-    const current = loadConfig();
-    const merged = { ...current, ...cfg };
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), { encoding: 'utf8', mode: 0o600 });
-    try {
-      fs.chmodSync(CONFIG_FILE, 0o600);
-    } catch { }
-  } catch (err) {
-    console.error('Failed to save configuration:', err);
-  }
-}
+const CONFIG_FILE = posixVault.configFile;
 
 interface CliArgs {
   provider?: 'gemini' | 'openai' | 'claude' | 'ollama';
@@ -137,7 +52,7 @@ interface CliArgs {
   version: boolean;
 }
 
-const PACKAGE_VERSION = '1.0.2';
+const PACKAGE_VERSION = '1.0.3';
 
 /**
  * Parses raw command-line arguments into structured configuration.
@@ -318,17 +233,17 @@ function getMimeType(filePath: string): string {
  */
 async function main(): Promise<void> {
   const args = parseArguments(process.argv.slice(2));
-  const savedConfig = loadConfig();
+  const savedConfig = posixVault.loadConfig<CliConfig>();
 
   if (args.version) {
     console.log(`vintgen v${PACKAGE_VERSION}`);
     process.exitCode = 0; return;
   }
 
-  if (args.apiKey || (args.command === 'set-key' && args.commandArg && args.commandArg !== '-')) {
-    console.warn('\nSecurity advisory: Passing API keys as command line arguments can expose them in shell history and system process listings.');
-    console.warn('Recommended: Use environment variables (e.g. export GEMINI_API_KEY=...) or interactive input ("vintgen set-key").\n');
-  }
+  const hasExposedCliKey = Boolean(
+    args.apiKey || (args.command === 'set-key' && args.commandArg && args.commandArg !== '-')
+  );
+  warnIfCliKeyExposed(hasExposedCliKey, 'GEMINI_API_KEY', 'vintgen');
 
   // Handle set-key shortcut
   if (args.command === 'set-key') {
@@ -341,7 +256,11 @@ async function main(): Promise<void> {
       process.exitCode = 1; return;
     }
     const targetProvider = args.provider || savedConfig.provider || 'gemini';
-    saveConfig({ apiKey: keyToSave, provider: targetProvider });
+    posixVault.saveConfig<CliConfig>({
+      apiKey: keyToSave,
+      provider: targetProvider,
+      keys: { ...(savedConfig.keys || {}), [targetProvider]: keyToSave },
+    });
     console.log(`API Key successfully saved for provider "${targetProvider}" to ${CONFIG_FILE} (permissions: 0600 owner only).`);
     console.log('You can now run "vintgen" in any folder without passing --key.');
     process.exitCode = 0; return;
@@ -357,13 +276,13 @@ async function main(): Promise<void> {
       if (args.model) updates.model = args.model;
       if (args.endpoint) updates.endpoint = args.endpoint;
       if (args.platform) updates.platform = args.platform;
-      saveConfig(updates);
-      const current = loadConfig();
-      const safeDisplay = { ...current, apiKey: redactApiKey(current.apiKey) };
-      console.log(`Configuration updated in ${CONFIG_FILE} (permissions: 0600):`, safeDisplay);
+      posixVault.saveConfig<CliConfig>(updates);
+      console.log(
+        `Configuration updated in ${CONFIG_FILE} (permissions: 0600):`,
+        posixVault.getRedactedConfig()
+      );
     } else {
-      const safeDisplay = { ...savedConfig, apiKey: redactApiKey(savedConfig.apiKey) };
-      console.log('Current configuration:', safeDisplay);
+      console.log('Current configuration:', posixVault.getRedactedConfig());
       console.log(`Config file: ${CONFIG_FILE} (permissions: 0600 owner only)`);
       console.log('Environment variables: GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY');
     }
@@ -380,18 +299,9 @@ async function main(): Promise<void> {
   const language = args.language || savedConfig.language || 'en';
   const model = args.model || savedConfig.model;
 
-  let defaultEnvKey: string | undefined;
-  if (provider === 'claude') {
-    defaultEnvKey = process.env.ANTHROPIC_API_KEY;
-  } else if (provider === 'openai') {
-    defaultEnvKey = process.env.OPENAI_API_KEY;
-  } else if (provider === 'ollama') {
-    defaultEnvKey = process.env.OLLAMA_API_KEY || '';
-  } else {
-    defaultEnvKey = process.env.GEMINI_API_KEY;
-  }
-
-  const apiKey = args.apiKey || savedConfig.apiKey || defaultEnvKey;
+  // Resolve key via openbyok/cli PosixFileVaultAdapter:
+  // Priority: Explicit CLI Flag (--key) > Environment Variable > Stored Per-Provider Key (keys[provider])
+  const apiKey = posixVault.resolveKey(provider, args.apiKey);
 
   if (provider !== 'ollama' && !apiKey) {
     const providerName = provider === 'claude' ? 'Anthropic Claude' : (provider === 'openai' ? 'OpenAI' : 'Google Gemini');
@@ -430,7 +340,7 @@ async function main(): Promise<void> {
     }
   }
 
-  // Resolve images: either from -i flag OR automatic discovery in current directory!
+  // Resolve images: either from -i flag OR automatic discovery in current directory
   let resolvedImagePaths: string[] = [];
   if (args.images && args.images.length > 0) {
     resolvedImagePaths = args.images.map((p) => path.resolve(process.cwd(), p));
@@ -549,4 +459,3 @@ main().catch((err) => {
   console.error('Unexpected CLI error:', err);
   process.exitCode = 1; return;
 });
-

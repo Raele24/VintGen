@@ -8,9 +8,12 @@
     "build": "tsc",
     "watch": "tsc -w"
   },
-  "dependencies": {},
+  "dependencies": {
+    "openbyok": "^1.1.0"
+  },
   "devDependencies": {
     "typescript": "^5.7.0"
   },
+  "author": "Raele24",
   "license": "MIT"
 }

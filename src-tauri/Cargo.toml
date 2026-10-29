@@ -2,7 +2,7 @@
 name = "vintgen"
 version = "1.0.0"
 description = "VintGen - AI Listing Generator for Vinted and Secondhand Fashion"
-authors = ["VintGen Contributors"]
+authors = ["Raele24"]
 license = "MIT"
 edition = "2021"
 

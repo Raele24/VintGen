@@ -1,4 +1,4 @@
-# Security Architecture & Credential Management
+﻿# Security Architecture & Credential Management
 
 VintGen implements a strict client-side model with Bring Your Own Key (BYOK) privacy and local offline model support. This document outlines the security architecture, threat model, potential risk vectors, and implemented defensive mitigations across the Web application, native desktop/mobile wrappers, and the terminal CLI.
 
@@ -34,22 +34,30 @@ However, executing AI calls directly from client environments introduces specifi
 
 ### Implemented Browser Mitigations
 
-VintGen provides multi-tier defense mechanisms inside the Web application:
+VintGen provides multi-tier defense mechanisms inside the Web application powered by `openbyok` and `openbyok/angular`:
 
 - **Tier 1: Session-Only In-Memory Storage (Default / Recommended)**:
-  - Users can configure the application to store keys exclusively in volatile JavaScript runtime memory (Angular Signals).
+  - Users can configure the application to store keys exclusively in volatile JavaScript runtime memory (`MemoryVaultAdapter` + Angular Signals).
   - Keys are never committed to `localStorage`, `sessionStorage`, or IndexedDB.
   - When the browser tab or window is closed, credentials are permanently lost from runtime memory, eliminating disk forensic extraction and at-rest compromise.
 
 - **Tier 2: Authenticated WebCrypto AES-GCM-256 At-Rest Encryption**:
   - When persistent device storage is explicitly enabled, credentials are not stored in plaintext.
-  - VintGen uses the standard Web Cryptography API (`crypto.subtle`) to encrypt keys with AES-GCM-256 and a 96-bit cryptographic initialization vector (IV) derived via PBKDF2 with 100,000 SHA-256 iterations.
+  - VintGen uses the standard Web Cryptography API (`crypto.subtle`) via `WebCryptoVaultAdapter` to encrypt keys with AES-GCM-256 and a 96-bit cryptographic initialization vector (IV) derived via PBKDF2 with 100,000 SHA-256 iterations.
   - Raw filesystem extraction yields only authenticated ciphertext envelopes (`enc:v1:<iv>:<ciphertext>`).
 
-- **Tier 3: One-Click Credential Purge**:
+- **Tier 2b: User Passphrase / PIN Encrypted Vault**:
+  - Powered by `PassphraseVaultAdapter`, users can protect persistent keys with a personal PIN or passphrase.
+  - Keys are encrypted with AES-GCM-256 using a key derived via PBKDF2 (100,000 SHA-256 iterations) from the user's PIN and a unique 128-bit cryptographic salt, verified via an encrypted canary block.
+  - The derived CryptoKey lives strictly in volatile RAM while unlocked and is never written to `localStorage`. Closing the browser tab or clicking **Lock Vault Now** zeroes the in-memory decryption key, requiring the PIN to unlock stored credentials on future sessions.
+
+- **Tier 3: Session Usage & Budget Telemetry**:
+  - Powered by `UsageTracker`, VintGen tracks session request count, estimated input/output tokens, and estimated USD cost per provider in real time inside the credentials modal.
+
+- **Tier 4: One-Click Credential Purge**:
   - The settings interface provides an instant purge action that zeroes all active memory signals and removes stored credential envelopes from browser storage.
 
-- **Tier 4: Zero-Credential Local Architecture (Ollama)**:
+- **Tier 5: Zero-Credential Local Architecture (Ollama)**:
   - Users seeking zero exposure can run local vision models via Ollama. This path requires no API keys, generates zero external internet traffic, and keeps all image analysis on the local machine.
 
 ---
@@ -95,8 +103,9 @@ The `vintgen` CLI allows developers and automated workflows to generate listings
 3. **Output Redaction**:
    - Inspecting configuration with `vintgen config` redacts stored keys (e.g. `AIza...Z4X2` or `sk-p...9aF1`), preventing accidental terminal shoulder surfing or screen recording leaks.
 
-4. **Environment Variable Precedence**:
-   - The CLI evaluates environment variables (`GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `OLLAMA_HOST`) first. Environment variables leave zero traces on disk, do not appear in process argument lists, and are not recorded in shell command histories.
+4. **Environment Variable Precedence & Per-Provider Key Isolation**:
+   - Powered by `openbyok/cli` (`PosixFileVaultAdapter`), the CLI stores credentials in an isolated per-provider map (`keys: { gemini, openai, claude, ollama }`) inside `~/.vintgen/config.json`.
+   - Credential resolution strictly follows `CLI Flag (--key) > Environment Variable (GEMINI_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY, OLLAMA_API_KEY) > Stored Provider Key`, ensuring environment variables always take precedence over disk configuration without cross-provider key collisions.
 
 ---
 
@@ -107,5 +116,5 @@ The `vintgen` CLI allows developers and automated workflows to generate listings
 2. **For Cloud BYOK in Terminal**:
    - Export keys as environment variables in private session startup scripts or secret managers rather than passing flags on the command line.
 3. **For Cloud BYOK in Web App**:
-   - Maintain the default **Session-Only Memory** mode if operating on shared or untrusted workstations.
+   - Maintain the default **Session-Only Memory** mode if operating on shared or untrusted workstations, or use **PIN Vault** mode for persistent keys protected by a personal passphrase.
    - Regularly use the **Purge All Credentials** button upon session completion.

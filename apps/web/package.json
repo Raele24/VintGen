@@ -33,6 +33,7 @@
     "@tauri-apps/plugin-opener": "^2.5.5",
     "@vintgen/core": "*",
     "onnxruntime-web": "^1.21.0-dev.20250206-d981b153d3",
+    "openbyok": "^1.1.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

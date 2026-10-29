@@ -1080,28 +1080,18 @@ export class App {
   public async testCandidateKey(): Promise<void> {
     const provider = this.modalProvider();
     if (!provider) return;
-    let result: { success: boolean; message: string };
 
-    if (provider === 'ollama') {
-      const engine = new (await import('@vintgen/core')).VintGenEngine();
-      result = await engine.testProvider('ollama', {
-        apiKey: this.tempApiKey().trim(),
-        baseUrl: this.tempOllamaEndpoint().trim() || 'http://localhost:11434',
-        model: this.tempOllamaModel().trim() || 'llama3.2-vision',
-      });
-    } else {
-      const key = this.tempApiKey().trim();
-      if (!key) {
-        this.keyTestResult.set({ success: false, message: 'Please enter an API key first.' });
-        return;
-      }
-      if (provider === 'claude' || provider === 'openai') {
-        const engine = new (await import('@vintgen/core')).VintGenEngine();
-        result = await engine.testProvider(provider, { apiKey: key });
-      } else {
-        result = await this.generator.testKey(key);
-      }
+    if (provider !== 'ollama' && !this.tempApiKey().trim()) {
+      this.keyTestResult.set({ success: false, message: 'Please enter an API key first.' });
+      return;
     }
+
+    const result = await this.generator.testKey(
+      this.tempApiKey().trim(),
+      provider === 'ollama' ? this.tempOllamaEndpoint().trim() || 'http://localhost:11434' : undefined,
+      provider === 'ollama' ? this.tempOllamaModel().trim() || 'llama3.2-vision' : undefined,
+      provider
+    );
     this.keyTestResult.set(result);
   }
 
@@ -1184,14 +1174,49 @@ export class App {
   public purgeAllCredentials(): void {
     this.storage.purgeAllCredentials();
     this.tempApiKey.set('');
+    this.vaultPinInput.set('');
     this.keyTestResult.set({
       success: true,
       message: 'All API keys have been purged from memory and storage.',
     });
   }
 
-  public setStorageMode(mode: 'session' | 'encrypted'): void {
-    this.storage.setStorageMode(mode);
+  public vaultPinInput = signal<string>('');
+  public vaultPinFeedback = signal<{ success: boolean; message: string } | null>(null);
+
+  public async setStorageMode(mode: 'session' | 'encrypted' | 'passphrase'): Promise<void> {
+    this.vaultPinFeedback.set(null);
+    await this.storage.setStorageMode(mode);
+  }
+
+  public async unlockPinVault(): Promise<void> {
+    const pin = this.vaultPinInput().trim();
+    if (!pin) {
+      this.vaultPinFeedback.set({ success: false, message: 'Enter a PIN or Passphrase.' });
+      return;
+    }
+    const ok = await this.storage.unlockWithPin(pin);
+    if (ok) {
+      this.vaultPinInput.set('');
+      this.vaultPinFeedback.set({
+        success: true,
+        message: 'PIN Vault unlocked. Keys decrypted into session memory.',
+      });
+    } else {
+      this.vaultPinFeedback.set({
+        success: false,
+        message: 'Invalid PIN / Passphrase for existing encrypted vault.',
+      });
+    }
+  }
+
+  public lockPinVault(): void {
+    this.storage.lockPinVault();
+    this.tempApiKey.set('');
+    this.vaultPinFeedback.set({
+      success: true,
+      message: 'PIN Vault locked. Passphrase and keys cleared from RAM.',
+    });
   }
 
   // --- History & Reset Controls ---

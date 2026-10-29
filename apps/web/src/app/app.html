@@ -1153,11 +1153,11 @@
         <div class="credential-privacy-banner">
           <div class="privacy-banner-top">
             <div class="privacy-banner-meta">
-              <span class="privacy-status-dot" [class.encrypted]="storage.storageMode() === 'encrypted'"></span>
+              <span class="privacy-status-dot" [class.encrypted]="storage.storageMode() !== 'session'"></span>
               <span class="privacy-banner-label">Credential Storage Mode</span>
             </div>
-            <span class="privacy-banner-tag" [class.encrypted]="storage.storageMode() === 'encrypted'">
-              {{ storage.storageMode() === 'session' ? 'In-Memory Only' : 'Device AES-256' }}
+            <span class="privacy-banner-tag" [class.encrypted]="storage.storageMode() !== 'session'">
+              {{ storage.storageMode() === 'session' ? 'In-Memory Only' : (storage.storageMode() === 'passphrase' ? 'PIN AES-256' : 'Device AES-256') }}
             </span>
           </div>
 
@@ -1184,12 +1184,66 @@
                 <span class="seg-subtitle">Device (AES-GCM-256)</span>
               </div>
             </button>
+            <button type="button"
+                    class="seg-pill"
+                    [class.active]="storage.storageMode() === 'passphrase'"
+                    (click)="setStorageMode('passphrase')"
+                    role="radio"
+                    [attr.aria-checked]="storage.storageMode() === 'passphrase'">
+              <div class="seg-pill-content">
+                <span class="seg-title">PIN Vault</span>
+                <span class="seg-subtitle">Passphrase AES-256</span>
+              </div>
+            </button>
           </div>
           <p class="privacy-banner-desc">
             {{ storage.storageMode() === 'session'
                 ? 'High Privacy: API keys reside strictly in volatile browser RAM and are completely erased when you close this window.'
-                : 'Persistent: API keys are encrypted with WebCrypto AES-GCM-256 before saving to this device.' }}
+                : (storage.storageMode() === 'passphrase'
+                    ? 'Zero-Trust PIN Vault: Keys are encrypted with a secret PIN/Passphrase that is never stored on disk.'
+                    : 'Persistent: API keys are encrypted with WebCrypto AES-GCM-256 before saving to this device.') }}
           </p>
+
+          @if (storage.storageMode() === 'passphrase') {
+          <div class="modal-field-group" style="margin-top: 0.75rem;">
+            <div class="field-label-row">
+              <label for="vault-pin-input" class="field-label">
+                {{ storage.isVaultLocked() ? 'Unlock or Set Vault PIN / Passphrase' : 'PIN Vault Active (Unlocked)' }}
+              </label>
+              @if (!storage.isVaultLocked()) {
+              <button type="button" class="btn-danger-subtle btn-sm" (click)="lockPinVault()">
+                Lock Vault Now
+              </button>
+              }
+            </div>
+            @if (storage.isVaultLocked()) {
+            <div class="input-with-action" style="display: flex; gap: 0.5rem;">
+              <input type="password" id="vault-pin-input" class="field-input field-input-mono"
+                placeholder="Enter secret PIN or passphrase..."
+                [ngModel]="vaultPinInput()" (ngModelChange)="vaultPinInput.set($event)"
+                (keydown.enter)="unlockPinVault()" autocomplete="off" />
+              <button type="button" class="btn-primary btn-sm" (click)="unlockPinVault()" [disabled]="!vaultPinInput().trim()">
+                Unlock
+              </button>
+            </div>
+            }
+            @if (vaultPinFeedback()) {
+            <div class="key-test-feedback" [class.success]="vaultPinFeedback()!.success" [class.error]="!vaultPinFeedback()!.success" style="margin-top: 0.5rem;">
+              {{ vaultPinFeedback()!.message }}
+            </div>
+            }
+          </div>
+          }
+
+          @if (storage.usageMetrics().requestCount > 0) {
+          <div class="modal-hint-row" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-subtle);">
+            <span class="hint-text">
+              Session Usage: <strong>{{ storage.usageMetrics().requestCount }}</strong> generation(s) &bull;
+              <strong>~{{ storage.usageMetrics().estimatedTotalTokens }}</strong> tokens &bull;
+              Est. Cost: <strong>${{ storage.usageMetrics().estimatedCostUsd.toFixed(4) }}</strong>
+            </span>
+          </div>
+          }
         </div>
 
         <div class="provider-hub-list">

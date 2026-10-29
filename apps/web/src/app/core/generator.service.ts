@@ -76,6 +76,12 @@ export class GeneratorService {
       this.currentListing.set(response.raw);
       this.formattedListing.set(response.formatted);
       this.storage.saveListing(response.raw, previewThumbnail);
+      this.storage.recordGenerationUsage(
+        provider,
+        (input.notes?.length || 0) + (input.titleHint?.length || 0) + 600,
+        input.images?.length || 0,
+        JSON.stringify(response.raw)
+      );
       this.statusMessage.set('');
       this.isQuotaExceeded.set(false);
       return true;
@@ -150,14 +156,15 @@ export class GeneratorService {
   }
 
   /**
-   * Tests a provided API key or currently stored key.
+   * Tests a provided API key or currently stored key via openbyok ByokClient.
    */
   public async testKey(
     candidateKey?: string,
     candidateEndpoint?: string,
-    candidateModel?: string
+    candidateModel?: string,
+    candidateProvider?: 'gemini' | 'openai' | 'claude' | 'ollama'
   ): Promise<{ success: boolean; message: string }> {
-    const p = this.storage.selectedProvider();
+    const p = candidateProvider || this.storage.selectedProvider();
     const key = candidateKey !== undefined ? candidateKey : this.storage.activeApiKey();
     if (p !== 'ollama' && !key) {
       return { success: false, message: 'API key is required' };
@@ -165,9 +172,9 @@ export class GeneratorService {
 
     this.isTestingKey.set(true);
     try {
-      const result = await this.engine.testProvider(p, {
+      const result = await this.storage.client.testConnection(p, {
         apiKey: key || '',
-        model: candidateModel || this.storage.activeModel(),
+        model: candidateModel || (p === 'ollama' ? this.storage.ollamaModel() : undefined),
         baseUrl: candidateEndpoint || (p === 'ollama' ? this.storage.ollamaEndpoint() : undefined),
       });
       return result;

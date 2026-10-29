@@ -1,6 +1,9 @@
-import { Injectable, signal, computed } from '@angular/core';
+﻿import { Injectable, signal, computed } from '@angular/core';
 import { ListingResult } from '@vintgen/core';
-import { encryptSecret, decryptSecret } from './crypto.util';
+import { ByokClient, UsageMetrics } from 'openbyok';
+import { ByokHeadlessController, registerByokSettingsElement } from 'openbyok/ui';
+import { createByokSignalStore } from 'openbyok/angular';
+import { vintgenWebCryptoVault } from './crypto.util';
 
 export interface SavedListingItem {
   id: string;
@@ -9,30 +12,51 @@ export interface SavedListingItem {
   previewThumbnail?: string;
 }
 
-export type StorageMode = 'session' | 'encrypted';
+export type StorageMode = 'session' | 'encrypted' | 'passphrase';
 
-const STORAGE_KEY_API_KEY = 'vintgen_gemini_api_key';
 const STORAGE_KEY_HISTORY = 'vintgen_saved_listings';
 const STORAGE_KEY_PROVIDER = 'vintgen_provider';
-const STORAGE_KEY_OPENAI_KEY = 'vintgen_openai_api_key';
-const STORAGE_KEY_CLAUDE_KEY = 'vintgen_claude_api_key';
 const STORAGE_KEY_OLLAMA_ENDPOINT = 'vintgen_ollama_endpoint';
 const STORAGE_KEY_OLLAMA_MODEL = 'vintgen_ollama_model';
-const STORAGE_KEY_OLLAMA_KEY = 'vintgen_ollama_api_key';
 const STORAGE_KEY_STORAGE_MODE = 'vintgen_storage_mode';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StorageService {
-  /** Storage mode: session-only (in-memory, privacy first) or encrypted persistent (WebCrypto AES-GCM) */
-  public storageMode = signal<StorageMode>(this.loadStorageMode());
+  /** Reactive openbyok/angular signal store */
+  private readonly byokStore = createByokSignalStore(
+    { signal, computed },
+    {
+      defaultProvider: this.loadProvider(),
+      fallbackProviders: ['gemini', 'openai', 'claude', 'ollama'],
+      defaultVaultMode: this.loadStorageMode(),
+      customVaultAdapters: [vintgenWebCryptoVault],
+    }
+  );
 
-  /** Primary provider API key */
-  public apiKey = signal<string>('');
+  /** Underlying openbyok ByokClient */
+  public readonly client: ByokClient = this.byokStore.client;
+
+  /** Underlying openbyok/ui Headless Controller */
+  public readonly uiController: ByokHeadlessController;
+
+  /** Storage mode: 'session' (RAM), 'encrypted' (Device AES-GCM), or 'passphrase' (User PIN AES-GCM) */
+  public storageMode = this.byokStore.storageMode as ReturnType<typeof signal<StorageMode>>;
+
+  /** Whether the PIN/Passphrase vault is currently locked */
+  public isVaultLocked = signal<boolean>(this.client.passphraseVault.isLocked());
+
+  /** Live session token & request usage metrics from openbyok UsageTracker */
+  public usageMetrics = signal<UsageMetrics>(this.client.getUsageMetrics());
+
+  /** Primary provider API key (Gemini) */
+  public apiKey = this.byokStore.geminiKey;
 
   /** Selected AI provider */
-  public selectedProvider = signal<'gemini' | 'openai' | 'claude' | 'ollama'>(this.loadProvider());
+  public selectedProvider = this.byokStore.selectedProvider as ReturnType<
+    typeof signal<'gemini' | 'openai' | 'claude' | 'ollama'>
+  >;
 
   /** Ollama local endpoint URL */
   public ollamaEndpoint = signal<string>(this.loadOllamaEndpoint());
@@ -41,166 +65,106 @@ export class StorageService {
   public ollamaModel = signal<string>(this.loadOllamaModel());
 
   /** Ollama optional API key/auth token */
-  public ollamaApiKey = signal<string>('');
+  public ollamaApiKey = this.byokStore.ollamaKey;
 
   /** Claude API key */
-  public claudeApiKey = signal<string>('');
+  public claudeApiKey = this.byokStore.claudeKey;
 
   /** OpenAI API key */
-  public openaiApiKey = signal<string>('');
+  public openaiApiKey = this.byokStore.openaiKey;
+
+  /** Whether the currently active provider has an API key configured */
+  public hasApiKey = this.byokStore.hasApiKey;
+
+  /** Active API key for the selected provider */
+  public activeApiKey = this.byokStore.activeApiKey;
 
   /** Recent listing history */
   public history = signal<SavedListingItem[]>(this.loadHistory());
 
   constructor() {
-    this.hydrateCredentials();
-  }
-
-  /**
-   * Hydrates credentials on startup.
-   * If in encrypted mode, decrypts AES-GCM payloads from localStorage.
-   * If in session mode, purges any leftover credentials in localStorage to prevent disk persistence.
-   */
-  private async hydrateCredentials(): Promise<void> {
-    const mode = this.storageMode();
-    if (mode === 'session') {
-      this.clearDiskStorage();
-      return;
-    }
-
-    try {
-      const rawGemini = localStorage.getItem(STORAGE_KEY_API_KEY) || '';
-      const rawOpenAI = localStorage.getItem(STORAGE_KEY_OPENAI_KEY) || '';
-      const rawClaude = localStorage.getItem(STORAGE_KEY_CLAUDE_KEY) || '';
-      const rawOllama = localStorage.getItem(STORAGE_KEY_OLLAMA_KEY) || '';
-
-      if (rawGemini) {
-        const decrypted = await decryptSecret(rawGemini);
-        this.apiKey.set(decrypted);
-        if (!rawGemini.startsWith('enc:v1:')) {
-          this.persistEncrypted(STORAGE_KEY_API_KEY, decrypted);
-        }
-      }
-
-      if (rawOpenAI) {
-        const decrypted = await decryptSecret(rawOpenAI);
-        this.openaiApiKey.set(decrypted);
-        if (!rawOpenAI.startsWith('enc:v1:')) {
-          this.persistEncrypted(STORAGE_KEY_OPENAI_KEY, decrypted);
-        }
-      }
-
-      if (rawClaude) {
-        const decrypted = await decryptSecret(rawClaude);
-        this.claudeApiKey.set(decrypted);
-        if (!rawClaude.startsWith('enc:v1:')) {
-          this.persistEncrypted(STORAGE_KEY_CLAUDE_KEY, decrypted);
-        }
-      }
-
-      if (rawOllama) {
-        const decrypted = await decryptSecret(rawOllama);
-        this.ollamaApiKey.set(decrypted);
-        if (!rawOllama.startsWith('enc:v1:')) {
-          this.persistEncrypted(STORAGE_KEY_OLLAMA_KEY, decrypted);
-        }
-      }
-    } catch (err) {
-      console.warn('Failed to hydrate encrypted credentials:', err);
+    registerByokSettingsElement('byok-settings');
+    this.uiController = new ByokHeadlessController(this.client, 'en');
+    this.uiController.setCustomEndpoint(this.ollamaEndpoint(), 'ollama');
+    this.uiController.setCustomModel(this.ollamaModel(), 'ollama');
+    if (this.storageMode() !== 'passphrase') {
+      this.byokStore.hydrate();
     }
   }
 
   /**
-   * Sets the storage mode ('session' or 'encrypted').
+   * Sets the storage mode ('session', 'encrypted', or 'passphrase') via openbyok/angular store.
    */
   public async setStorageMode(mode: StorageMode): Promise<void> {
-    this.storageMode.set(mode);
     try {
       localStorage.setItem(STORAGE_KEY_STORAGE_MODE, mode);
     } catch { }
-
-    if (mode === 'session') {
-      this.clearDiskStorage();
-    } else {
-      await this.persistEncrypted(STORAGE_KEY_API_KEY, this.apiKey());
-      await this.persistEncrypted(STORAGE_KEY_OPENAI_KEY, this.openaiApiKey());
-      await this.persistEncrypted(STORAGE_KEY_CLAUDE_KEY, this.claudeApiKey());
-      await this.persistEncrypted(STORAGE_KEY_OLLAMA_KEY, this.ollamaApiKey());
+    if (mode === 'passphrase' && this.client.passphraseVault.isLocked()) {
+      this.storageMode.set('passphrase');
+      this.isVaultLocked.set(true);
+      return;
     }
+    await this.byokStore.setMode(mode);
+    this.isVaultLocked.set(this.client.passphraseVault.isLocked());
   }
 
   /**
-   * Helper to encrypt and save a secret to localStorage when encrypted mode is active.
+   * Unlocks the PassphraseVaultAdapter with the user's PIN/passphrase and hydrates stored keys.
    */
-  private async persistEncrypted(key: string, value: string): Promise<void> {
-    if (this.storageMode() !== 'encrypted') return;
-    try {
-      if (value && value.trim()) {
-        const encrypted = await encryptSecret(value.trim());
-        localStorage.setItem(key, encrypted);
-      } else {
-        localStorage.removeItem(key);
-      }
-    } catch (e) {
-      console.warn('Failed to persist encrypted credential:', e);
+  public async unlockWithPin(pin: string): Promise<boolean> {
+    const ok = await this.client.passphraseVault.unlock(pin);
+    this.isVaultLocked.set(this.client.passphraseVault.isLocked());
+    if (ok) {
+      await this.byokStore.setMode('passphrase');
+      await this.byokStore.hydrate();
     }
+    return ok;
   }
 
   /**
-   * Clears credentials from localStorage.
+   * Locks the PassphraseVaultAdapter and wipes decrypted keys from volatile RAM.
    */
-  private clearDiskStorage(): void {
-    try {
-      localStorage.removeItem(STORAGE_KEY_API_KEY);
-      localStorage.removeItem(STORAGE_KEY_OPENAI_KEY);
-      localStorage.removeItem(STORAGE_KEY_CLAUDE_KEY);
-      localStorage.removeItem(STORAGE_KEY_OLLAMA_KEY);
-    } catch { }
-  }
-
-  /**
-   * Immediately purges all credentials from memory and disk.
-   */
-  public purgeAllCredentials(): void {
+  public lockPinVault(): void {
+    this.client.passphraseVault.lock();
+    this.isVaultLocked.set(true);
     this.apiKey.set('');
     this.openaiApiKey.set('');
     this.claudeApiKey.set('');
     this.ollamaApiKey.set('');
-    this.clearDiskStorage();
+  }
+
+  /**
+   * Records a generation event in the UsageTracker and refreshes usageMetrics signal.
+   */
+  public recordGenerationUsage(
+    providerId: string,
+    promptChars: number,
+    imageCount: number,
+    outputText: string
+  ): void {
+    this.client.budget.recordUsage(
+      providerId,
+      {
+        userPrompt: 'x'.repeat(promptChars),
+        images: Array.from({ length: imageCount }, () => ({ data: '', mimeType: 'image/jpeg' })),
+      },
+      outputText
+    );
+    this.usageMetrics.set(this.client.getUsageMetrics());
+  }
+
+  /**
+   * Immediately purges all credentials from memory and disk via openbyok/angular store.
+   */
+  public purgeAllCredentials(): void {
+    this.byokStore.purgeAll();
+    this.isVaultLocked.set(this.client.passphraseVault.isLocked());
     try {
       sessionStorage.clear();
     } catch { }
   }
 
-  /** Whether the currently active provider has an API key configured */
-  public hasApiKey = computed(() => {
-    if (this.selectedProvider() === 'ollama') {
-      return true;
-    }
-    if (this.selectedProvider() === 'claude') {
-      return this.claudeApiKey().trim().length > 0;
-    }
-    if (this.selectedProvider() === 'openai') {
-      return this.openaiApiKey().trim().length > 0;
-    }
-    return this.apiKey().trim().length > 0;
-  });
-
-  /** Active API key for the selected provider */
-  public activeApiKey = computed(() => {
-    if (this.selectedProvider() === 'ollama') {
-      return this.ollamaApiKey();
-    }
-    if (this.selectedProvider() === 'claude') {
-      return this.claudeApiKey();
-    }
-    if (this.selectedProvider() === 'openai') {
-      return this.openaiApiKey();
-    }
-    return this.apiKey();
-  });
-
-  /** Active model for the selected provider (configured for Ollama, defaults handled dynamically by provider) */
+  /** Active model for the selected provider */
   public activeModel = computed(() => {
     if (this.selectedProvider() === 'ollama') {
       return this.ollamaModel();
@@ -208,13 +172,8 @@ export class StorageService {
     return undefined;
   });
 
-  /**
-   * Sets the primary provider API key.
-   */
   public setApiKey(key: string): void {
-    const cleanKey = key.trim();
-    this.apiKey.set(cleanKey);
-    this.persistEncrypted(STORAGE_KEY_API_KEY, cleanKey);
+    this.byokStore.setKey('gemini', key.trim());
   }
 
   public clearApiKey(): void {
@@ -223,6 +182,7 @@ export class StorageService {
 
   public setProvider(provider: 'gemini' | 'openai' | 'claude' | 'ollama'): void {
     this.selectedProvider.set(provider);
+    this.uiController.selectProvider(provider);
     try {
       localStorage.setItem(STORAGE_KEY_PROVIDER, provider);
     } catch (e) {
@@ -231,9 +191,7 @@ export class StorageService {
   }
 
   public setOpenAIKey(key: string): void {
-    const cleanKey = key.trim();
-    this.openaiApiKey.set(cleanKey);
-    this.persistEncrypted(STORAGE_KEY_OPENAI_KEY, cleanKey);
+    this.byokStore.setKey('openai', key.trim());
   }
 
   public clearOpenAIKey(): void {
@@ -241,9 +199,7 @@ export class StorageService {
   }
 
   public setClaudeKey(key: string): void {
-    const cleanKey = key.trim();
-    this.claudeApiKey.set(cleanKey);
-    this.persistEncrypted(STORAGE_KEY_CLAUDE_KEY, cleanKey);
+    this.byokStore.setKey('claude', key.trim());
   }
 
   public clearClaudeKey(): void {
@@ -251,29 +207,29 @@ export class StorageService {
   }
 
   public setOllamaEndpoint(endpoint: string): void {
-    const clean = endpoint.trim();
-    this.ollamaEndpoint.set(clean || 'http://localhost:11434');
+    const clean = endpoint.trim() || 'http://localhost:11434';
+    this.ollamaEndpoint.set(clean);
+    this.uiController.setCustomEndpoint(clean, 'ollama');
     try {
-      localStorage.setItem(STORAGE_KEY_OLLAMA_ENDPOINT, clean || 'http://localhost:11434');
+      localStorage.setItem(STORAGE_KEY_OLLAMA_ENDPOINT, clean);
     } catch (e) {
       console.warn('localStorage is unavailable', e);
     }
   }
 
   public setOllamaModel(model: string): void {
-    const clean = model.trim();
-    this.ollamaModel.set(clean || 'llama3.2-vision');
+    const clean = model.trim() || 'llama3.2-vision';
+    this.ollamaModel.set(clean);
+    this.uiController.setCustomModel(clean, 'ollama');
     try {
-      localStorage.setItem(STORAGE_KEY_OLLAMA_MODEL, clean || 'llama3.2-vision');
+      localStorage.setItem(STORAGE_KEY_OLLAMA_MODEL, clean);
     } catch (e) {
       console.warn('localStorage is unavailable', e);
     }
   }
 
   public setOllamaKey(key: string): void {
-    const clean = key.trim();
-    this.ollamaApiKey.set(clean);
-    this.persistEncrypted(STORAGE_KEY_OLLAMA_KEY, clean);
+    this.byokStore.setKey('ollama', key.trim());
   }
 
   public clearOllamaKey(): void {
@@ -315,6 +271,7 @@ export class StorageService {
     try {
       const mode = localStorage.getItem(STORAGE_KEY_STORAGE_MODE);
       if (mode === 'encrypted') return 'encrypted';
+      if (mode === 'passphrase') return 'passphrase';
       return 'session';
     } catch {
       return 'session';
