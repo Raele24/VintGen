@@ -4,6 +4,7 @@
 > Works in your browser, on Android, Windows, and the terminal.
 
 [![npm version](https://img.shields.io/npm/v/vintgen.svg)](https://www.npmjs.com/package/vintgen)
+[![BYOK Engine: openbyok](https://img.shields.io/badge/BYOK_Engine-openbyok-10b981.svg)](https://github.com/Raele24/openbyok)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Web App](https://img.shields.io/badge/Web_App-Live-blue.svg)](https://vintgen-ai.vercel.app)
 
@@ -105,7 +106,7 @@ npm run web
 
 ## Supported AI Providers
 
-VintGen connects directly from your device to the AI provider you prefer:
+VintGen connects directly from your device to the AI provider you prefer via [`openbyok`](https://github.com/Raele24/openbyok):
 
 | Provider | Provider Name | Where to get a key | Cost |
 | :--- | :--- | :--- | :--- |
@@ -120,6 +121,7 @@ VintGen connects directly from your device to the AI provider you prefer:
 Click the **API Settings** button in the top navigation bar to select your provider and choose your storage mode:
 - **Session-Only Memory (Recommended)**: Credentials remain strictly in runtime memory and are cleared when the window closes.
 - **Encrypted Device Storage**: Credentials are encrypted at rest via WebCrypto AES-GCM-256.
+- **PIN Vault**: Credentials are encrypted via PBKDF2-SHA256 + AES-GCM-256 using your personal PIN and locked when idle.
 
 #### In the Command Line:
 For optimal security, use environment variables to avoid shell history and process table exposure:
@@ -136,9 +138,7 @@ vintgen set-key
 vintgen config --provider ollama
 ```
 
-
 ---
-
 
 ## Client-Side Image Enhancement & Background Removal
 
@@ -181,6 +181,7 @@ vintgen -n "Vintage denim jacket" --platform ebay
 # Generate tailored for Depop
 vintgen -n "Y2K leather boots" --platform depop
 ```
+
 ## Command Line Options
 
 | Option | Short | Description |
@@ -201,8 +202,9 @@ vintgen -n "Y2K leather boots" --platform depop
 
 ---
 
-## Privacy
+## Privacy & BYOK Architecture
 
+- Powered by [`openbyok`](https://www.npmjs.com/package/openbyok) ([GitHub Repository](https://github.com/Raele24/openbyok)).
 - Your API keys stay on your device.
 - Photos go directly from your device to the AI provider you select.
 - No middleman servers, no tracking, and no data collection.
