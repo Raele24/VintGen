@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0.0",
+  "phase_number": 3,
+  "phase_slug": "03-specification",
+  "status": "completed",
+  "timestamp_utc": "2026-11-16T20:00:00Z",
+  "producer_role": "product-analyst",
+  "next_role": "software-architect",
+  "input_artifacts": [
+    {
+      "path": "docs/specs/01-discovery-brief.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "path": "docs/specs/02-clarified-requirements.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "output_artifacts": [
+    {
+      "path": "docs/specs/03-specification.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "decisions_locked": [
+    "No external runtime dependencies outside Python 3.10+ standard library for core CLI scripts",
+    "Apache License 2.0 applied across repository"
+  ],
+  "open_risks": [
+    "Local Docker Engine not installed; Strix dynamic container runs must execute in CI or after Docker installation"
+  ],
+  "human_approval": {
+    "gate_id": "Gate-01b",
+    "required": true,
+    "approved": true,
+    "notes": "Specification approved for architecture and implementation"
+  }
+}

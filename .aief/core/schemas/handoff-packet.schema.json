@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Raele24/ai-engineering-framework/core/schemas/handoff-packet.schema.json",
+  "title": "Phase Handoff Packet Schema",
+  "description": "Validates .framework-state/handoffs/phase-NN-handoff.json files",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "phase_number",
+    "phase_slug",
+    "status",
+    "timestamp_utc",
+    "producer_role",
+    "next_role",
+    "input_artifacts",
+    "output_artifacts",
+    "decisions_locked",
+    "open_risks",
+    "human_approval"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "phase_number": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 15
+    },
+    "phase_slug": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "blocked",
+        "awaiting_human_approval"
+      ]
+    },
+    "timestamp_utc": {
+      "type": "string"
+    },
+    "producer_role": {
+      "type": "string"
+    },
+    "next_role": {
+      "type": "string"
+    },
+    "input_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string" }
+        }
+      }
+    },
+    "output_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string" }
+        }
+      }
+    },
+    "decisions_locked": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "open_risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "human_approval": {
+      "type": "object",
+      "required": ["gate_id", "required", "approved"],
+      "properties": {
+        "gate_id": { "type": "string" },
+        "required": { "type": "boolean" },
+        "approved": { "type": "boolean" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Raele24/ai-engineering-framework/core/schemas/skill-frontmatter.schema.json",
+  "title": "Agent Skill Frontmatter Schema",
+  "description": "Validates YAML frontmatter of portable SKILL.md files in skills/",
+  "type": "object",
+  "required": [
+    "name",
+    "description",
+    "version",
+    "source",
+    "license",
+    "category",
+    "tier",
+    "platforms",
+    "requires_tools",
+    "dependencies",
+    "security_scope"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Must match the enclosing skill folder name"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 15,
+      "maxLength": 300
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Upstream repository URL or first-party identifier"
+    },
+    "license": {
+      "type": "string",
+      "enum": ["Apache-2.0", "MIT", "BSD-3-Clause"]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "core-sdlc",
+        "token-optimization",
+        "context-engineering",
+        "ui-ux-design",
+        "agent-architecture",
+        "codebase-intelligence",
+        "seo-growth"
+      ]
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "core",
+        "optional-communication",
+        "optional-context",
+        "optional-agent-architecture",
+        "optional-frontend",
+        "optional-growth"
+      ]
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "antigravity",
+          "copilot",
+          "claude-code",
+          "codex",
+          "gemini-cli"
+        ]
+      },
+      "minItems": 1
+    },
+    "requires_tools": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "security_scope": {
+      "type": "string",
+      "enum": [
+        "read-only",
+        "workspace-write",
+        "network-external"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

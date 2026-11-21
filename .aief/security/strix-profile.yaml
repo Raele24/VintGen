@@ -1,0 +1,42 @@
+# Conditional Strix Security Testing Profile (security/strix-profile.yaml)
+# ==============================================================================
+# WARNING: Active security testing with Strix (https://github.com/usestrix/strix)
+# is classified as CONDITIONAL (Category B/C).
+#
+# Prerequisites before enabling:
+# 1. Docker Engine must be installed and running (`docker info` exits 0).
+# 2. STRIX_LLM and LLM_API_KEY must be set in the environment (never committed).
+# 3. Target must be explicitly authorized by the human owner at Gate-Sec.
+# ==============================================================================
+
+schema_version: "1.0.0"
+profile_name: "local-authorized-sandbox"
+enabled: false
+
+authorization:
+  gate_id: "Gate-Sec"
+  require_explicit_human_approval_per_run: true
+  authorized_by: "<PENDING_HUMAN_APPROVAL>"
+  authorization_date: "<YYYY-MM-DD>"
+
+environment_requirements:
+  require_docker_sandbox: true
+  llm_provider_env_var: "STRIX_LLM"
+  llm_api_key_env_var: "LLM_API_KEY"
+
+scope:
+  # ONLY local loopback or isolated container networks are permitted by default
+  authorized_targets:
+    - "http://127.0.0.1:3000"
+    - "http://localhost:8080"
+  forbidden_targets:
+    - "*.production.*"
+    - "https://github.com/*"
+    - "0.0.0.0/0"
+  max_concurrency: 2
+  rate_limit_requests_per_second: 5
+
+reporting:
+  output_dir: ".framework-state/security/strix"
+  redact_sensitive_headers: true
+  fail_on_severity: "HIGH"

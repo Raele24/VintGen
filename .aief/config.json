@@ -1,0 +1,80 @@
+{
+  "$schema": "./core/schemas/framework-config.schema.json",
+  "frameworkVersion": "0.5.0",
+  "projectName": "VintGen",
+  "workflowProfile": "standard",
+  "enabledPlatforms": [
+    "antigravity",
+    "gemini-cli"
+  ],
+  "stacks": [
+    "node-angular"
+  ],
+  "optionalSkillPacks": {
+    "communication": [
+      "caveman",
+      "rtk-cli",
+      "i-have-adhd",
+      "humanizer"
+    ],
+    "contextEngineering": [
+      "context-optimization",
+      "context-compression",
+      "filesystem-context",
+      "memory-systems",
+      "session-handoff"
+    ],
+    "agentArchitecture": [
+      "multi-agent-patterns",
+      "tool-design",
+      "evaluation",
+      "self-improvement-loops"
+    ],
+    "frontendDesign": [
+      "ui-ux-pro-max",
+      "angular-developer",
+      "angular-new-app",
+      "web-design-guidelines",
+      "canvas-design"
+    ],
+    "growthMedia": [
+      "seo-audit",
+      "ai-seo",
+      "content-strategy",
+      "pricing",
+      "brand-strategy",
+      "video-lens",
+      "video-use"
+    ]
+  },
+  "disabled": {
+    "skills": [],
+    "agents": [],
+    "phases": [],
+    "gates": [],
+    "mechanisms": []
+  },
+  "customizations": {
+    "overlayDir": ".aief/custom",
+    "promptInjectionMode": "inline",
+    "inlineMaxBytes": 16384
+  },
+  "qualityGates": {
+    "requireTddRedGreen": true,
+    "requireIndependentCodeReview": true,
+    "requireGraphifyCheck": true,
+    "minimumTestCoveragePercent": 80
+  },
+  "security": {
+    "enforcePreCommitSecretScan": true,
+    "allowActiveSecurityTesting": false,
+    "strixProfilePath": ".aief/security/strix-profile.yaml"
+  },
+  "paths": {
+    "specsDir": "docs/specs",
+    "adrDir": "docs/adr",
+    "plansDir": "docs/plans",
+    "retrospectivesDir": "docs/retrospectives",
+    "stateDir": ".aief/state"
+  }
+}

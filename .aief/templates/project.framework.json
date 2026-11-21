@@ -1,0 +1,70 @@
+{
+  "$schema": "./core/schemas/framework-config.schema.json",
+  "frameworkVersion": "0.5.0",
+  "projectName": "ai-engineering-framework",
+  "workflowProfile": "full",
+  "enabledPlatforms": [
+    "antigravity",
+    "copilot",
+    "claude-code",
+    "codex",
+    "gemini-cli"
+  ],
+  "stacks": [],
+  "optionalSkillPacks": {
+    "communication": [
+      "caveman",
+      "rtk-cli",
+      "i-have-adhd",
+      "humanizer"
+    ],
+    "contextEngineering": [
+      "context-optimization",
+      "context-compression",
+      "filesystem-context",
+      "session-handoff"
+    ],
+    "agentArchitecture": [
+      "multi-agent-patterns",
+      "evaluation"
+    ],
+    "frontendDesign": [
+      "ui-ux-pro-max",
+      "angular-developer",
+      "angular-new-app",
+      "web-design-guidelines",
+      "canvas-design"
+    ],
+    "growthMedia": []
+  },
+  "qualityGates": {
+    "requireTddRedGreen": true,
+    "requireIndependentCodeReview": true,
+    "requireGraphifyCheck": true,
+    "minimumTestCoveragePercent": 80
+  },
+  "security": {
+    "enforcePreCommitSecretScan": true,
+    "allowActiveSecurityTesting": false,
+    "strixProfilePath": ".aief/security/strix-profile.yaml"
+  },
+  "paths": {
+    "specsDir": "docs/specs",
+    "adrDir": "docs/adr",
+    "plansDir": "docs/plans",
+    "retrospectivesDir": "docs/retrospectives",
+    "stateDir": ".aief/state"
+  },
+  "disabled": {
+    "skills": [],
+    "agents": [],
+    "phases": [],
+    "gates": [],
+    "mechanisms": []
+  },
+  "customizations": {
+    "overlayDir": ".aief/custom",
+    "promptInjectionMode": "inline",
+    "inlineMaxBytes": 16384
+  }
+}

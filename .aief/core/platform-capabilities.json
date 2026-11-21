@@ -1,0 +1,305 @@
+{
+  "schema_version": "1.0.0",
+  "framework_version": "0.4.0",
+  "description": "Declarative platform capability model for the 5 AI Engineering Framework adapters based on M8 empirical and documentation evidence.",
+  "platforms": [
+    {
+      "id": "antigravity",
+      "display_name": "Google Antigravity IDE & CLI",
+      "runtime_status": "RUNTIME_VERIFIED",
+      "native_skill_dirs": {
+        "state": "verified_runtime",
+        "manifest_file": ".agents/skills.json",
+        "paths": [
+          ".agents/skills/<name>/SKILL.md"
+        ],
+        "notes": "M8-02B verified .agents/skills.json discovery in consumer workspace (19 skills); native .agents/skills/<name>/SKILL.md documented in adapters/compatibility-matrix.md."
+      },
+      "tool_id_map": {
+        "state": "verified_runtime",
+        "canonical_to_native": {
+          "read_file": "read_file",
+          "write_file": "write_file",
+          "edit_file": "edit_file",
+          "run_command": "run_command"
+        },
+        "notes": "Canonical framework tool names match built-in Antigravity tools observed in M8-02B."
+      },
+      "agent_definition": {
+        "state": "verified_static",
+        "format": "canonical_markdown",
+        "target_path": "agents/<name>.md",
+        "unsupported_fields": [],
+        "notes": "Consumes canonical role files directly alongside native invoke_subagent delegation."
+      },
+      "instruction_entries": {
+        "state": "verified_runtime",
+        "root_files": [
+          "GEMINI.md",
+          "AGENTS.md"
+        ],
+        "scoped_glob": ".agents/rules/*.md",
+        "notes": "M8-02B verified GEMINI.md, AGENTS.md, and consumer-rewritten .agents/rules/framework-core.md."
+      },
+      "workflow_commands": {
+        "state": "verified_runtime",
+        "format": "workflows_markdown",
+        "target_glob": "workflows/*.md",
+        "supports_subagents": true,
+        "notes": "Reference runtime supporting full 15-phase SDLC and subagent/browser delegation (M6-Pilot, M8-02B, M8-02C)."
+      },
+      "hooks_support": {
+        "state": "documentation_derived",
+        "schema_family": "antigravity_lifecycle_hooks",
+        "target_file": "adapters/antigravity/hooks.json",
+        "notes": "Aligned in M9-03 with documented .agents/hooks.json contract (<hook-name>.Stop handler, enabled: false for opt-in safety); runtime hook execution unverified."
+      },
+      "runtime_constraints": {
+        "verified_facts": [
+          "Dedicated read_file and write_file operate cleanly under agy --mode accept-edits.",
+          "25/25 M8-02B tool calls remained strictly inside consumer workspace."
+        ],
+        "known_blocks": [
+          "Headless run_command is denied under accept-edits / nested exebox.",
+          "Host-global ~/.gemini/config/skills/ remains visible in IDE host sessions."
+        ]
+      }
+    },
+    {
+      "id": "copilot",
+      "display_name": "GitHub Copilot (VS Code & CLI)",
+      "runtime_status": "BLOCKED_EXTERNAL",
+      "native_skill_dirs": {
+        "state": "documentation_derived",
+        "manifest_file": null,
+        "paths": [
+          ".agents/skills/<name>/SKILL.md"
+        ],
+        "notes": "Mapped in adapters/compatibility-matrix.md; unverified at runtime (copilot CLI and GitHub.copilot* extensions not installed in M8-01)."
+      },
+      "tool_id_map": {
+        "state": "documentation_derived",
+        "canonical_to_native": {
+          "read_file": "read",
+          "write_file": "edit",
+          "edit_file": "edit",
+          "run_command": "terminal"
+        },
+        "notes": "Derived from VS Code custom agent (.agent.md) docs; M9-03 updated code-reviewer.agent.md to least-privilege read-only tools ['read', 'search']."
+      },
+      "agent_definition": {
+        "state": "documentation_derived",
+        "format": "copilot_agent_md",
+        "target_path": ".github/agents/<name>.agent.md",
+        "unsupported_fields": [],
+        "notes": "Read-only reviewer contract ['read', 'search'] aligned in M9-03 from VS Code docs; runtime execution unverified."
+      },
+      "instruction_entries": {
+        "state": "verified_static",
+        "root_files": [
+          ".github/copilot-instructions.md",
+          "AGENTS.md"
+        ],
+        "scoped_glob": ".github/instructions/*.instructions.md",
+        "notes": "Generated cleanly in upstream and consumer bootstrap; COP-W02 consumer test command reference deferred to M9-02."
+      },
+      "workflow_commands": {
+        "state": "verified_static",
+        "format": "prompt_md",
+        "target_glob": ".github/prompts/*.prompt.md",
+        "supports_subagents": false,
+        "notes": "Static YAML frontmatter validated; subagent behavior unverified at runtime."
+      },
+      "hooks_support": {
+        "state": "unsupported",
+        "schema_family": "git_hooks_only",
+        "target_file": null,
+        "notes": "No Copilot-native lifecycle hook JSON contract; relies on Git pre-commit validation."
+      },
+      "runtime_constraints": {
+        "verified_facts": [
+          "Static adapter YAML/Markdown links validated with 0 failures (M8-02A)."
+        ],
+        "known_blocks": [
+          "gh 2.104.0 unauthenticated and copilot CLI / VS Code Copilot extensions absent on host (M8-01)."
+        ]
+      }
+    },
+    {
+      "id": "claude-code",
+      "display_name": "Anthropic Claude Code CLI",
+      "runtime_status": "BLOCKED_EXTERNAL",
+      "native_skill_dirs": {
+        "state": "documentation_derived",
+        "manifest_file": null,
+        "paths": [
+          ".claude/skills/<name>/SKILL.md"
+        ],
+        "notes": "Derived from official code.claude.com documentation and compatibility-matrix.md; unverified at runtime."
+      },
+      "tool_id_map": {
+        "state": "documentation_derived",
+        "canonical_to_native": {
+          "read_file": "Read",
+          "write_file": "Write",
+          "edit_file": "Edit",
+          "run_command": "Bash"
+        },
+        "notes": "Derived from official code.claude.com subagent docs; M9-03 updated framework-code-reviewer to read-only tools (Read, Glob, Grep) and disallowedTools (Write, Edit, Bash)."
+      },
+      "agent_definition": {
+        "state": "documentation_derived",
+        "format": "claude_agent_md",
+        "target_path": ".claude/agents/framework-<name>.md",
+        "unsupported_fields": [
+          "subagent",
+          "mainAgent"
+        ],
+        "notes": "Unsupported subagent/mainAgent keys removed and read-only tools mapped in M9-03 per code.claude.com docs; runtime execution blocked externally."
+      },
+      "instruction_entries": {
+        "state": "verified_static",
+        "root_files": [
+          "CLAUDE.md",
+          "AGENTS.md"
+        ],
+        "scoped_glob": null,
+        "notes": "CLAUDE.md and .claude/settings.json aligned in M9-02/M9-03 (consumer commands + top-level description removed); runtime unverified."
+      },
+      "workflow_commands": {
+        "state": "verified_static",
+        "format": "claude_command_md",
+        "target_glob": ".claude/commands/*.md",
+        "supports_subagents": true,
+        "notes": "CLI 2.1.311 --agent/--agents flags verified in --help (M8-03C); runtime execution blocked by eligibility."
+      },
+      "hooks_support": {
+        "state": "documentation_derived",
+        "schema_family": "claude_settings_hooks",
+        "target_file": ".claude/settings.json",
+        "notes": "Claude settings.json permissions/hooks contract documented externally; runtime behavior unverified."
+      },
+      "runtime_constraints": {
+        "verified_facts": [
+          "Isolated CLI binary 2.1.311 installed and --version/--help verified (M8-03C)."
+        ],
+        "known_blocks": [
+          "BLOCKED_BY_ACCOUNT_ELIGIBILITY: authentication requires Claude Pro, Max, or Ultra subscription; paid API billing unauthorized."
+        ]
+      }
+    },
+    {
+      "id": "codex",
+      "display_name": "OpenAI Codex CLI",
+      "runtime_status": "PARTIAL_RUNTIME_VERIFIED",
+      "native_skill_dirs": {
+        "state": "verified_runtime",
+        "manifest_file": null,
+        "paths": [
+          ".agents/skills/<name>/SKILL.md"
+        ],
+        "notes": "M8-03B empirically proved Codex 0.169.0 ignores .agents/skills.json and natively scans <workspace>/.agents/skills and $HOME/.agents/skills."
+      },
+      "tool_id_map": {
+        "state": "unknown",
+        "canonical_to_native": {},
+        "notes": "Codex CLI exposes runtime execution tools (functions.exec) rather than static per-agent tool frontmatter IDs."
+      },
+      "agent_definition": {
+        "state": "verified_runtime",
+        "format": "agents_md_routing",
+        "target_path": "AGENTS.md",
+        "unsupported_fields": [],
+        "notes": "No .codex/agents/*.md directory; M8-03B proved consumer AGENTS.md with role and 19-skill tables is auto-injected into prompt context."
+      },
+      "instruction_entries": {
+        "state": "verified_runtime",
+        "root_files": [
+          "AGENTS.md"
+        ],
+        "scoped_glob": null,
+        "notes": "AGENTS.md auto-injection verified via codex debug prompt-input (Canonical Digest 785a81ef86a31d8b)."
+      },
+      "workflow_commands": {
+        "state": "verified_static",
+        "format": "agents_md_workflow_refs",
+        "target_glob": "AGENTS.md",
+        "supports_subagents": false,
+        "notes": "collaboration.* runtime tools detected in prompt-input (M8-03B), but disk handoff execution blocked by Windows sandbox."
+      },
+      "hooks_support": {
+        "state": "unsupported",
+        "schema_family": "sandbox_policy_only",
+        "target_file": ".codex/config.toml",
+        "notes": "Uses TOML sandbox_mode and approval_policy rather than lifecycle hook scripts."
+      },
+      "runtime_constraints": {
+        "verified_facts": [
+          "Isolated CLI 0.169.0 authenticated via ChatGPT WebSocket HTTP 101.",
+          "Auto-injected consumer AGENTS.md and listed all 19 registered skills in CODEX-RT-02."
+        ],
+        "known_blocks": [
+          "No standalone non-shell read_file/write_file tool on Windows; all file I/O uses exec_command -> powershell.exe.",
+          "BLOCKED_BY_CODEX_SANDBOX: sandbox backend disabled + Defender exclusions block CreateProcess under -s read-only and -s workspace-write.",
+          "PowerShell non-TTY codex exec requires closed stdin (-)."
+        ]
+      }
+    },
+    {
+      "id": "gemini-cli",
+      "display_name": "Google Gemini CLI",
+      "runtime_status": "BLOCKED_EXTERNAL",
+      "native_skill_dirs": {
+        "state": "documentation_derived",
+        "manifest_file": null,
+        "paths": [
+          ".agents/skills/<name>/SKILL.md",
+          ".gemini/skills/<name>/SKILL.md"
+        ],
+        "notes": "M8-03A verified pre-auth gemini skills list scans ~/.agents/skills and skips untrusted workspace folders; trusted workspace discovery follows geminicli.com docs."
+      },
+      "tool_id_map": {
+        "state": "unknown",
+        "canonical_to_native": {},
+        "notes": "No per-agent tool frontmatter translation verified for Gemini CLI."
+      },
+      "agent_definition": {
+        "state": "documentation_derived",
+        "format": "toml_commands_only",
+        "target_path": ".gemini/commands/workflow.toml",
+        "unsupported_fields": [],
+        "notes": "Maps canonical workflow stages to single-session TOML commands per compatibility-matrix.md."
+      },
+      "instruction_entries": {
+        "state": "verified_static",
+        "root_files": [
+          "GEMINI.md",
+          "AGENTS.md"
+        ],
+        "scoped_glob": null,
+        "notes": "adapters/gemini-cli/settings.json declares contextFileName [GEMINI.md, AGENTS.md] with top-level description removed in M9-03."
+      },
+      "workflow_commands": {
+        "state": "verified_static",
+        "format": "gemini_command_toml",
+        "target_glob": ".gemini/commands/*.toml",
+        "supports_subagents": false,
+        "notes": "GEM-W02 consumer docs/WORKFLOW.md reference fix deferred to M9-02."
+      },
+      "hooks_support": {
+        "state": "unknown",
+        "schema_family": "gemini_settings_json",
+        "target_file": ".gemini/settings.json",
+        "notes": "Runtime hook contract unverified due to post-auth account block."
+      },
+      "runtime_constraints": {
+        "verified_facts": [
+          "Isolated CLI 0.68.0 installed; gemini skills list observed untrusted folder gate and ~/.agents/skills scanning (M8-03A)."
+        ],
+        "known_blocks": [
+          "Post-auth individual tier rejected with IneligibleTierError / UNSUPPORTED_CLIENT directing users to Antigravity."
+        ]
+      }
+    }
+  ]
+}

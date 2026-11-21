@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Raele24/ai-engineering-framework/core/schemas/agent-role.schema.json",
+  "title": "Canonical Agent Role Frontmatter Schema",
+  "description": "Validates YAML frontmatter of canonical agent role definitions in agents/*.md",
+  "type": "object",
+  "required": [
+    "name",
+    "title",
+    "description",
+    "version",
+    "phases",
+    "allowed_tools",
+    "required_skills",
+    "delegation_targets",
+    "approval_gates"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Kebab-case role identifier matching the filename"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3
+    },
+    "description": {
+      "type": "string",
+      "minLength": 15,
+      "maxLength": 300
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 15
+      },
+      "minItems": 1
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "read_file",
+          "write_file",
+          "edit_file",
+          "run_command",
+          "manage_task",
+          "search_web",
+          "ask_question",
+          "invoke_subagent",
+          "run_workflow",
+          "swarm"
+        ]
+      },
+      "minItems": 1
+    },
+    "required_skills": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "delegation_targets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approval_gates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

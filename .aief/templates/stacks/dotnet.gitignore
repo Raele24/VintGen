@@ -1,0 +1,13 @@
+# .NET / C# Build & Test Artifacts
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+TestResults/
+*.nupkg
+*.snupkg
+appsettings.Development.local.json

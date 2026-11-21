@@ -1,0 +1,5 @@
+# Ephemeral framework runtime state & Python bytecode
+state/
+lock.json.tmp
+__pycache__/
+*.py[cod]

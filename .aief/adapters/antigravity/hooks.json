@@ -1,0 +1,12 @@
+{
+  "framework-validation-reminder": {
+    "enabled": false,
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python .aief/scripts/validate.py --mode consumer --json",
+        "timeout": 30
+      }
+    ]
+  }
+}

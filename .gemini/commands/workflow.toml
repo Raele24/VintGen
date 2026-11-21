@@ -1,0 +1,6 @@
+# AUTO-GENERATED CONSUMER ADAPTER | Canonical Digest: b0a2dbeb02511f58
+description = "Execute active AI Engineering Framework workflow stage"
+prompt = """
+Read AGENTS.md, follow active .aief/workflows/ stage runbooks, and check .aief/state/manifest.json (handoffs disabled: False).
+Respect active gates: Gate-01a, Gate-01b, Gate-02, Gate-03, Gate-Sec, Gate-04, Gate-05.
+"""

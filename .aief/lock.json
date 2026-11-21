@@ -1,0 +1,2060 @@
+{
+  "schema_version": "2.0.0",
+  "framework_version": "0.5.0",
+  "enabled_platforms": [
+    "antigravity",
+    "gemini-cli"
+  ],
+  "optional_packs": [
+    "communication",
+    "context-engineering",
+    "agent-architecture",
+    "frontend-design",
+    "growth-media"
+  ],
+  "stacks": [
+    "node-angular"
+  ],
+  "projection_state": {
+    "status": "completed",
+    "canonical_digest": "b0a2dbeb02511f58",
+    "last_successful_projection": {
+      "framework_version": "0.5.0",
+      "enabled_platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "projected_skill_count": 33,
+      "projected_file_count": 149
+    },
+    "pending_entries": {}
+  },
+  "projected_skills": {
+    "antigravity": {
+      "projection_root": ".agents/skills",
+      "skills": [
+        "adr-writer",
+        "agent-browser",
+        "ai-seo",
+        "angular-developer",
+        "angular-new-app",
+        "anti-slop",
+        "brand-strategy",
+        "canvas-design",
+        "caveman",
+        "content-strategy",
+        "context-compression",
+        "context-optimization",
+        "evaluation",
+        "filesystem-context",
+        "find-skills",
+        "graphify",
+        "grill-me",
+        "humanizer",
+        "i-have-adhd",
+        "memory-systems",
+        "multi-agent-patterns",
+        "ponytail",
+        "pricing",
+        "rtk-cli",
+        "self-improvement-loops",
+        "seo-audit",
+        "session-handoff",
+        "tdd-cycle",
+        "tool-design",
+        "ui-ux-pro-max",
+        "video-lens",
+        "video-use",
+        "web-design-guidelines"
+      ]
+    },
+    "gemini-cli": {
+      "projection_root": ".agents/skills",
+      "skills": [
+        "adr-writer",
+        "agent-browser",
+        "ai-seo",
+        "angular-developer",
+        "angular-new-app",
+        "anti-slop",
+        "brand-strategy",
+        "canvas-design",
+        "caveman",
+        "content-strategy",
+        "context-compression",
+        "context-optimization",
+        "evaluation",
+        "filesystem-context",
+        "find-skills",
+        "graphify",
+        "grill-me",
+        "humanizer",
+        "i-have-adhd",
+        "memory-systems",
+        "multi-agent-patterns",
+        "ponytail",
+        "pricing",
+        "rtk-cli",
+        "self-improvement-loops",
+        "seo-audit",
+        "session-handoff",
+        "tdd-cycle",
+        "tool-design",
+        "ui-ux-pro-max",
+        "video-lens",
+        "video-use",
+        "web-design-guidelines"
+      ]
+    }
+  },
+  "managed_files": {
+    ".agents/rules/framework-core.md": {
+      "ownership": "framework_managed",
+      "source": ".agents/rules/framework-core.md",
+      "sha256": "90cc57b0e8421c2ffe587e0808483c86e339a953ed83db8903824d06dead5491",
+      "platforms": [
+        "antigravity"
+      ]
+    },
+    ".agents/skills.json": {
+      "ownership": "framework_managed",
+      "source": ".agents/skills.json",
+      "sha256": "2f9471e01ffd7af746412d11494e0930a4d0ca96bd7d573214e645260fea3a31",
+      "platforms": [
+        "antigravity"
+      ]
+    },
+    ".agents/skills/adr-writer/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/adr-writer/SKILL.md",
+      "sha256": "538e5aed02b929e84483e6d099a3e1d7fd5c855b6ea45a73366ee3a80456e5ab",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "adr-writer"
+    },
+    ".agents/skills/agent-browser/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/agent-browser/SKILL.md",
+      "sha256": "017294dfa033e148ca478fa80ae0674bdecf5be5801e29221bdfcfb079e67904",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "agent-browser"
+    },
+    ".agents/skills/ai-seo/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ai-seo/SKILL.md",
+      "sha256": "87ce46d92c5aef865a51869ec4e82dee541fec830b121391e6c4b49d32e185ae",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ai-seo"
+    },
+    ".agents/skills/angular-developer/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/SKILL.md",
+      "sha256": "c69b669a0830e8ab7d358c39154b0de8488810007fc6d80990b7f62c1d2c2276",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/angular-animations.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/angular-animations.md",
+      "sha256": "0361278cabc4925807c8a93ebce717f1c8d52d553870ddd8634b1075b0395dbc",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/angular-aria.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/angular-aria.md",
+      "sha256": "258262515f0b9f11df3a291c80e6326432b14d3f67109a6ff1592f4c5761a98d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/cli.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/cli.md",
+      "sha256": "b7a5f9f85125659966fe087b623939fe2b89ea5d7cdf53265476adf1666e37d9",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/component-harnesses.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/component-harnesses.md",
+      "sha256": "6b4f4958684308e76b4c57fb4b5f7efdf1cfc64001dd671fe40ae1ceab8e0943",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/component-styling.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/component-styling.md",
+      "sha256": "de3351fdb72174361c6eee150940193f20d148afaceab0f22107758a3cb2d787",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/components.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/components.md",
+      "sha256": "dbfb520f2dddd017acb617369c45544374440fcb0b178d9648fab7ada0178468",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/creating-services.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/creating-services.md",
+      "sha256": "9b0d8b6d627ec33e5957638049877eac655cd31444cd4afa440597e191e4cb94",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/data-resolvers.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/data-resolvers.md",
+      "sha256": "0a6eb7ee89b29d1766941ed88881803b32870e705f2e438a7cae1c4e59ed8289",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/define-routes.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/define-routes.md",
+      "sha256": "1288b38bad6cc9749e9d0fd35a294771ea2181dd712bfc2887d80e8b40fab7e6",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/defining-providers.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/defining-providers.md",
+      "sha256": "e654c23a080c642cf7031b5cc5de1101b8c75030c15256f7e3b81b0336953c6d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/di-fundamentals.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/di-fundamentals.md",
+      "sha256": "87a0bd6addde006dde9fbc9bd89db0525ce37308beb4f6ca474ae4372b046109",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/e2e-testing.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/e2e-testing.md",
+      "sha256": "c04a12aa5fb763b9b592aeb3b5dc68a1d6c707ccf94469095c193227d180d1e7",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/effects.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/effects.md",
+      "sha256": "c06ad02460be7f57d024bb8e263a3390e72059815879bf6bcd0583e510a2b4ad",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/hierarchical-injectors.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/hierarchical-injectors.md",
+      "sha256": "05546d8043b93a2ab8deccdc2bd9c1704350883107701139e790ff8adb0f626a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/host-elements.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/host-elements.md",
+      "sha256": "b898bab74d518feba3c527dbf9694abe6d3ec7bfa44d81b34cff119016984080",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/injection-context.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/injection-context.md",
+      "sha256": "bd0b1dad833696bf2aef2413426d445222aa29cd1cf5608c89147272ca34d9bb",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/inputs.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/inputs.md",
+      "sha256": "229a6e37f7006a6f3426cc2bc42baa67ecbbab77c343d141e44b10c1bb11de09",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/linked-signal.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/linked-signal.md",
+      "sha256": "4971692a36c4d470b5c8efec1a8106418ac28cdc33601e554ecff9dded95d289",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/loading-strategies.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/loading-strategies.md",
+      "sha256": "fa82c48573532a7f5e3ccf7eaa50dc7a2db1f23a8599638d9c18e023dbd73e2f",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/mcp.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/mcp.md",
+      "sha256": "38a5187f1e2e7eb9b20cd1f12d44f74faadeb8f4c71664e7f06b0c2ee65489cd",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/migrations.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/migrations.md",
+      "sha256": "47983ed2683dc10f692d254cdca9c97fc13dec9ad099b759f5d31886f3cbaa7a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/navigate-to-routes.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/navigate-to-routes.md",
+      "sha256": "ea3c3d53b5db47b4f8d8b05124330e72bea92fc908d42c06aa7edb9e652b425e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/outputs.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/outputs.md",
+      "sha256": "a191f8982d9ac6868023d56c887f362052c4fccc70a89adc8a6bc546f851e5dc",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/reactive-forms.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/reactive-forms.md",
+      "sha256": "e71118562247c94141dfaca74efd246e38226bf26ffedbd7f3337f1866113283",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/rendering-strategies.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/rendering-strategies.md",
+      "sha256": "329aa9aa35c85dd2048c899f26025439d3b0244067dbb508e724d291fdad7c97",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/resource.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/resource.md",
+      "sha256": "ff03e5f21219cb0cb6e8ea9fe3c47ead2308471a15a925cbcaf051473669c40c",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/route-animations.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/route-animations.md",
+      "sha256": "eda1452f85ce05f3f28753cc77cd8c31c7a52515d7ccebbb35de0ec1e3beb374",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/route-guards.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/route-guards.md",
+      "sha256": "491a93cb49fbcba04f7e8ffcd0f784fce7319ca3e2fe393c553f3d683a68424c",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/router-lifecycle.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/router-lifecycle.md",
+      "sha256": "4abc8cb8dfeb2e9f57dc11c117d5f4a5b756b39dc076910d9ced9da640effc2d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/router-testing.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/router-testing.md",
+      "sha256": "c1bebdf31808659161891783ac32cfe7300e4ba314ba93b1980c6f35a3e871a2",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/show-routes-with-outlets.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/show-routes-with-outlets.md",
+      "sha256": "43a2ed62ea2edafa8569bf7045f20928110f8f844d5890bfb6a2f2dde45e754b",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/signal-forms.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/signal-forms.md",
+      "sha256": "bcd6ed1b975d28768fb450cc231635d9ba38cbbff6b485874a6571355f4ade7c",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/signals-overview.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/signals-overview.md",
+      "sha256": "da07c58fdea2ab7d82a28faf9f3d117ccb98ccaf3eec06f103b898f557791146",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/tailwind-css.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/tailwind-css.md",
+      "sha256": "bdb952d0dd2d415560a796ecaf843cacff5ac20d8ef961eaaf75656fef9b9263",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/template-driven-forms.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/template-driven-forms.md",
+      "sha256": "52e83e576b0c6dc05f854e903c4cfda1222bcd55c50ddee07344d1e53d02c1df",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-developer/references/testing-fundamentals.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-developer/references/testing-fundamentals.md",
+      "sha256": "c19aba15bd188bb6570fb593e0ca06d52ab86b9ef071611ad89aef1fbdd1a45e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-developer"
+    },
+    ".agents/skills/angular-new-app/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/angular-new-app/SKILL.md",
+      "sha256": "e0e5d2efdfbe3d6a86043a5891a9b831cc2aaf1ff9a16de198d8fcd7b81c7c1a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "angular-new-app"
+    },
+    ".agents/skills/anti-slop/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/anti-slop/SKILL.md",
+      "sha256": "30410bc28aa5b6b67f26ed2306447f2c9dbdf15d5c7fa651a516f7a781374ac3",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "anti-slop"
+    },
+    ".agents/skills/brand-strategy/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/SKILL.md",
+      "sha256": "a7486fed859457a27292f2bd9d8f3f63752cf00e14bbf8cc7153fe76ab6c0793",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/approval-checklist.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/approval-checklist.md",
+      "sha256": "4bf8549687f53a7b9684005b4b87de93c26f018e00609b4c506a5812abd13d20",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/asset-organization.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/asset-organization.md",
+      "sha256": "de98123417e9c5a1cc71a78131bba979c4c8ed2e5289e6c7a7f166576e488101",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/brand-guideline-template.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/brand-guideline-template.md",
+      "sha256": "392db8cf10fef492221c15a86e68590074bf5716de1f2982f41c01fbe30567cc",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/color-palette-management.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/color-palette-management.md",
+      "sha256": "c429298ffe3955edb8b22c9f51426fef75e83d02848cd4300e89c0d3fc34b44a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/consistency-checklist.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/consistency-checklist.md",
+      "sha256": "56d8b2d4852cda11e600adec4b9dd68fc89a1b8265382359953bec5c5e5e2c36",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/logo-usage-rules.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/logo-usage-rules.md",
+      "sha256": "044c5ddf30cfe0eea047451cfce6ea654939198ffdd8968a19161c97066a5a26",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/messaging-framework.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/messaging-framework.md",
+      "sha256": "24b2500a72867b55dd10f4bf359178b0eb347fddd852659ce47b69d9f597d4e6",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/typography-specifications.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/typography-specifications.md",
+      "sha256": "921c3d9e6ddfde2677b9a3e32eee94c7922f54f22c1f380c5ed2eb25a7d5bfa9",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/update.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/update.md",
+      "sha256": "537cb55ebe260e1de127bd6288b19d8d7b15b6c893545442a58b739cbd342b37",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/visual-identity.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/visual-identity.md",
+      "sha256": "63f0cfc5d95403d8e12aca4d839cc28471515574d9a431334bfbb96c15407c31",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/references/voice-framework.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/references/voice-framework.md",
+      "sha256": "08c15ac79f81cd964c5efbe593131b61a093c7e1b060d5dd28b17f3cc5b331fb",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/scripts/extract-colors.cjs": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/scripts/extract-colors.cjs",
+      "sha256": "36d21f3905e5762cfc8054b3f3b7276f6bc656884fe57c6bfa539526044778ed",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/scripts/inject-brand-context.cjs": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/scripts/inject-brand-context.cjs",
+      "sha256": "5b98abdeb5c636f247102cd235f1d3421db7a4de53fd853360feaa0c471b5c96",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/scripts/sync-brand-to-tokens.cjs": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/scripts/sync-brand-to-tokens.cjs",
+      "sha256": "390a760570fdba6d6ecfdfd8907fc802b64659b6178f8920349b0c6a2c822106",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/scripts/tests/test_sync_brand_to_tokens.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/scripts/tests/test_sync_brand_to_tokens.py",
+      "sha256": "0ace0cf7c6a8c12c0b9154f317e847b1084eb00b065b6f22431e37b7c7e948d6",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/scripts/validate-asset.cjs": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/scripts/validate-asset.cjs",
+      "sha256": "4546c9109fb0f4f767426508cb29e60d02b301f8897cf16d8e378b7ce9d997fc",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/brand-strategy/templates/brand-guidelines-starter.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/brand-strategy/templates/brand-guidelines-starter.md",
+      "sha256": "d157a57b15f0b458c79636d11de42f3c89f03d8c0bbea1bdd3cf1c3542b2140d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "brand-strategy"
+    },
+    ".agents/skills/canvas-design/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/canvas-design/SKILL.md",
+      "sha256": "0a6176e7ec6e39280f6d0089c5b87503575605e9decf8045999523327962ca4f",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "canvas-design"
+    },
+    ".agents/skills/caveman/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/caveman/SKILL.md",
+      "sha256": "ab0d1d76675db130ada276071ebf0e89b2662e184f7f0faa220d7e2cfdeb15b9",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "caveman"
+    },
+    ".agents/skills/content-strategy/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/content-strategy/SKILL.md",
+      "sha256": "231588b93c598c5a8b48a8a62b772c7ed100eadb6632c465691a5263e32d3886",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "content-strategy"
+    },
+    ".agents/skills/context-compression/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/context-compression/SKILL.md",
+      "sha256": "6e207cda9f8dd5b1dc2dba054a6f05c06e7284f3fb92d24bc4d36f7be40e8714",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "context-compression"
+    },
+    ".agents/skills/context-compression/references/evaluation-framework.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/context-compression/references/evaluation-framework.md",
+      "sha256": "2584d5ab6c1322c0df7a581a6f5354be052bae077e16f76ef7c772f750ef81d2",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "context-compression"
+    },
+    ".agents/skills/context-compression/scripts/compression_evaluator.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/context-compression/scripts/compression_evaluator.py",
+      "sha256": "425d07d73420073304ce58c078c561cddd61420816efdb080b40778f5c1ed350",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "context-compression"
+    },
+    ".agents/skills/context-optimization/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/context-optimization/SKILL.md",
+      "sha256": "67b221485a32332fb1bd479aca9f5a7631afa16d4a66569640ad499e43da42fd",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "context-optimization"
+    },
+    ".agents/skills/context-optimization/references/optimization_techniques.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/context-optimization/references/optimization_techniques.md",
+      "sha256": "8fa1c2eaca5965d5e9bdf1823236514f83ed8cf0f6b5a21511c139ffce061bec",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "context-optimization"
+    },
+    ".agents/skills/context-optimization/scripts/compaction.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/context-optimization/scripts/compaction.py",
+      "sha256": "7d7986d82639e60cf6c8aca470fc8d2b80507e33340dc208b00d7727a168a978",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "context-optimization"
+    },
+    ".agents/skills/evaluation/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/evaluation/SKILL.md",
+      "sha256": "09e3ad7694f257e6defc1d090e4ce0c77cb3734f9d72ae4cd47170380833c603",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "evaluation"
+    },
+    ".agents/skills/evaluation/references/metrics.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/evaluation/references/metrics.md",
+      "sha256": "342db4111af7a627ea1ce90ac17a637d553ee3b8bcbcc3017b4cbc0c7695a4a8",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "evaluation"
+    },
+    ".agents/skills/evaluation/scripts/evaluator.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/evaluation/scripts/evaluator.py",
+      "sha256": "c4736f9211cd494d1da594f1ecccd1a0ed8d95ee50a084561f4432b624328c67",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "evaluation"
+    },
+    ".agents/skills/filesystem-context/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/filesystem-context/SKILL.md",
+      "sha256": "c5cd4c2b32e0d749659220be2fc77d55e6460a2e80720f9742182a1fe59d11c0",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "filesystem-context"
+    },
+    ".agents/skills/filesystem-context/references/implementation-patterns.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/filesystem-context/references/implementation-patterns.md",
+      "sha256": "78380a2f426f43bcae4658d6498e0953470c3398673e807d861c268d9b96b6b2",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "filesystem-context"
+    },
+    ".agents/skills/filesystem-context/scripts/filesystem_context.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/filesystem-context/scripts/filesystem_context.py",
+      "sha256": "daccf94285ec679ff39f28d3531dea92528a9443736009d8949e488bb21330bb",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "filesystem-context"
+    },
+    ".agents/skills/find-skills/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/find-skills/SKILL.md",
+      "sha256": "7427aadaee8dcb4c408ff469e717180a499e5fb369854ba3d28b567b5bc93ac2",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "find-skills"
+    },
+    ".agents/skills/graphify/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/graphify/SKILL.md",
+      "sha256": "d84421627238898e4686a07858807b4ad2e09e131500c65b383c361e3add015d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "graphify"
+    },
+    ".agents/skills/grill-me/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/grill-me/SKILL.md",
+      "sha256": "236c7e520114b95fe50aeed6ed4f8bb134debbb21319ab4f2fd36cbafc740553",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "grill-me"
+    },
+    ".agents/skills/humanizer/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/humanizer/SKILL.md",
+      "sha256": "33c9aa61e8bd7aeef577d0c7aef524731ee4daaddef8043aeb07e98b64b67cf4",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "humanizer"
+    },
+    ".agents/skills/i-have-adhd/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/i-have-adhd/SKILL.md",
+      "sha256": "b9c1687c178af91242f4e218e669fbb41b0ba03a44fd7c7e0d98d95122dc896e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "i-have-adhd"
+    },
+    ".agents/skills/memory-systems/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/memory-systems/SKILL.md",
+      "sha256": "fbf76e592eacc91018117c3d60feb0ad3035e79d76646ee401d91572649ab9f9",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "memory-systems"
+    },
+    ".agents/skills/memory-systems/references/implementation.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/memory-systems/references/implementation.md",
+      "sha256": "3bd3fa6464a42624f09a31ee262e2e76a4b1c4d10a8e677f398fd08f7b3fccc8",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "memory-systems"
+    },
+    ".agents/skills/memory-systems/scripts/memory_store.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/memory-systems/scripts/memory_store.py",
+      "sha256": "42fc44b2d7545de833b6c70f0ed711285dd3009e631f0711ffe48150ad2c795e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "memory-systems"
+    },
+    ".agents/skills/multi-agent-patterns/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/multi-agent-patterns/SKILL.md",
+      "sha256": "aabdf2a6f0fe763905eaf16ec833947bb9457794e07cf209ed045867a20684f4",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "multi-agent-patterns"
+    },
+    ".agents/skills/multi-agent-patterns/references/frameworks.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/multi-agent-patterns/references/frameworks.md",
+      "sha256": "9bdfc21927dba6390c8ca38b13b32601c2936a30e6821beff8466ad95e3beb76",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "multi-agent-patterns"
+    },
+    ".agents/skills/multi-agent-patterns/scripts/coordination.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/multi-agent-patterns/scripts/coordination.py",
+      "sha256": "703848c18c1be4e1c2bb1d9eb30a267593c2523957b0e3e852912a0f61f2edf2",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "multi-agent-patterns"
+    },
+    ".agents/skills/ponytail/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ponytail/SKILL.md",
+      "sha256": "ad666a3da8f7e6d25c208f7cadc015347b303398e29c96224aae832fd63467df",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ponytail"
+    },
+    ".agents/skills/pricing/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/pricing/SKILL.md",
+      "sha256": "013f08fd2251a4a5f43ad1da267d718eb0ecfbcf7165b2628b4bbf322d9f7844",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "pricing"
+    },
+    ".agents/skills/rtk-cli/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/rtk-cli/SKILL.md",
+      "sha256": "557599149a14e6519f9da25cd4a3af27325b1d072298e5b4d8e57b57e1b4ec0e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "rtk-cli"
+    },
+    ".agents/skills/self-improvement-loops/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/self-improvement-loops/SKILL.md",
+      "sha256": "674c3c53f30e96207ef98a4c8d5b9cf22de88bbda9f34331ce32c3f5d4040135",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "self-improvement-loops"
+    },
+    ".agents/skills/self-improvement-loops/references/loop-design-evidence.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/self-improvement-loops/references/loop-design-evidence.md",
+      "sha256": "d68c7b33fa01466ec98f99b4cedc7c48ee8489ce1fe74045a8cd46fef717d255",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "self-improvement-loops"
+    },
+    ".agents/skills/seo-audit/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/seo-audit/SKILL.md",
+      "sha256": "6cbcfe98a1eb11be215835e5edcba7972fd2b614a163b98ed8a3308efab8adb1",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "seo-audit"
+    },
+    ".agents/skills/session-handoff/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/SKILL.md",
+      "sha256": "16812a5f9e2a647abe88cfd93343b4441988c187798373b6da2b672ad5832a0f",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/session-handoff/references/handoff-template.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/references/handoff-template.md",
+      "sha256": "35492711db3a903cf431fe221b82b2d79e3e18aa9d9900dfc3685ee202e3e0e9",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/session-handoff/references/resume-checklist.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/references/resume-checklist.md",
+      "sha256": "bd64d36be5e68f361038ab7465b7f0c6bd47f4d3e43c925cc38a3868356f19e4",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/session-handoff/scripts/check_staleness.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/scripts/check_staleness.py",
+      "sha256": "9142ebf7596c0923948e301d6bb2e9cfd6da7325a96d83db56ee9a87a1e8995d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/session-handoff/scripts/create_handoff.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/scripts/create_handoff.py",
+      "sha256": "7b9637b8312fea19a4d4a0f3d5ceea91e318398e9c82d7bc35207b9fbf8dfe0a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/session-handoff/scripts/list_handoffs.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/scripts/list_handoffs.py",
+      "sha256": "b56d8fc02212ce1b4a9b50337f86b14558d41f1f02ace1511a64a7f55dc0d1ff",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/session-handoff/scripts/validate_handoff.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/session-handoff/scripts/validate_handoff.py",
+      "sha256": "e5e33ee3d5fb1beb1784918d78c08c9eed6836e2be75d678a94e116f07181099",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "session-handoff"
+    },
+    ".agents/skills/tdd-cycle/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/tdd-cycle/SKILL.md",
+      "sha256": "49a09d77d80883fe5b3685038b6472d1345dcc221d58cbceeed44ef0a9bf67ed",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "tdd-cycle"
+    },
+    ".agents/skills/tool-design/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/tool-design/SKILL.md",
+      "sha256": "3b7a47f3cb6a6afe62f31cce2720ff8e6d13c26b7f50341259f07ea5ae19ba39",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "tool-design"
+    },
+    ".agents/skills/tool-design/references/architectural_reduction.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/tool-design/references/architectural_reduction.md",
+      "sha256": "0d27e7991ccaac97f0db37c151837d5cc795075ba7b44a82560aeb45bb35b1c7",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "tool-design"
+    },
+    ".agents/skills/tool-design/references/best_practices.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/tool-design/references/best_practices.md",
+      "sha256": "3dc82e05ba5f9e5d5e8b0f48e05241e5850130b9b0f365e032bf0635fd3380b6",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "tool-design"
+    },
+    ".agents/skills/tool-design/scripts/description_generator.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/tool-design/scripts/description_generator.py",
+      "sha256": "ad20d1550dc41b6cbedba6c09f927765d54d1267bbe4bc8bfdf930b8987697ce",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "tool-design"
+    },
+    ".agents/skills/ui-ux-pro-max/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/SKILL.md",
+      "sha256": "d1d2a6bf1d61324a924dfe342676c3a507a3c0143fbf74ca970312b21bb11471",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/_sync_all.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/_sync_all.py",
+      "sha256": "b540b3a4f87598ae29048b3cceae1fc17b39b629aee2cbe5c802ffc7b48abf6d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/app-interface.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/app-interface.csv",
+      "sha256": "2a17ef810dab715ce1f339861817a8fbe3ccc38142b70517301e874803e838ac",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/charts.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/charts.csv",
+      "sha256": "a70ef7460b0eaaea8614f86a0d09a4bc38b467804179762464b5ca45b491baac",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/colors.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/colors.csv",
+      "sha256": "cb26759805217edaaa31b09836aec09eab0fe245c58f5884e9a16ef802c6e26a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/design.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/design.csv",
+      "sha256": "6f0ae42f16b3cbfa3f07050268387557859ff666e2651b1b82763f099d724b3f",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/draft.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/draft.csv",
+      "sha256": "e190c796b707858a5436dc4c27f9ee9bb6618014ca73f533e423abe5ce9e4d06",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/google-fonts.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/google-fonts.csv",
+      "sha256": "3fd2898fb0fdd31ba758bf05cfcd2b58cd0f038a20cf08e417d09e5a8a4a509e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/icons.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/icons.csv",
+      "sha256": "f376c29fb4df37b4bdb366a5aa70cb211ba3dd8b435390aaa03152a64b07d2e8",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/landing.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/landing.csv",
+      "sha256": "121a2cac7cf21050234b5f80e7b4e182f10123536032e0f9ad862ad3aec9677d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/motion.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/motion.csv",
+      "sha256": "6452fbd8028ab71d52993775340e1bc40a150d92be8d4b4cb8710620fd1a7512",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/products.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/products.csv",
+      "sha256": "e9749e4fd8f7d4c94919c25ebd347a4adaddb671e7b01d33fbc2c87d447e6667",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/react-performance.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/react-performance.csv",
+      "sha256": "904c8afcda229629545912dde0e8ac37503757131f0169f80b016f1f58c4fd3f",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/angular.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/angular.csv",
+      "sha256": "9de35bbda536ced9af7642d88b7675cefa3e18c370ab40c0875f75ab473f0fd6",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/astro.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/astro.csv",
+      "sha256": "6b587e32df201b6e5e7b2ed187b65eee8e6d55dcd6cc16bde29fc25e0f911dae",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/avalonia.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/avalonia.csv",
+      "sha256": "6bfa40ec6609fcb59e52a38281edcc3a3e5b5e56341304fe5628b32cb9b1f875",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/flutter.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+      "sha256": "fe36d404c799781e8ba6e9a8179b45799ed5126a545528550cd2eb0f2346e8c5",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+      "sha256": "7aef38e75c53559470afcfa91580a9917ca8b7dbf8b92110389e23e93703ac52",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/javafx.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/javafx.csv",
+      "sha256": "5545e331b2479eb431ca45203799ce1b0ab1e369045ab7735d5a9f85ec78f956",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+      "sha256": "6c8fd4b0391c342c12b0af15610cd5becbeccaef0bbe8dcfc01d928c3195d93e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/laravel.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/laravel.csv",
+      "sha256": "3e9f551b5232136f7b5ce1304c5e1bf5a83bd63c0dc02afb37502b238772d145",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+      "sha256": "e828ccc04843742f52f545a068e8a9ab0d2b97c0e771f7e93bf0cef74da05554",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+      "sha256": "b9972b31e721faabc667ee2b4e93ba2af29e1df86f186c2ff608b68370f0e3a5",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+      "sha256": "f7a3f2d9542856d00199f85c6c023b7c284cc698e2e6e12d61afce2edacb24d6",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/react-native.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+      "sha256": "077aefc81d194895ecf7936b3ed298b978e36961f183e3a275f8acda19b5f621",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/react.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/react.csv",
+      "sha256": "e5624ab41d33427d88e41d07581ce4eca59b37b36ab72a6ad43a9c8e2d0a1c72",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+      "sha256": "395c2e415ef6f48a474acccdc8eb2c7258a6ed751a5037ba171a2d8823e02ded",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/svelte.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+      "sha256": "71af52d64f266c88070b91dbbaa900c2f8074b6baae9f35eaea6ba9cec6fd803",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+      "sha256": "c9c2d2510f8e66281a2514e8dd0125a6b653b9ef53a71281b5e7dfe003d5b569",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/threejs.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/threejs.csv",
+      "sha256": "f1c05f8f269fc4784170c837f4ff43b50042f00bbd6ba7dbef2896081a052544",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/uno.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/uno.csv",
+      "sha256": "5d2e0f396bb9dc5a2661204264cc0eda7cc4fa3d78152dec89d668704a41b8fc",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/uwp.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/uwp.csv",
+      "sha256": "debf669928871261ced9333788d5afd5784377ea1fa1b4f53993dd8f1574c0fc",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/vue.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/vue.csv",
+      "sha256": "c2724915d3c11cd67263f25896cff721f787a0fdd8326002d31e9f5806dfd8f8",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/winui.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/winui.csv",
+      "sha256": "2d970b08e44509d7afa53ce7feb446930b2d5e0667fa637df9aeeed65c42bbbe",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/stacks/wpf.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/stacks/wpf.csv",
+      "sha256": "ca78b5f28dc50d66900548d602d74856400097284c73e076fcfbb5a38ae5083c",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/styles.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/styles.csv",
+      "sha256": "1bf9c1d8484a0a7a54fb67555902380446865b604c8449e47a449cb3d9c1ef88",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/typography.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/typography.csv",
+      "sha256": "7abead73de0e43e09544f164cb60cd431674e411f1e063e555a8b44d51273328",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/ui-reasoning.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+      "sha256": "06e4369445388ba9b7a57347510b125b7a2145bbf8546a327ba50292503b204a",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/data/ux-guidelines.csv": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+      "sha256": "e01943c433b2cad3040f19389b3b0455673758a569b7a927b5bedf65c989cb96",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/scripts/core.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+      "sha256": "ab9f398b493e34404448cefc766239ee86119c7a21d8581ba965cabdc698b0a8",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/scripts/design_system.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+      "sha256": "db272c6649322e383714c73305705101fe1d44c15bd64556d5a515b1c419c2d2",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/ui-ux-pro-max/scripts/search.py": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/ui-ux-pro-max/scripts/search.py",
+      "sha256": "b38f35395a7ded28a7d5adfd39195d6db01602121aefcdc4a7e67eb1bbdd5a40",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "ui-ux-pro-max"
+    },
+    ".agents/skills/video-lens/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/video-lens/SKILL.md",
+      "sha256": "babec249ece62ddf728b228360950374174ff46ce066354c032b3390d10d249e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "video-lens"
+    },
+    ".agents/skills/video-use/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/video-use/SKILL.md",
+      "sha256": "a3d8e14ba388ff2c9af7a7ed5729de3233bc8ea30aa870e8eb51feb431dc106d",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "video-use"
+    },
+    ".agents/skills/web-design-guidelines/SKILL.md": {
+      "ownership": "platform_projected_skill",
+      "source": ".agents/skills/web-design-guidelines/SKILL.md",
+      "sha256": "ebcc5e4210b4ddc7a154446962c9299350fcd954f130c899f14b638267f01549",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ],
+      "skill": "web-design-guidelines"
+    },
+    ".aief/adapters/antigravity/hooks.json": {
+      "ownership": "framework_managed",
+      "source": ".aief/adapters/antigravity/hooks.json",
+      "sha256": "0ae8f5c9b9bc02f16439a55237d65cd6de4b83b7c080f5c67843fa2b78995125",
+      "platforms": [
+        "antigravity"
+      ]
+    },
+    ".aief/agents/ai-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/ai-engineer.md",
+      "sha256": "b835bfb63bf11ad73458b98813d3727b703b28f8a054a0745a6abbcf2c2dfaab",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/backend-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/backend-engineer.md",
+      "sha256": "03bec6b2a0b2de774d0ad847aad83bc8362e3b45189bd11abf44fafdf9342c34",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/code-reviewer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/code-reviewer.md",
+      "sha256": "4c7e8dc2540b8c5ce40e4d713f1376de8272312a42ca05d3e5935e3a9bed263c",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/data-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/data-engineer.md",
+      "sha256": "f6982234bf89bf153b4d8315ffe516c497f52a7d4e4ba2f6514b5bcefa8e4679",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/devops-release-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/devops-release-engineer.md",
+      "sha256": "550afc345fd002e7284d615da69150f94089f9325116cd55943a1727caa5fc40",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/frontend-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/frontend-engineer.md",
+      "sha256": "772e258e08467f9ec76be6a47309a27f62a58eec18438f9c7388cfad104f5633",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/implementation-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/implementation-engineer.md",
+      "sha256": "b37d2c7e706906780c3bc46eca4800e8dfbf8c75f3f54adaf9116f0108095124",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/planner-orchestrator.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/planner-orchestrator.md",
+      "sha256": "7c918328fabc5fc5f65fbe62c7c297cd74f4bd0e3da13c3718da90327f566642",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/product-analyst.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/product-analyst.md",
+      "sha256": "e94344dfba7d0498230a69579be15b9e35171cadce2e36315ef52cec33879dd3",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/qa-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/qa-engineer.md",
+      "sha256": "62bb08744789aa947c52f13184b547bf637c7d335500346d9d26b3fb0751fc2a",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/security-engineer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/security-engineer.md",
+      "sha256": "80ef52b5ab5a075185285f0782c35df0410598137873e2db8ff390c82d611533",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/software-architect.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/software-architect.md",
+      "sha256": "6d94bf9712c2a05ed31bdb8b3d12752c397e41a8991d494a4b8ad3d65f58ffd3",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/agents/ui-ux-designer.md": {
+      "ownership": "framework_managed",
+      "source": ".aief/agents/ui-ux-designer.md",
+      "sha256": "3110f59985e41b319eaa90f36782be7e0d762b747bb7c56db3ccf1629afdb971",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/platform-capabilities.json": {
+      "ownership": "framework_managed",
+      "source": "core/platform-capabilities.json",
+      "sha256": "fed03936478aad6844e8f4bd1035582b8490b4a59073ad561160ca5a1aa3734f",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/rules/context-handoff-protocol.md": {
+      "ownership": "framework_managed",
+      "source": "core/rules/context-handoff-protocol.md",
+      "sha256": "41bb666a023fae0135f110cafa9c1c75b04184744cf8ba5f524afbfde8e79671",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/rules/engineering-principles.md": {
+      "ownership": "framework_managed",
+      "source": "core/rules/engineering-principles.md",
+      "sha256": "bbea8b741ba7f0b27eaca24edea840b649abb18296f03b646a1559afd2db7bbc",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/rules/human-approval-gates.md": {
+      "ownership": "framework_managed",
+      "source": "core/rules/human-approval-gates.md",
+      "sha256": "354a42d8abe13d0755c3611b2ebf921f9f39740fdf45df2c48ac8ab204edf7a9",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/rules/security-guardrails.md": {
+      "ownership": "framework_managed",
+      "source": "core/rules/security-guardrails.md",
+      "sha256": "ba1d0ef70153d45206e05d6abc09297410f0d67eaf8174f5108937c75c968b0f",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/schemas/agent-role.schema.json": {
+      "ownership": "framework_managed",
+      "source": "core/schemas/agent-role.schema.json",
+      "sha256": "6aa435e498762a2a55a0680c2684208f130a6a21fc29669eaf795df5e9173e3e",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/schemas/framework-config.schema.json": {
+      "ownership": "framework_managed",
+      "source": "core/schemas/framework-config.schema.json",
+      "sha256": "35a2935bd67ebd3c3710fab913bd54b6c2b15de37bf8291224f6cac9024d8183",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/schemas/handoff-packet.schema.json": {
+      "ownership": "framework_managed",
+      "source": "core/schemas/handoff-packet.schema.json",
+      "sha256": "f7cc80d25d9708e390a75f639887ef7401e8f67810957efe3d647ff6d8808238",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/core/schemas/skill-frontmatter.schema.json": {
+      "ownership": "framework_managed",
+      "source": "core/schemas/skill-frontmatter.schema.json",
+      "sha256": "771834493c8d599d2dbda6915814cd416114b221064c79219112065ce92b82dd",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/quality/code-review-rubric.md": {
+      "ownership": "framework_managed",
+      "source": "quality/code-review-rubric.md",
+      "sha256": "fefa4986483c0ecef312f5808b998c6d676c1e8b5a676b698b6b6b4195e9e66f",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/quality/definition-of-done.md": {
+      "ownership": "framework_managed",
+      "source": "quality/definition-of-done.md",
+      "sha256": "947759975176d6ec0b341d384682045f668694a01f2f0bfcf94b011c7bccc0d8",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/quality/tdd-protocol.md": {
+      "ownership": "framework_managed",
+      "source": "quality/tdd-protocol.md",
+      "sha256": "ddd146cb0e6f474118d90070b3d5cb88e7dd11e1886fca6af78e617c21b3e0ce",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/quality/tool-classification.md": {
+      "ownership": "framework_managed",
+      "source": "quality/tool-classification.md",
+      "sha256": "25409d613c22e175b2094e940157ce12d1823d1777b4b64c55c29030e5e45007",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/scripts/compose.py": {
+      "ownership": "framework_managed",
+      "source": "scripts/compose.py",
+      "sha256": "184f896d78f18b9ff9abf4d76700ba225994a7a311bbda30aa5ca51bdcd48ada",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/scripts/platform_capabilities.py": {
+      "ownership": "framework_managed",
+      "source": "scripts/platform_capabilities.py",
+      "sha256": "adea0787d78e624f24b11b22bc66d583cf09ecfa1c40de461e1c2e30acd46d16",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/scripts/preflight.py": {
+      "ownership": "framework_managed",
+      "source": "scripts/preflight.py",
+      "sha256": "401e509bfcd7ef9ec897cc1716d596729db1b2c555982881528616a037aa4f27",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/scripts/readiness.py": {
+      "ownership": "framework_managed",
+      "source": "scripts/readiness.py",
+      "sha256": "4f3a52754c021554a6e639d80a5a74c58739816727c34dadca18037f0202331e",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/scripts/validate.py": {
+      "ownership": "framework_managed",
+      "source": "scripts/validate.py",
+      "sha256": "8eb9f783725fa3a6d8ed16cf8d615f234e5a15065e8c935d7e032846ab27b341",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/security/authorization-policy.md": {
+      "ownership": "framework_managed",
+      "source": "security/authorization-policy.md",
+      "sha256": "1f597657ebcc79d87fc8ba220ceb1440e041f4ce1798a5347052c07673e401a8",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/security/pre-commit-secrets.md": {
+      "ownership": "framework_managed",
+      "source": "security/pre-commit-secrets.md",
+      "sha256": "f5eb0d15706abf613727ce6685437c2a107e7a3fff734bc5591cd4a777328b31",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/security/strix-profile.yaml": {
+      "ownership": "framework_managed",
+      "source": "security/strix-profile.yaml",
+      "sha256": "8f4ee0e5e632b427f472b13deb975bd5d91c6b8b18ede3afb45e32c6f9ab147d",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/skills/registry.json": {
+      "ownership": "framework_managed",
+      "source": ".aief/skills/registry.json",
+      "sha256": "e46fad4679fffdf8f2ed6206b69a33e92fbb03cf0bba0a073c18463f24f59f7a",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/ADR.template.md": {
+      "ownership": "framework_managed",
+      "source": "templates/ADR.template.md",
+      "sha256": "26348b5057651b0a5fc94ed1812d395361b225525cf870d733a0435f0a70ae2d",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/HANDOFF_PACKET.template.json": {
+      "ownership": "framework_managed",
+      "source": "templates/HANDOFF_PACKET.template.json",
+      "sha256": "7932847ca4b6eb620c04c5fab0b7778662453cd3b0aeefb46eb2bbdff50bbcc6",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/PRD.template.md": {
+      "ownership": "framework_managed",
+      "source": "templates/PRD.template.md",
+      "sha256": "dc3bd4b0cfe10ad4635ee55d2c3f32c92ec12840f2db426270b86a3dd1c03f3c",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/SPEC.template.md": {
+      "ownership": "framework_managed",
+      "source": "templates/SPEC.template.md",
+      "sha256": "a5682110a3c859998d2b5511434be0c38a922416ad40619bb8febf3829b508d5",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/TEST_PLAN.template.md": {
+      "ownership": "framework_managed",
+      "source": "templates/TEST_PLAN.template.md",
+      "sha256": "2941e418c17585a11ed2be6119ff2808e65e81e141518db682d54f6c1a1e0575",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/project.framework.json": {
+      "ownership": "framework_managed",
+      "source": "templates/project.framework.json",
+      "sha256": "2081c3ba15eeddab200ff49bd666a17c5125aa459ddc96ecb529983d74ece80a",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/stacks/dotnet.gitignore": {
+      "ownership": "framework_managed",
+      "source": "templates/stacks/dotnet.gitignore",
+      "sha256": "a1b8b6f27fda0e8bfe6c52b9e8694956040c1a17d04428ad8f4ad181d00e87ff",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/stacks/node-angular.gitignore": {
+      "ownership": "framework_managed",
+      "source": "templates/stacks/node-angular.gitignore",
+      "sha256": "f2f201fd79a08ae8ec3744e5f2be7c5cdbaad8851c77a9d4be79117594f2c3b4",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/templates/stacks/python.gitignore": {
+      "ownership": "framework_managed",
+      "source": "templates/stacks/python.gitignore",
+      "sha256": "b511db292c230db2975b9c6c1a25b3426d261f7da2e0826eb4fbc8fcf1672449",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/workflows/01-discovery-and-grill-me.md": {
+      "ownership": "framework_managed",
+      "source": "workflows/01-discovery-and-grill-me.md",
+      "sha256": "ced0784d14aee397b578b82bb5d30e4664c202f931f12dbdcb036c94339b3d3c",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/workflows/02-specification-and-adr.md": {
+      "ownership": "framework_managed",
+      "source": "workflows/02-specification-and-adr.md",
+      "sha256": "4f4b1728bf70ed3401a8ea2884708176b16802cc863f08ba155b4323ece4a93e",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/workflows/03-planning-and-decomposition.md": {
+      "ownership": "framework_managed",
+      "source": "workflows/03-planning-and-decomposition.md",
+      "sha256": "dd576b3ded5224c402f1f1f8af5bd6136f336491b10acc70a7dc881e80aec4e8",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/workflows/04-tdd-and-implementation.md": {
+      "ownership": "framework_managed",
+      "source": "workflows/04-tdd-and-implementation.md",
+      "sha256": "77f7d624add9b904a6b09aed8b59d2528a3f1caed2cb77f9036aff088f7b3d91",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/workflows/05-review-qa-and-security.md": {
+      "ownership": "framework_managed",
+      "source": "workflows/05-review-qa-and-security.md",
+      "sha256": "38e92cca2c0eb0446b45c1bf2670b634e6ff2cad3ff23f81857c02c901edfc61",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".aief/workflows/06-release-and-retrospective.md": {
+      "ownership": "framework_managed",
+      "source": "workflows/06-release-and-retrospective.md",
+      "sha256": "df8acf4a5804b7ff0d297552053e06fa5cd8cb87507d4a8ef43937a312afc754",
+      "platforms": [
+        "core"
+      ]
+    },
+    ".gemini/commands/workflow.toml": {
+      "ownership": "framework_managed",
+      "source": ".gemini/commands/workflow.toml",
+      "sha256": "778cd4a0ecc05de5607166beadf8b8a0c58c5a19b225fe2cf6bbcbff6638f88f",
+      "platforms": [
+        "gemini-cli"
+      ]
+    },
+    ".gemini/settings.json": {
+      "ownership": "framework_managed",
+      "source": ".gemini/settings.json",
+      "sha256": "fde68351988a5ed25c8220d41839de3c814f142bbf416757e8f59c31873d09ba",
+      "platforms": [
+        "gemini-cli"
+      ]
+    },
+    "AGENTS.md": {
+      "ownership": "framework_managed",
+      "source": "AGENTS.md",
+      "sha256": "2e8f9e410f6199071a1dcfe9e133b951e4a02257a563903011bd0eefb6308c01",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ]
+    },
+    "GEMINI.md": {
+      "ownership": "framework_managed",
+      "source": "GEMINI.md",
+      "sha256": "4260c5046bfa17d9a91065e7ba891a0b812718595459c1993848eb2a84cf982e",
+      "platforms": [
+        "antigravity",
+        "gemini-cli"
+      ]
+    }
+  }
+}
