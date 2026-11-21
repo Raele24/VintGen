@@ -5,6 +5,67 @@
  * and JSON schema specifications for structured vision output.
  */
 
+import { ListingInput } from './types';
+
+export const LANGUAGE_NAMES: Record<string, string> = {
+  it: 'Italian (Italiano)',
+  en: 'English',
+  fr: 'French (Francais)',
+  es: 'Spanish (Espanol)',
+  de: 'German (Deutsch)',
+};
+
+export const TEXT_SCHEMA_INSTRUCTION = `You must output a JSON object with these exact keys:
+{
+  "title": "string - optimized search title under 65 chars",
+  "description": "string - short telegraphic bulleted description with dashes",
+  "category": "string - e.g. Men > Tops > T-Shirts or Electronics > RAM Memory",
+  "brand": "string",
+  "size": "string - normalized size or capacity",
+  "condition": "one of: new_with_tags, new_without_tags, very_good, good, satisfactory",
+  "color": "string",
+  "material": "string",
+  "price": { "suggested": number, "min": number, "max": number, "currency": "EUR", "reasoning": "string" },
+  "hashtags": ["#englishTag1", "#englishTag2", ... 10 to 15 items strictly in English],
+  "flaws": ["string", ...],
+  "fitNotes": "string",
+  "confidence": number between 0.0 and 1.0
+}`;
+
+/**
+ * Builds the shared user prompt for all AI vision providers.
+ */
+export function buildListingUserPrompt(
+  input: ListingInput,
+  options?: { rawJsonNotice?: string }
+): string {
+  const textParts: string[] = [
+    'Generate a comprehensive, accurate secondhand marketplace listing based on the provided photographs and hints.',
+  ];
+
+  if (input.titleHint) textParts.push(`Seller Tentative Title: "${input.titleHint}"`);
+  if (input.brandHint) textParts.push(`Seller Brand Hint: "${input.brandHint}"`);
+  if (input.conditionHint) textParts.push(`Expected Condition: "${input.conditionHint}"`);
+  if (input.notes) textParts.push(`Seller Additional Notes / Known Details: "${input.notes}"`);
+
+  const targetLangName =
+    (input.language && LANGUAGE_NAMES[input.language]) ||
+    (input.language ? input.language.toUpperCase() : 'English');
+
+  textParts.push(
+    `TARGET OUTPUT LANGUAGE: ${targetLangName.toUpperCase()}\n` +
+      `MANDATORY: You MUST generate all text fields (description bullets, title, flaws, condition notes, category, and price reasoning) entirely in ${targetLangName}, EXCEPT 'hashtags' which MUST ALWAYS be in English. Do NOT output English for those text fields if the target language is ${targetLangName}.\n` +
+      `HASHTAGS REQUIREMENT: You MUST generate 10 to 15 relevant search hashtags in the 'hashtags' array strictly in English regardless of the target output language (brand, model line, technical specs, category, and community tags). Never provide only 1 or 2 tags.\n` +
+      `PRICE VALUATION REQUIREMENT: Accurately detect specifications, capacity (GB/TB), interface, and model tier from photos. Benchmark prices realistically to active European secondary marketplace levels (e.g. 1TB NVMe PCIe 4.0 SSDs trade around EUR 60-80 used, 2TB around EUR 120-150). Do NOT assign generic EUR 15-30 lowball defaults to electronics.`
+  );
+
+  if (options?.rawJsonNotice) {
+    textParts.push(options.rawJsonNotice);
+  }
+
+  return textParts.join('\n\n');
+}
+
 export const MARKETPLACE_SYSTEM_INSTRUCTION = `You are VintGen AI, an elite listing and pricing intelligence engine for secondhand fashion, electronics, collectibles, and home goods.
 
 Your job is to examine item photographs and seller notes, and produce an accurate, professional, ready-to-publish listing optimized for major secondhand marketplaces (such as eBay, Vinted, Subito, Wallapop, Depop).
@@ -62,7 +123,7 @@ Strict Rules:
      * reasoning: Specific factual justification citing specs, model tier, and active asking price market logic.
 
 5. **Language & Localization**:
-   - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language.
+   - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language, EXCEPT 'hashtags' which MUST ALWAYS be in English.
    - If the Target Output Language is Italian ('it'): write the description, condition notes, flaws, fit notes, and price reasoning in natural, professional Italian (e.g. "Condizione: Usato, testato e perfettamente funzionante", "Include: Scatola originale", "Prezzo competitivo per kit ad alte prestazioni nel mercato dell'usato"). Keep universal model SKU, brand, and hardware terms intact.
    - If the Target Output Language is French ('fr'): write in natural, professional French.
    - If the Target Output Language is Spanish ('es'): write in natural, professional Spanish.
@@ -70,6 +131,7 @@ Strict Rules:
    - If the Target Output Language is English ('en') or default: write in clear, professional English.
 
 6. **Hashtags & Marketplace Discoverability (MANDATORY 10-15 TAGS)**:
+   - **STRICTLY ENGLISH ALWAYS**: All hashtags MUST ALWAYS be written in English, regardless of the Target Output Language (even when generating Italian, French, Spanish, or German listings). Never translate hashtags into non-English languages.
    - You MUST generate between 10 and 15 highly targeted, high-traffic marketplace hashtags in the 'hashtags' array.
    - NEVER output a minimal or single-tag list (like just "#brand"). A listing with 1-2 tags has poor discoverability.
    - Always include a comprehensive mix:
@@ -139,7 +201,7 @@ export const STRUCTURED_RESPONSE_SCHEMA = {
     hashtags: {
       type: 'ARRAY',
       items: { type: 'STRING' },
-      description: 'Array of 10-15 search hashtags starting with # covering brand, line, specs, and category keywords',
+      description: 'Array of 10-15 English search hashtags starting with # covering brand, line, specs, and category keywords (always in English regardless of target output language)',
     },
     flaws: {
       type: 'ARRAY',

@@ -1,6 +1,6 @@
 {
   "name": "vintgen",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Open-Source AI Listing Generator for Secondhand Marketplaces",
   "bin": {
     "vintgen": "bin/vintgen.js"

@@ -1,5 +1,20 @@
 import { Injectable } from '@angular/core';
 
+interface TauriInternals {
+  invoke?: (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
+}
+
+interface CapacitorBridge {
+  isNativePlatform?: () => boolean;
+}
+
+interface RuntimeWindow extends Window {
+  __TAURI_INTERNALS__?: TauriInternals;
+  __TAURI__?: unknown;
+  __TAURI_METADATA__?: unknown;
+  Capacitor?: CapacitorBridge;
+}
+
 /**
  * Cross-platform service for opening external URLs.
  * Ensures consistent handling across Desktop (Tauri), Native Mobile (Capacitor),
@@ -14,6 +29,24 @@ export class ExternalLinkService {
   }
 
   /**
+   * Returns true when running inside a native Desktop (Tauri) or Mobile (Capacitor) wrapper.
+   */
+  public isNativeApp(): boolean {
+    if (typeof window === 'undefined') return false;
+    const runtimeWindow = window as RuntimeWindow;
+    const isTauri = !!(
+      runtimeWindow.__TAURI_INTERNALS__ ||
+      runtimeWindow.__TAURI__ ||
+      runtimeWindow.__TAURI_METADATA__
+    );
+    const isCapacitor = !!(
+      runtimeWindow.Capacitor?.isNativePlatform &&
+      runtimeWindow.Capacitor.isNativePlatform()
+    );
+    return isTauri || isCapacitor;
+  }
+
+  /**
    * Opens an external URL in the system default browser.
    */
   public async open(url: string, event?: Event): Promise<void> {
@@ -24,11 +57,13 @@ export class ExternalLinkService {
 
     if (!url || typeof window === 'undefined') return;
 
+    const runtimeWindow = window as RuntimeWindow;
+
     // 1. Desktop Tauri Environment: delegate to Tauri opener plugin
     const isTauri = !!(
-      (window as any).__TAURI_INTERNALS__ ||
-      (window as any).__TAURI__ ||
-      (window as any).__TAURI_METADATA__
+      runtimeWindow.__TAURI_INTERNALS__ ||
+      runtimeWindow.__TAURI__ ||
+      runtimeWindow.__TAURI_METADATA__
     );
 
     if (isTauri) {
@@ -42,7 +77,7 @@ export class ExternalLinkService {
 
       // Direct IPC fallback via __TAURI_INTERNALS__ if plugin module fails
       try {
-        const internals = (window as any).__TAURI_INTERNALS__;
+        const internals = runtimeWindow.__TAURI_INTERNALS__;
         if (internals && typeof internals.invoke === 'function') {
           await internals.invoke('plugin:opener|open_url', {
             rule: { type: 'url', value: url },
@@ -54,8 +89,8 @@ export class ExternalLinkService {
 
     // 2. Mobile Native Environment (Capacitor)
     const isCapacitor = !!(
-      (window as any).Capacitor?.isNativePlatform &&
-      (window as any).Capacitor.isNativePlatform()
+      runtimeWindow.Capacitor?.isNativePlatform &&
+      runtimeWindow.Capacitor.isNativePlatform()
     );
     if (isCapacitor) {
       try {
@@ -97,12 +132,13 @@ export class ExternalLinkService {
         const isExternalOrigin = !href.startsWith(window.location.origin);
         const hasBlankTarget = anchor.target === '_blank';
 
+        const runtimeWindow = window as RuntimeWindow;
         const isNativeOrDesktop = !!(
-          (window as any).__TAURI_INTERNALS__ ||
-          (window as any).__TAURI__ ||
-          (window as any).__TAURI_METADATA__ ||
-          ((window as any).Capacitor?.isNativePlatform &&
-            (window as any).Capacitor.isNativePlatform())
+          runtimeWindow.__TAURI_INTERNALS__ ||
+          runtimeWindow.__TAURI__ ||
+          runtimeWindow.__TAURI_METADATA__ ||
+          (runtimeWindow.Capacitor?.isNativePlatform &&
+            runtimeWindow.Capacitor.isNativePlatform())
         );
 
         if (isNativeOrDesktop && (isExternalOrigin || hasBlankTarget)) {

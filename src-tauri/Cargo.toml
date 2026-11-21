@@ -1,6 +1,6 @@
 [package]
 name = "vintgen"
-version = "1.0.0"
+version = "1.0.4"
 description = "VintGen - AI Listing Generator for Vinted and Secondhand Fashion"
 authors = ["Raele24"]
 license = "MIT"

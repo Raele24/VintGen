@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VintGen Command-Line Interface (CLI)
  *
  * Automated, scriptable secondhand fashion listing generator
@@ -52,7 +52,7 @@ interface CliArgs {
   version: boolean;
 }
 
-const PACKAGE_VERSION = '1.0.3';
+const PACKAGE_VERSION = '1.0.4';
 
 /**
  * Parses raw command-line arguments into structured configuration.
@@ -118,12 +118,32 @@ function parseArguments(args: string[]): CliArgs {
     } else if (arg === '--platform' || arg === '-P') {
       i++;
       if (i < args.length) {
-        result.platform = args[i].toLowerCase() as any;
+        const val = args[i].toLowerCase();
+        if (
+          val === 'universal' ||
+          val === 'vinted' ||
+          val === 'ebay' ||
+          val === 'depop' ||
+          val === 'subito' ||
+          val === 'wallapop'
+        ) {
+          result.platform = val;
+        }
       }
     } else if (arg === '--lang' || arg === '-l') {
       i++;
       if (i < args.length) {
-        result.language = args[i] as any;
+        const val = args[i].toLowerCase();
+        if (
+          val === 'it' ||
+          val === 'en' ||
+          val === 'fr' ||
+          val === 'es' ||
+          val === 'de' ||
+          val === 'auto'
+        ) {
+          result.language = val;
+        }
       }
     } else if (!result.command && !arg.startsWith('-')) {
       result.command = arg;

@@ -11,12 +11,26 @@ export interface ReleaseInfo {
   publishedAt: string;
 }
 
+interface GitHubReleaseAsset {
+  name?: string;
+  browser_download_url?: string;
+}
+
+interface GitHubReleaseResponse {
+  tag_name?: string;
+  name?: string;
+  body?: string;
+  html_url?: string;
+  published_at?: string;
+  assets?: GitHubReleaseAsset[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class UpdateService {
   private readonly externalLinks = inject(ExternalLinkService);
-  public readonly currentVersion = '1.0.1';
+  public readonly currentVersion = '1.0.4';
   public hasNativeUpdate = signal<boolean>(false);
   public isWebUpdateReady = signal<boolean>(false);
   public latestRelease = signal<ReleaseInfo | null>(null);
@@ -47,7 +61,7 @@ export class UpdateService {
 
       if (!res.ok) return;
 
-      const data = await res.json();
+      const data = (await res.json()) as GitHubReleaseResponse;
       const tagName: string = data.tag_name || '';
       const cleanLatest = tagName.replace(/^v/, '').trim();
       const isNewer = this.compareSemver(cleanLatest, this.currentVersion) > 0;
@@ -56,7 +70,7 @@ export class UpdateService {
         // Find APK asset if available
         let apkAssetUrl: string | undefined;
         if (Array.isArray(data.assets)) {
-          const apkAsset = data.assets.find((a: any) =>
+          const apkAsset = data.assets.find((a: GitHubReleaseAsset) =>
             a.name?.endsWith('.apk')
           );
           if (apkAsset) {
@@ -70,8 +84,8 @@ export class UpdateService {
           name: data.name || tagName,
           body: data.body || '',
           apkDownloadUrl: apkAssetUrl,
-          htmlUrl: data.html_url,
-          publishedAt: data.published_at,
+          htmlUrl: data.html_url || '',
+          publishedAt: data.published_at || '',
         });
 
         this.hasNativeUpdate.set(true);

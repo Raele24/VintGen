@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Ollama Local AI Provider
  *
  * Delegates HTTP transport and model inspection directly to
@@ -9,11 +9,10 @@ import {
   AIProvider,
   ListingInput,
   ListingResult,
-  PriceRecommendation,
   ProviderConfig,
-  ItemCondition,
 } from '../types';
-import { MARKETPLACE_SYSTEM_INSTRUCTION } from '../prompts';
+import { MARKETPLACE_SYSTEM_INSTRUCTION, buildListingUserPrompt } from '../prompts';
+import { sanitizeListingResult } from './sanitize';
 import { OllamaProvider as ByokOllamaProvider } from 'openbyok';
 
 export class OllamaProvider implements AIProvider {
@@ -29,30 +28,15 @@ export class OllamaProvider implements AIProvider {
     input: ListingInput,
     config: ProviderConfig
   ): Promise<ListingResult> {
-    const textParts: string[] = [
-      'Analyze the provided photograph(s) and generate a complete, accurate secondhand marketplace listing in strict JSON format matching the schema.',
-    ];
+    const userPrompt = buildListingUserPrompt(input, {
+      rawJsonNotice:
+        'Output ONLY raw JSON conforming strictly to the requested schema. Do not enclose in markdown ticks if possible.',
+    });
 
-    if (input.titleHint) textParts.push(`Seller Tentative Title: "${input.titleHint}"`);
-    if (input.brandHint) textParts.push(`Seller Brand Hint: "${input.brandHint}"`);
-    if (input.conditionHint) textParts.push(`Expected Condition: "${input.conditionHint}"`);
-    if (input.notes) textParts.push(`Seller Additional Notes: "${input.notes}"`);
-
-    const langMap: Record<string, string> = {
-      it: 'Italian',
-      en: 'English',
-      fr: 'French',
-      es: 'Spanish',
-      de: 'German',
-    };
-    const targetLang = input.language ? langMap[input.language] || 'English' : 'English';
-    textParts.push(`Target Output Language: ${targetLang}.`);
-    textParts.push('Output ONLY raw JSON conforming strictly to the requested schema. Do not enclose in markdown ticks if possible.');
-
-    const parsed = await this.byokProvider.generateObject<Record<string, any>>(
+    const parsed = await this.byokProvider.generateObject<Record<string, unknown>>(
       {
         systemPrompt: MARKETPLACE_SYSTEM_INSTRUCTION,
-        userPrompt: textParts.join('\n'),
+        userPrompt,
         images: input.images,
         temperature: 0.2,
       },
@@ -64,53 +48,22 @@ export class OllamaProvider implements AIProvider {
       }
     );
 
-    const validConditions: ItemCondition[] = [
-      'new_with_tags',
-      'new_without_tags',
-      'very_good',
-      'good',
-      'satisfactory',
-    ];
-
-    const rawCond = String(parsed['condition'] || 'very_good').toLowerCase();
-    const condition: ItemCondition = validConditions.includes(rawCond as ItemCondition)
-      ? (rawCond as ItemCondition)
-      : 'very_good';
-
-    const rawPrice = parsed['price'] || {};
-    const price: PriceRecommendation = {
-      suggested: Number(rawPrice.suggested) || 25,
-      min: Number(rawPrice.min) || 20,
-      max: Number(rawPrice.max) || 35,
-      currency: 'EUR',
-      reasoning: String(rawPrice.reasoning || 'Estimated secondhand marketplace valuation'),
-    };
-
-    const rawTags = Array.isArray(parsed['hashtags']) ? parsed['hashtags'] : [];
-    const hashtags = rawTags.map((t: unknown) => {
-      const s = String(t).trim();
-      return s.startsWith('#') ? s : `#${s}`;
+    return sanitizeListingResult(parsed, {
+      title: 'Secondhand Item',
+      description: 'No description provided.',
+      category: 'Clothing',
+      brand: 'Unbranded',
+      size: 'Standard',
+      color: 'Multi',
+      material: 'Not specified',
+      priceSuggested: 25,
+      priceMin: 20,
+      priceMax: 35,
+      priceReasoning: 'Estimated secondhand marketplace valuation',
+      defaultHashtags: ['#secondhand', '#fashion', '#marketplace'],
+      fitNotes: 'Standard fit',
+      confidence: 0.85,
     });
-
-    const rawFlaws = Array.isArray(parsed['flaws']) ? parsed['flaws'] : [];
-    const flaws = rawFlaws.map((f: unknown) => String(f).trim()).filter(Boolean);
-
-    return {
-      title: String(parsed['title'] || 'Secondhand Item').trim(),
-      description: String(parsed['description'] || 'No description provided.').trim(),
-      category: String(parsed['category'] || 'Clothing').trim(),
-      brand: String(parsed['brand'] || 'Unbranded').trim(),
-      size: String(parsed['size'] || 'Standard').trim(),
-      condition,
-      color: String(parsed['color'] || 'Multi').trim(),
-      material: String(parsed['material'] || 'Not specified').trim(),
-      price,
-      hashtags: hashtags.length > 0 ? hashtags : ['#secondhand', '#fashion', '#marketplace'],
-      flaws,
-      fitNotes: String(parsed['fitNotes'] || 'Standard fit').trim(),
-      confidence: Number(parsed['confidence']) || 0.85,
-      createdAt: new Date().toISOString(),
-    };
   }
 
   public async testConnection(

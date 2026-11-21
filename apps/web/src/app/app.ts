@@ -39,6 +39,18 @@ export interface TourStep {
   placement?: 'bottom' | 'top' | 'left' | 'right';
 }
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+interface NavigatorWithExtensions extends Navigator {
+  standalone?: boolean;
+  userAgentData?: {
+    platform?: string;
+  };
+}
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -162,7 +174,7 @@ export class App {
   public theme = signal<'dark' | 'light'>('dark');
 
   // PWA Install State
-  public deferredPrompt = signal<any>(null);
+  public deferredPrompt = signal<BeforeInstallPromptEvent | null>(null);
   public isAppInstalled = signal<boolean>(false);
   public isMobileMenuOpen = signal<boolean>(false);
   public isIos = signal<boolean>(false);
@@ -175,7 +187,7 @@ export class App {
   @HostListener('window:beforeinstallprompt', ['$event'])
   public onBeforeInstallPrompt(e: Event): void {
     e.preventDefault();
-    this.deferredPrompt.set(e);
+    this.deferredPrompt.set(e as BeforeInstallPromptEvent);
   }
 
   @HostListener('window:appinstalled')
@@ -199,7 +211,8 @@ export class App {
         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const isStandaloneMode =
         window.matchMedia('(display-mode: standalone)').matches ||
-        (navigator as any).standalone === true;
+        (navigator as NavigatorWithExtensions).standalone === true ||
+        this.externalLinks.isNativeApp();
       this.isIos.set(isIosDevice);
       this.isStandalone.set(isStandaloneMode);
     }
@@ -208,7 +221,10 @@ export class App {
   public detectPlatform(): 'windows' | 'android' | 'ios' | 'mac' {
     if (typeof window === 'undefined') return 'windows';
     const ua = navigator.userAgent || '';
-    const platform = (navigator as any).userAgentData?.platform || navigator.platform || '';
+    const platform =
+      (navigator as NavigatorWithExtensions).userAgentData?.platform ||
+      navigator.platform ||
+      '';
 
     if (/iPad|iPhone|iPod/.test(ua) || (platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
       return 'ios';
