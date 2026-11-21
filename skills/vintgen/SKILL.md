@@ -32,10 +32,8 @@ Activate this skill when:
 4. **Marketplace Pricing Engine (Realistic Seller Asking Strategy)**:
    - Calculate a realistic asking price representing what sellers actively list for on European secondary platforms (eBay, Subito, Vinted, Wallapop):
      - Adopt a seller listing perspective with healthy asking margins, NOT bottom-dollar liquidation rates.
-     - 32GB (2x16GB) DDR4 RAM kits (Corsair Vengeance, G.Skill, Kingston): Benchmark at €115 - €145 asking price (€140 - €185 if brand new sealed).
-     - 16GB DDR4: Benchmark at €45 - €60.
-     - 500GB SSDs / M.2 SATA: Benchmark at €42 - €55 asking price. 1TB SSDs: €70 - €95.
-     - Provide a recommended listing price along with a 15-20% floor and ceiling.
+     - Evaluate dynamically by brand tier, exact model or generation, technical specs or materials, condition, completeness (original box, tags, accessories), and active secondary demand.
+     - Provide a recommended listing price along with a 15-20% floor and 15-25% ceiling.
    - Construct clean 1-click live search links using clean Brand and Model (stripping condition and redundant terms):
      - eBay: `https://www.ebay.it/sch/i.html?_nkw=[Clean+Query]`
      - Vinted: `https://www.vinted.it/catalog?search_text=[Clean+Query]`
@@ -57,4 +55,4 @@ Activate this skill when:
 | **Market Search Links** | [eBay Live Search](https://www.ebay.it/sch/i.html?_nkw=[Encoded+Query]) \| [Vinted Live Search](https://www.vinted.it/catalog?search_text=[Encoded+Query]) \| [Subito Live Search](https://www.subito.it/annunci-italia/vendita/usato/?q=[Encoded+Query]) |
 | **Price** | EUR [Recommended Price] (Floor: EUR [Floor Price], Ceiling: EUR [Ceiling Price]) |
 | **Description** | - [Brand] [Style] [Core specs]<br>- Composition: [Materials]<br>- Size: [Labeled size and fit]<br>- Condition: [Actual state]<br>- Details: [Provenance or notable features]<br>- Flaws: [Disclosed flaws, or 'None'] |
-| **Hashtags** | [8-10 targeted hashtags: #brand #model #spec #category ...] |
+| **Hashtags** | [10-15 targeted English hashtags (always in English regardless of listing language): #brand #model #spec #category ...] |

@@ -17,7 +17,7 @@
   ],
   "projection_state": {
     "status": "completed",
-    "canonical_digest": "b0a2dbeb02511f58",
+    "canonical_digest": "4f2d7e49e4172799",
     "last_successful_projection": {
       "framework_version": "0.5.0",
       "enabled_platforms": [
@@ -110,15 +110,15 @@
   "managed_files": {
     ".agents/rules/framework-core.md": {
       "ownership": "framework_managed",
-      "source": ".agents/rules/framework-core.md",
-      "sha256": "90cc57b0e8421c2ffe587e0808483c86e339a953ed83db8903824d06dead5491",
+      "source": "adapters/antigravity/rules/framework-core.md",
+      "sha256": "d25f9f3f74324430ae57ce998989345daaf629f0f417849d1878616321979ce0",
       "platforms": [
         "antigravity"
       ]
     },
     ".agents/skills.json": {
       "ownership": "framework_managed",
-      "source": ".agents/skills.json",
+      "source": "adapters/antigravity/skills.json",
       "sha256": "2f9471e01ffd7af746412d11494e0930a4d0ca96bd7d573214e645260fea3a31",
       "platforms": [
         "antigravity"
@@ -887,7 +887,7 @@
     ".agents/skills/graphify/SKILL.md": {
       "ownership": "platform_projected_skill",
       "source": ".agents/skills/graphify/SKILL.md",
-      "sha256": "d84421627238898e4686a07858807b4ad2e09e131500c65b383c361e3add015d",
+      "sha256": "7ab263236a9eeb9a6c9322fb604b5ade0db2f55b32242b02ec33a46666d2b7d6",
       "platforms": [
         "antigravity",
         "gemini-cli"
@@ -1616,7 +1616,7 @@
     },
     ".aief/adapters/antigravity/hooks.json": {
       "ownership": "framework_managed",
-      "source": ".aief/adapters/antigravity/hooks.json",
+      "source": "adapters/antigravity/hooks.json",
       "sha256": "0ae8f5c9b9bc02f16439a55237d65cd6de4b83b7c080f5c67843fa2b78995125",
       "platforms": [
         "antigravity"
@@ -1833,7 +1833,7 @@
     ".aief/scripts/compose.py": {
       "ownership": "framework_managed",
       "source": "scripts/compose.py",
-      "sha256": "184f896d78f18b9ff9abf4d76700ba225994a7a311bbda30aa5ca51bdcd48ada",
+      "sha256": "e1ea7f24cf5830302dc40b5749dfc2da893a39ac99f81d8dd8c62dff8e797cbd",
       "platforms": [
         "core"
       ]
@@ -1865,7 +1865,7 @@
     ".aief/scripts/validate.py": {
       "ownership": "framework_managed",
       "source": "scripts/validate.py",
-      "sha256": "8eb9f783725fa3a6d8ed16cf8d615f234e5a15065e8c935d7e032846ab27b341",
+      "sha256": "d9c90f2076281b27abf1d1501a7d600597c843a6de4315269915c5466c1dadad",
       "platforms": [
         "core"
       ]
@@ -1896,8 +1896,8 @@
     },
     ".aief/skills/registry.json": {
       "ownership": "framework_managed",
-      "source": ".aief/skills/registry.json",
-      "sha256": "e46fad4679fffdf8f2ed6206b69a33e92fbb03cf0bba0a073c18463f24f59f7a",
+      "source": "skills/registry.json",
+      "sha256": "bc32ca6ca915df99ff44386e2842096e14df25410dedb87188a1f6ba2ab3f30d",
       "platforms": [
         "core"
       ]
@@ -2024,15 +2024,15 @@
     },
     ".gemini/commands/workflow.toml": {
       "ownership": "framework_managed",
-      "source": ".gemini/commands/workflow.toml",
-      "sha256": "778cd4a0ecc05de5607166beadf8b8a0c58c5a19b225fe2cf6bbcbff6638f88f",
+      "source": "adapters/gemini-cli/commands/workflow.toml",
+      "sha256": "f2f034364873bec6f4202953def50102782338ad2d557dc31372149e12f5eff8",
       "platforms": [
         "gemini-cli"
       ]
     },
     ".gemini/settings.json": {
       "ownership": "framework_managed",
-      "source": ".gemini/settings.json",
+      "source": "adapters/gemini-cli/settings.json",
       "sha256": "fde68351988a5ed25c8220d41839de3c814f142bbf416757e8f59c31873d09ba",
       "platforms": [
         "gemini-cli"
@@ -2041,7 +2041,7 @@
     "AGENTS.md": {
       "ownership": "framework_managed",
       "source": "AGENTS.md",
-      "sha256": "2e8f9e410f6199071a1dcfe9e133b951e4a02257a563903011bd0eefb6308c01",
+      "sha256": "6d24e618e074aa7db1d9d58ec445a73491a5dc3127ecfcf5c3b82f8574ab7bea",
       "platforms": [
         "antigravity",
         "gemini-cli"
@@ -2050,7 +2050,7 @@
     "GEMINI.md": {
       "ownership": "framework_managed",
       "source": "GEMINI.md",
-      "sha256": "4260c5046bfa17d9a91065e7ba891a0b812718595459c1993848eb2a84cf982e",
+      "sha256": "28308a4027f696449e15dd3fb7e208da46c3e2d9a70c04e1a6a15d43eba6c908",
       "platforms": [
         "antigravity",
         "gemini-cli"

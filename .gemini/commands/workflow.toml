@@ -1,4 +1,4 @@
-# AUTO-GENERATED CONSUMER ADAPTER | Canonical Digest: b0a2dbeb02511f58
+# AUTO-GENERATED CONSUMER ADAPTER | Canonical Digest: 4f2d7e49e4172799
 description = "Execute active AI Engineering Framework workflow stage"
 prompt = """
 Read AGENTS.md, follow active .aief/workflows/ stage runbooks, and check .aief/state/manifest.json (handoffs disabled: False).

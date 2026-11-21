@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED CONSUMER ADAPTER | Canonical Digest: b0a2dbeb02511f58 -->
+<!-- AUTO-GENERATED CONSUMER ADAPTER | Canonical Digest: 4f2d7e49e4172799 -->
 # AI Engineering Framework — Universal Agent Instructions (`AGENTS.md`)
 
 This repository is governed by the **AI Engineering Framework** and project-specific rules.
@@ -6,12 +6,13 @@ Follow these active instructions automatically without requiring per-turn file r
 
 ## 1. Active Engineering Rules & Gates
 - **Workflow Profile:** `standard`
-- **Spec First ([`.aief/core/rules/engineering-principles.md`](./.aief/core/rules/engineering-principles.md)):** Clarify edge cases and lock testable acceptance criteria before production code.
-- **TDD Discipline:** Write failing tests first (Red -> Green -> Refactor) before implementation.
-- **Graphify First:** Query `graphify-out/graph.json` (`graphify query`) before broad directory greps; if missing on repos with >=15 files, run `graphify .` or report to the user if `graphify` CLI is not installed.
+- **Spec First ([`.aief/core/rules/engineering-principles.md`](./.aief/core/rules/engineering-principles.md)):** Clarify edge cases (`Gate-01a`) and lock testable acceptance criteria before production code.
+- **TDD & Skill Read-Through:** Read `SKILL.md` for `tdd-cycle` and active domain skills before editing; write failing tests first (use built-in `node --test` or Python `unittest` if a package lacks a test runner).
+- **Graphify First:** Query `graphify-out/graph.json` (`graphify query`) before broad directory greps; if `graphify` CLI fails in sandbox or is missing, read `graphify-out/GRAPH_REPORT.md` / JSON directly without blocking.
+- **CLI Token Optimization (`rtk-cli`):** When `rtk` is available, prefix repetitive `git`, `npm`, `test`, and directory commands with `rtk`.
 - **Filesystem Handoffs ([`.aief/core/rules/context-handoff-protocol.md`](./.aief/core/rules/context-handoff-protocol.md)):** Persist phase artifacts under `docs/` and handoff JSON under `.aief/state/handoffs/`.
 - **Independent Code Review:** Evaluate git diff against specs and quality rubrics before release.
-- **Subagent-First Delegation (`Category B/C`):** Spawn fresh specialist subagents from Section 3 (design/DB-BigData/BE/FE/AI/DevOps/QA/review/security) with disjoint `target_files` rather than executing every phase in one bloated context.
+- **Subagent-First Delegation (`>=2` source files or feature/refactor):** Delegate specialist layers (`ui-ux-designer`, `data-engineer`, `backend-engineer`, `frontend-engineer`, `ai-engineer`, `devops-release-engineer`, `implementation-engineer`) via `invoke_subagent`/`define_subagent` (`TypeName="self"` loading `.aief/agents/<role>.md`) or `.claude/agents/` / `.github/agents/` with disjoint `target_files`; always run `code-reviewer` (+ `qa-engineer` for UI/behavior changes) in a fresh independent subagent.
 - **Active Approval Gates ([`.aief/core/rules/human-approval-gates.md`](./.aief/core/rules/human-approval-gates.md)):** `Gate-01a`, `Gate-01b`, `Gate-02`, `Gate-03`, `Gate-Sec`, `Gate-04`, `Gate-05`.
 - **Security Guardrails ([`.aief/core/rules/security-guardrails.md`](./.aief/core/rules/security-guardrails.md)):** Never commit or echo secrets/tokens/keys; run `python .aief/scripts/validate.py --mode consumer` before finishing.
 - **Self-Maintained Customizations:** Whenever you or the user modify `.aief/custom/` or `.aief/config.json`, automatically run `python .aief/scripts/compose.py` (which re-composes and validates consumer integrity in one step).

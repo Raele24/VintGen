@@ -19,7 +19,7 @@ security_scope: "workspace-write"
 - **Category / Tier:** `codebase-intelligence` / `core` (Priority: `P0`)
 - **Activation Conditions:** Workflow Phases `[1, 4, 5, 10, 14]` (Progressive disclosure: loads on demand when relevant).
 - **Security Scope:** `workspace-write`
-- **Adaptation Note:** Added Minimum Corpus Threshold Guard (skip graph build on repositories with <15 files and <2,000 LOC) and integrated Phase 1/4/5/10/14 triggers. Original preserved in UPSTREAM_SKILL.md.
+- **Adaptation Note:** Added Minimum Corpus Threshold Guard (skip graph build on repositories with <15 files and <2,000 LOC), sandbox fallback (if `graphify.exe`/CLI fails under Windows or sandbox ACL restrictions, fall back cleanly to reading `graphify-out/GRAPH_REPORT.md` / `graphify-out/graph.json` without blocking), and integrated Phase 1/4/5/10/14 triggers. Original preserved in UPSTREAM_SKILL.md.
 
 ---
 

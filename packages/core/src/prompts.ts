@@ -56,7 +56,7 @@ export function buildListingUserPrompt(
     `TARGET OUTPUT LANGUAGE: ${targetLangName.toUpperCase()}\n` +
       `MANDATORY: You MUST generate all text fields (description bullets, title, flaws, condition notes, category, and price reasoning) entirely in ${targetLangName}, EXCEPT 'hashtags' which MUST ALWAYS be in English. Do NOT output English for those text fields if the target language is ${targetLangName}.\n` +
       `HASHTAGS REQUIREMENT: You MUST generate 10 to 15 relevant search hashtags in the 'hashtags' array strictly in English regardless of the target output language (brand, model line, technical specs, category, and community tags). Never provide only 1 or 2 tags.\n` +
-      `PRICE VALUATION REQUIREMENT: Accurately detect specifications, capacity (GB/TB), interface, and model tier from photos. Benchmark prices realistically to active European secondary marketplace levels (e.g. 1TB NVMe PCIe 4.0 SSDs trade around EUR 60-80 used, 2TB around EUR 120-150). Do NOT assign generic EUR 15-30 lowball defaults to electronics.`
+      `PRICE VALUATION REQUIREMENT: Identify exact brand, model tier, capacity/size, generation, condition, and original packaging from photos and notes. Estimate a realistic European secondhand asking price with healthy negotiation margin based on active market demand—never fall back to generic lowball defaults.`
   );
 
   if (options?.rawJsonNotice) {
@@ -99,28 +99,18 @@ Strict Rules:
    - 'satisfactory': Noticeable flaws, cosmetic defects, or wear (fully detailed in description).
 
 4. **Marketplace Price Estimation (EUR) - REALISTIC MARKET ASKING STRATEGY**:
-   - You MUST determine a realistic, premium asking price representing what active sellers successfully list for on European secondary platforms (eBay, Subito, Vinted, Wallapop).
-   - NEVER adopt a buyer-negotiator, yard-sale, or wholesale liquidation perspective. Secondhand marketplace sellers list with healthy asking margins, NOT bottom-dollar bargain clearance prices.
-   - MANDATORY HARDWARE & ELECTRONICS ASKING PRICE BENCHMARKS:
-     * Memory / RAM Kits:
-       - 16GB (2x8GB) DDR4: Listing asking price €45 - €60 (Floor: €38, Ceiling: €70). Brand new sealed in box: €65 - €85.
-       - 32GB (2x16GB) DDR4 (Corsair Vengeance LPX, G.Skill Trident, Kingston Fury): Listing asking price €115 - €145 (Floor: €98, Ceiling: €165). Brand new sealed in box: €140 - €185.
-       - 32GB (2x16GB) DDR5: Listing asking price €125 - €160 (Floor: €110, Ceiling: €185). Brand new sealed in box: €155 - €210.
-       - 64GB (2x32GB) DDR4/DDR5: Listing asking price €190 - €260 (Floor: €165, Ceiling: €300).
-     * Storage (SSDs & NVMe M.2):
-       - 500GB SATA / NVMe (including M.2 SATA replacement drives for laptops): Listing asking price €42 - €55 (Floor: €35, Ceiling: €65). Brand new in box: €55 - €70.
-       - 1TB (1000GB) NVMe / SATA: Listing asking price €70 - €95 (Floor: €60, Ceiling: €110). Brand new in box: €95 - €130.
-       - 2TB (2000GB) NVMe: Listing asking price €135 - €180 (Floor: €118, Ceiling: €210). Brand new in box: €175 - €240.
-       - 4TB NVMe: Listing asking price €260 - €340 (Floor: €230, Ceiling: €390).
-     * Graphics Cards (GPUs) & Processors (CPUs):
-       - Always evaluate at prevailing secondary asking prices, preserving model generation tier, VRAM, and brand tier.
-   - FASHION, STREETWEAR, VINTAGE & LUXURY:
-     - Differentiate fast fashion (€15 - €30) from coveted heritage workwear (Carhartt Detroit, Barbour, Levi's Made in USA: €90 - €250) and designer/luxury fashion with appropriate negotiation buffers.
+   - You MUST determine a realistic asking price representing what active sellers list for on European secondary platforms (eBay, Subito, Vinted, Wallapop).
+   - NEVER adopt a buyer-negotiator, yard-sale, or wholesale liquidation perspective. Secondhand marketplace sellers list with healthy asking margins, NOT bottom-dollar clearance prices.
+   - Evaluate dynamically based on:
+     * Brand tier, exact model/generation, and current secondary market demand.
+     * Technical specifications, capacity, size, or material quality detected from photos and notes.
+     * Item condition, visible wear, and completeness (original box, tags, accessories, manuals).
+     * Never assign generic lowball defaults to electronics, branded vintage, or specialized gear.
    - THREE-TIER CORRIDOR:
      * suggested: Strategic recommended listing asking price in EUR.
      * min: 15-20% below suggested (practical walkaway floor for counter-offers).
      * max: 15-25% above suggested (ceiling for patient sellers, pristine condition, or sealed packaging).
-     * reasoning: Specific factual justification citing specs, model tier, and active asking price market logic.
+     * reasoning: Specific factual justification citing detected specs, condition, completeness, and secondary market logic.
 
 5. **Language & Localization**:
    - You MUST generate all textual fields (title, description, price reasoning, category, fitNotes, flaws) in the requested Target Output Language, EXCEPT 'hashtags' which MUST ALWAYS be in English.

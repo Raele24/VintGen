@@ -438,13 +438,24 @@ HOST_GLOBAL_SKILL_LOCATIONS: Tuple[Tuple[str, str, str], ...] = (
 
 def inspect_host_global_skill_visibility(home_dir: Path | None = None) -> List[str]:
     """Read-only visibility report of host-global skill folders without inspecting/modifying contents."""
-    effective_home = home_dir if home_dir is not None else Path.home()
+    try:
+        effective_home = home_dir if home_dir is not None else Path.home()
+    except OSError as exc:
+        return [f"Host-global skill visibility check skipped (home unreachable in sandbox: {exc})."]
     info_msgs: List[str] = []
     observed_any = False
 
     for rel_sub, runtimes, label in HOST_GLOBAL_SKILL_LOCATIONS:
         candidate = effective_home / Path(rel_sub)
-        if candidate.exists() and candidate.is_dir():
+        try:
+            is_dir = candidate.exists() and candidate.is_dir()
+        except OSError as exc:
+            observed_any = True
+            info_msgs.append(
+                f"{label} check skipped (~/{rel_sub} blocked by sandbox/host permissions: {exc})."
+            )
+            continue
+        if is_dir:
             observed_any = True
             try:
                 dir_count = sum(1 for entry in candidate.iterdir() if entry.is_dir())

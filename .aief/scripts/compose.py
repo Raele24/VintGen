@@ -967,27 +967,37 @@ def _render_inline_rules_bullets(
     config_rel: str = ISOLATED_CONFIG_REL,
     state_rel: str = ISOLATED_STATE_REL,
     validate_cmd: str = "python .aief/scripts/validate.py --mode consumer",
+    active_skill_names: Set[str] | None = None,
 ) -> List[str]:
     disabled_mechs: Set[str] = disabled["mechanisms"]  # type: ignore[assignment]
     disabled_phases: Set[int] = disabled["phases"]  # type: ignore[assignment]
     disabled_gates: Set[str] = disabled["gates"]  # type: ignore[assignment]
     fw_link_base = f"{prefix_rel}/{fw_prefix.rstrip('/')}" if fw_prefix else prefix_rel
+    skills_set = active_skill_names or set()
 
     bullets = [f"- **Workflow Profile:** `{profile}`"]
     if 2 not in disabled_phases and 3 not in disabled_phases:
         bullets.append(
             f"- **Spec First ([`{fw_prefix}core/rules/engineering-principles.md`]({fw_link_base}/core/rules/engineering-principles.md)):** "
-            "Clarify edge cases and lock testable acceptance criteria before production code."
+            "Clarify edge cases (`Gate-01a`) and lock testable acceptance criteria before production code."
         )
     if "tdd" not in disabled_mechs and 9 not in disabled_phases:
-        bullets.append("- **TDD Discipline:** Write failing tests first (Red -> Green -> Refactor) before implementation.")
+        bullets.append(
+            "- **TDD & Skill Read-Through:** Read `SKILL.md` for `tdd-cycle` and active domain skills before editing; "
+            "write failing tests first (use built-in `node --test` or Python `unittest` if a package lacks a test runner)."
+        )
     else:
         bullets.append(f"- **TDD Requirement:** Disabled by `{config_rel}` (`disabled.mechanisms: tdd`).")
 
     if "graphify" not in disabled_mechs:
         bullets.append(
             "- **Graphify First:** Query `graphify-out/graph.json` (`graphify query`) before broad directory greps; "
-            "if missing on repos with >=15 files, run `graphify .` or report to the user if `graphify` CLI is not installed."
+            "if `graphify` CLI fails in sandbox or is missing, read `graphify-out/GRAPH_REPORT.md` / JSON directly without blocking."
+        )
+
+    if "rtk-cli" in skills_set:
+        bullets.append(
+            "- **CLI Token Optimization (`rtk-cli`):** When `rtk` is available, prefix repetitive `git`, `npm`, `test`, and directory commands with `rtk`."
         )
 
     if "handoffs" not in disabled_mechs:
@@ -1002,8 +1012,10 @@ def _render_inline_rules_bullets(
         bullets.append("- **Independent Code Review:** Evaluate git diff against specs and quality rubrics before release.")
 
     bullets.append(
-        "- **Subagent-First Delegation (`Category B/C`):** Spawn fresh specialist subagents from Section 3 "
-        "(design/DB-BigData/BE/FE/AI/DevOps/QA/review/security) with disjoint `target_files` rather than executing every phase in one bloated context."
+        "- **Subagent-First Delegation (`>=2` source files or feature/refactor):** Delegate specialist layers (`ui-ux-designer`, `data-engineer`, "
+        "`backend-engineer`, `frontend-engineer`, `ai-engineer`, `devops-release-engineer`, `implementation-engineer`) via `invoke_subagent`/`define_subagent` "
+        f"(`TypeName=\"self\"` loading `{fw_prefix}agents/<role>.md`) or `.claude/agents/` / `.github/agents/` with disjoint `target_files`; "
+        "always run `code-reviewer` (+ `qa-engineer` for UI/behavior changes) in a fresh independent subagent."
     )
 
     active_gates = _active_gates(disabled_gates)
@@ -1296,6 +1308,7 @@ def compose_consumer_artifacts(
             config_rel=config_rel,
             state_rel=state_rel,
             validate_cmd=validate_cmd,
+            active_skill_names=active_skill_names,
         )
     )
     agents_md_text = (

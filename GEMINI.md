@@ -1,4 +1,4 @@
-<!-- AUTO-GENERATED CONSUMER ADAPTER (AI Engineering Framework) | Canonical Digest: b0a2dbeb02511f58 -->
+<!-- AUTO-GENERATED CONSUMER ADAPTER (AI Engineering Framework) | Canonical Digest: 4f2d7e49e4172799 -->
 # Google Antigravity & Gemini CLI Instructions (`GEMINI.md`)
 
 Follow [`AGENTS.md`](./AGENTS.md) for all active framework rules, gates, stage runbooks, and project customizations.
